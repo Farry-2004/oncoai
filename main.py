@@ -88,6 +88,18 @@ def serve_patient_portal():
     return FileResponse("static/patient-portal.html")
 
 
+@app.get("/.well-known/assetlinks.json")
+def asset_links():
+    return [{
+        "relation": ["delegate_permission/common.handle_all_urls"],
+        "target": {
+            "namespace": "android_app",
+            "package_name": "com.oncoai.app",
+            "sha256_cert_fingerprints": []
+        }
+    }]
+
+
 @app.get("/api/health")
 def health_check():
     return {"status": "ok", "service": "OncoAI"}

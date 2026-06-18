@@ -1,0 +1,40 @@
+{
+  "packageId": "com.oncoai.app",
+  "host": "oncoai-6ukk.onrender.com",
+  "name": "OncoAI",
+  "launcherName": "OncoAI",
+  "display": "standalone",
+  "themeColor": "#0F4C5C",
+  "navigationColor": "#062A33",
+  "navigationColorDark": "#062A33",
+  "navigationDividerColor": "#00000000",
+  "navigationDividerColorDark": "#00000000",
+  "backgroundColor": "#0F4C5C",
+  "enableNotifications": true,
+  "startUrl": "/",
+  "iconUrl": "https://oncoai-6ukk.onrender.com/static/img/icon-512.png",
+  "maskableIconUrl": "https://oncoai-6ukk.onrender.com/static/img/icon-512.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "oncoai-keystore.jks",
+    "alias": "oncoai"
+  },
+  "appVersionName": "1.0.0",
+  "appVersionCode": 1,
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "shortName": "Dashboard",
+      "url": "/app",
+      "chosenIconUrl": "https://oncoai-6ukk.onrender.com/static/img/icon-192.png"
+    },
+    {
+      "name": "Patient Portal",
+      "shortName": "Portal",
+      "url": "/patient-portal",
+      "chosenIconUrl": "https://oncoai-6ukk.onrender.com/static/img/icon-192.png"
+    }
+  ],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://oncoai-6ukk.onrender.com/static/manifest.json"
+}
