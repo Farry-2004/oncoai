@@ -6,6 +6,10 @@
 <title>OncoAI — Intelligent Oncology & Tumor Board Platform</title>
 <meta name="description" content="OncoAI is an AI-powered oncology decision support platform for head and neck cancer care. Streamline tumor board workflows, coordinate multidisciplinary teams, and improve patient outcomes.">
 <link rel="icon" type="image/png" href="/static/img/logo.png">
+<link rel="manifest" href="/static/manifest.json">
+<meta name="theme-color" content="#0F4C5C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="apple-touch-icon" href="/static/img/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -956,6 +960,11 @@ document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
   initNodes();
   draw();
 })();
+
+// Register Service Worker for PWA
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/static/sw.js').then(() => console.log('SW registered'));
+}
 </script>
 </body>
 </html>

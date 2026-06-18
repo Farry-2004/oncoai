@@ -77,6 +77,12 @@ def serve_register():
     return FileResponse("static/register.html")
 
 
+@app.get("/static/sw.js")
+def serve_sw():
+    return FileResponse("static/sw.js", media_type="application/javascript",
+                       headers={"Service-Worker-Allowed": "/"})
+
+
 @app.get("/patient-portal")
 def serve_patient_portal():
     return FileResponse("static/patient-portal.html")

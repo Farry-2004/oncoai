@@ -1,0 +1,38 @@
+{
+  "name": "OncoAI — Oncology & Tumor Board Platform",
+  "short_name": "OncoAI",
+  "description": "AI-Powered Oncology Decision Support for Head & Neck Cancer Care",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0F4C5C",
+  "theme_color": "#0F4C5C",
+  "categories": ["medical", "health"],
+  "icons": [
+    {
+      "src": "/static/img/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/img/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "url": "/app",
+      "icons": [{"src": "/static/img/icon-192.png", "sizes": "192x192"}]
+    },
+    {
+      "name": "Patient Portal",
+      "url": "/patient-portal",
+      "icons": [{"src": "/static/img/icon-192.png", "sizes": "192x192"}]
+    }
+  ]
+}
