@@ -1,23 +1,19 @@
-# Render.com — Free hosting (https://render.com)
-# Connect your GitHub repo and Render auto-deploys
+# Render.com — Free hosting
+# 1. Go to https://render.com
+# 2. New > Web Service > Connect GitHub repo "Farry-2004/oncoai"
+# 3. It auto-detects this file and deploys
 
 services:
   - type: web
     name: oncoai
     runtime: python
+    plan: free
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn main:app -w 2 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:$PORT
+    startCommand: gunicorn main:app -w 2 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:$PORT --timeout 120
     envVars:
-      - key: DATABASE_URL
-        fromDatabase:
-          name: oncoai-db
-          property: connectionString
       - key: SECRET_KEY
         generateValue: true
       - key: PYTHON_VERSION
         value: 3.12.0
-
-databases:
-  - name: oncoai-db
-    plan: free
-    databaseName: oncoai
+      - key: DATABASE_URL
+        value: sqlite:///./oncoai.db

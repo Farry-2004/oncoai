@@ -1,8 +1,20 @@
 import uuid
+import json
 from datetime import datetime, timezone
-from sqlalchemy import Column, String, Text, DateTime, ForeignKey, Integer, Boolean, Float, JSON
+from sqlalchemy import Column, String, Text, DateTime, ForeignKey, Integer, Boolean, Float, JSON, TypeDecorator
 from sqlalchemy.orm import relationship
-from database import Base
+from database import Base, SQLALCHEMY_DATABASE_URL
+
+# SQLite doesn't support native JSON — use Text with serialization
+if SQLALCHEMY_DATABASE_URL.startswith("sqlite"):
+    class JSONType(TypeDecorator):
+        impl = Text
+        cache_ok = True
+        def process_bind_param(self, value, dialect):
+            return json.dumps(value) if value is not None else None
+        def process_result_value(self, value, dialect):
+            return json.loads(value) if value is not None else None
+    JSON = JSONType
 
 
 def generate_uuid():
