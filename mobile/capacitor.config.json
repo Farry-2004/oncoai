@@ -1,0 +1,32 @@
+{
+  "appId": "com.oncoai.app",
+  "appName": "OncoAI",
+  "webDir": "../static",
+  "server": {
+    "url": "https://oncoai-6ukk.onrender.com",
+    "cleartext": true
+  },
+  "android": {
+    "allowMixedContent": true,
+    "backgroundColor": "#0F4C5C",
+    "buildOptions": {
+      "keystorePath": "oncoai-keystore.jks",
+      "keystoreAlias": "oncoai"
+    }
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "backgroundColor": "#0F4C5C",
+      "showSpinner": true,
+      "spinnerColor": "#14FFEC"
+    },
+    "StatusBar": {
+      "style": "DARK",
+      "backgroundColor": "#0F4C5C"
+    },
+    "PushNotifications": {
+      "presentationOptions": ["badge", "sound", "alert"]
+    }
+  }
+}
