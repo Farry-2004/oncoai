@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OncoAI — Create Account</title>
+<link rel="icon" type="image/png" href="/static/img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.5.0/remixicon.min.css">
+<style>
+:root {
+  --primary: #0F4C5C;
+  --primary-dark: #0A3B48;
+  --secondary: #14FFEC;
+  --gray-50: #FAFAF9;
+  --gray-200: #E7E5E4;
+  --gray-400: #A8A29E;
+  --gray-500: #78716C;
+  --gray-700: #44403C;
+  --gray-800: #292524;
+  --gray-900: #1C1917;
+  --font: 'Inter', system-ui, sans-serif;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: var(--font);
+  min-height: 100vh;
+  display: flex;
+  background: var(--gray-50);
+  -webkit-font-smoothing: antialiased;
+}
+
+.auth-layout { display: flex; width: 100%; min-height: 100vh; }
+
+.auth-side {
+  width: 45%;
+  background:
+    radial-gradient(circle at 20% 80%, rgba(20,255,236,0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(167,139,250,0.05) 0%, transparent 50%),
+    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2314FFEC' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='1.5'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"),
+    linear-gradient(135deg, #0F4C5C 0%, #0A3B48 60%, #062A33 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 4rem;
+  position: relative;
+  overflow: hidden;
+}
+.auth-side::before {
+  content: '';
+  position: absolute;
+  top: -20%;
+  right: -15%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(20,255,236,0.08) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: authOrb 15s ease-in-out infinite;
+}
+@keyframes authOrb {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -20px) scale(1.1); }
+  66% { transform: translate(-20px, 15px) scale(0.95); }
+}
+.auth-side-content { position: relative; z-index: 1; }
+.auth-brand { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 2.5rem; }
+.auth-brand-logo {
+  width: 44px; height: 44px;
+  background: rgba(20,255,236,0.15);
+  border: 1px solid rgba(20,255,236,0.3);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--secondary); font-size: 1.3rem;
+}
+
+.auth-brand-full-logo {
+  max-width: 340px;
+  width: 100%;
+  height: auto;
+  margin-bottom: 1.5rem;
+}
+.auth-brand h1 { font-size: 1.5rem; font-weight: 700; color: white; letter-spacing: -0.02em; }
+.auth-brand h1 span { color: var(--secondary); }
+.auth-side h2 { font-size: 2rem; font-weight: 800; color: white; line-height: 1.2; margin-bottom: 1rem; }
+.auth-side p { font-size: 1rem; color: rgba(255,255,255,0.6); line-height: 1.7; max-width: 400px; }
+
+.auth-roles {
+  margin-top: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.auth-role-tag {
+  padding: 0.3rem 0.75rem;
+  background: rgba(20,255,236,0.08);
+  border: 1px solid rgba(20,255,236,0.15);
+  border-radius: 20px;
+  color: rgba(255,255,255,0.7);
+  font-size: 0.87rem;
+  font-weight: 500;
+}
+
+.auth-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 3rem;
+  overflow-y: auto;
+}
+
+.auth-card { width: 100%; max-width: 480px; }
+.auth-card h2 { font-size: 1.5rem; font-weight: 800; color: var(--gray-900); margin-bottom: 0.35rem; }
+.auth-card .subtitle { font-size: 0.95rem; color: var(--gray-500); margin-bottom: 1.75rem; }
+.auth-card .subtitle a { color: var(--primary); text-decoration: none; font-weight: 600; }
+.auth-card .subtitle a:hover { text-decoration: underline; }
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.form-group { margin-bottom: 1rem; }
+.form-group label { display: block; font-size: 0.9rem; font-weight: 600; color: var(--gray-700); margin-bottom: 0.35rem; }
+.form-group.full { grid-column: 1 / -1; }
+
+.input-wrapper { position: relative; }
+.input-wrapper i {
+  position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%);
+  color: var(--gray-400); font-size: 1rem;
+}
+.input-wrapper input, .input-wrapper select {
+  width: 100%;
+  padding: 0.65rem 0.85rem 0.65rem 2.5rem;
+  border: 1px solid var(--gray-200);
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-family: var(--font);
+  color: var(--gray-800);
+  background: white;
+  transition: all 0.2s;
+  -webkit-appearance: none;
+}
+.input-wrapper input:focus, .input-wrapper select:focus {
+  outline: none;
+  border-color: rgba(15,76,92,0.3);
+  box-shadow: 0 0 0 3px rgba(15,76,92,0.08);
+}
+
+.btn-auth {
+  width: 100%;
+  padding: 0.75rem;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+.btn-auth:hover { background: var(--primary-dark); }
+.btn-auth:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.error-msg {
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  color: #DC2626;
+  padding: 0.6rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  display: none;
+}
+
+.password-strength {
+  height: 3px;
+  background: var(--gray-200);
+  border-radius: 3px;
+  margin-top: 0.4rem;
+  overflow: hidden;
+}
+.password-strength-bar {
+  height: 100%;
+  border-radius: 3px;
+  transition: all 0.3s;
+  width: 0;
+}
+
+@media (max-width: 768px) {
+  .auth-side { display: none; }
+  .auth-main { padding: 1.5rem; }
+  .form-row { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="auth-layout">
+  <div class="auth-side">
+    <div class="auth-side-content">
+      <div class="auth-brand">
+        <img src="/static/img/logo-light.png" alt="OncoAI" class="auth-brand-full-logo">
+      </div>
+      <p>Register to collaborate with specialists, participate in tumor board meetings, and deliver coordinated cancer care.</p>
+      <div class="auth-roles">
+        <span class="auth-role-tag">Oncologist</span>
+        <span class="auth-role-tag">Surgeon</span>
+        <span class="auth-role-tag">Radiologist</span>
+        <span class="auth-role-tag">Pathologist</span>
+        <span class="auth-role-tag">Nurse</span>
+        <span class="auth-role-tag">TB Coordinator</span>
+        <span class="auth-role-tag">Nutritionist</span>
+        <span class="auth-role-tag">Dentist</span>
+        <span class="auth-role-tag">Social Worker</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="auth-main">
+    <div class="auth-card">
+      <h2>Create your account</h2>
+      <p class="subtitle">Already have an account? <a href="/login">Sign in</a></p>
+
+      <div class="error-msg" id="errorMsg"></div>
+
+      <form id="registerForm" onsubmit="handleRegister(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Full Name</label>
+            <div class="input-wrapper">
+              <i class="ri-user-line"></i>
+              <input type="text" id="fullName" placeholder="Dr. Jane Doe" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Specialty / Role</label>
+            <div class="input-wrapper">
+              <i class="ri-stethoscope-line"></i>
+              <select id="specialty" required>
+                <option value="">Select...</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Email</label>
+          <div class="input-wrapper">
+            <i class="ri-mail-line"></i>
+            <input type="email" id="email" placeholder="you@hospital.org" required autocomplete="email">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Phone (optional)</label>
+            <div class="input-wrapper">
+              <i class="ri-phone-line"></i>
+              <input type="tel" id="phone" placeholder="+255 712 345 678">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Institution (optional)</label>
+            <div class="input-wrapper">
+              <i class="ri-hospital-line"></i>
+              <input type="text" id="institution" placeholder="Hospital name">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Password</label>
+          <div class="input-wrapper">
+            <i class="ri-lock-line"></i>
+            <input type="password" id="password" placeholder="Min 6 characters" required minlength="6" oninput="checkStrength()">
+          </div>
+          <div class="password-strength"><div class="password-strength-bar" id="strengthBar"></div></div>
+        </div>
+
+        <div class="form-group">
+          <label>Confirm Password</label>
+          <div class="input-wrapper">
+            <i class="ri-lock-check-line"></i>
+            <input type="password" id="confirmPassword" placeholder="Re-enter password" required>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-auth" id="submitBtn">
+          <i class="ri-user-add-line"></i> Create Account
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+if (localStorage.getItem('oncoai_token')) {
+  window.location.href = '/app';
+}
+
+fetch('/api/auth/specialties').then(r => r.json()).then(specs => {
+  const sel = document.getElementById('specialty');
+  specs.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s;
+    opt.textContent = s;
+    sel.appendChild(opt);
+  });
+});
+
+function checkStrength() {
+  const pw = document.getElementById('password').value;
+  const bar = document.getElementById('strengthBar');
+  let score = 0;
+  if (pw.length >= 6) score++;
+  if (pw.length >= 10) score++;
+  if (/[A-Z]/.test(pw)) score++;
+  if (/[0-9]/.test(pw)) score++;
+  if (/[^A-Za-z0-9]/.test(pw)) score++;
+  const pct = Math.min(score / 5, 1) * 100;
+  const colors = ['#EF4444', '#F59E0B', '#F59E0B', '#22C55E', '#22C55E'];
+  bar.style.width = pct + '%';
+  bar.style.background = colors[Math.min(score, 4)] || '#EF4444';
+}
+
+async function handleRegister(e) {
+  e.preventDefault();
+  const btn = document.getElementById('submitBtn');
+  const errEl = document.getElementById('errorMsg');
+  errEl.style.display = 'none';
+
+  const pw = document.getElementById('password').value;
+  const cpw = document.getElementById('confirmPassword').value;
+  if (pw !== cpw) {
+    errEl.textContent = 'Passwords do not match';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ri-loader-4-line" style="animation:spin 1s linear infinite"></i> Creating account...';
+
+  try {
+    const res = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: document.getElementById('email').value,
+        password: pw,
+        full_name: document.getElementById('fullName').value,
+        specialty: document.getElementById('specialty').value,
+        phone: document.getElementById('phone').value || null,
+        institution: document.getElementById('institution').value || null,
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || 'Registration failed');
+
+    localStorage.setItem('oncoai_token', data.access_token);
+    localStorage.setItem('oncoai_user', JSON.stringify(data.user));
+    window.location.href = '/app';
+  } catch (err) {
+    errEl.textContent = err.message;
+    errEl.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="ri-user-add-line"></i> Create Account';
+  }
+}
+</script>
+<style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+</body>
+</html>

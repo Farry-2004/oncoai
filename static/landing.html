@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OncoAI — Intelligent Oncology & Tumor Board Platform</title>
+<meta name="description" content="OncoAI is an AI-powered oncology decision support platform for head and neck cancer care. Streamline tumor board workflows, coordinate multidisciplinary teams, and improve patient outcomes.">
+<link rel="icon" type="image/png" href="/static/img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.5.0/remixicon.min.css">
+<style>
+:root {
+  --primary: #0F4C5C;
+  --primary-dark: #0A3B48;
+  --secondary: #14FFEC;
+  --accent: #A78BFA;
+  --font: 'Inter', system-ui, sans-serif;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--font); color: #292524; line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+
+/* ─── NAVBAR ─── */
+.land-nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(255,255,255,0.85); backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  transition: all 0.3s;
+}
+.land-nav.scrolled { box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+.land-nav-inner {
+  max-width: 1200px; margin: 0 auto; padding: 0 2rem;
+  display: flex; align-items: center; justify-content: space-between; height: 64px;
+}
+.land-nav-logo { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; }
+.land-nav-logo img { height: 32px; }
+.land-nav-links { display: flex; align-items: center; gap: 2rem; }
+.land-nav-links a { color: #57534E; text-decoration: none; font-size: 0.95rem; font-weight: 500; transition: color 0.2s; }
+.land-nav-links a:hover { color: var(--primary); }
+.social-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,0.08); border-color: rgba(15,76,92,0.15); }
+.land-nav-cta { display: flex; gap: 0.75rem; align-items: center; }
+.btn-outline { padding: 0.5rem 1.25rem; border: 2px solid var(--primary); color: var(--primary); border-radius: 10px; font-weight: 600; font-size: 0.9rem; text-decoration: none; transition: all 0.2s; font-family: var(--font); cursor: pointer; background: transparent; }
+.btn-outline:hover { background: var(--primary); color: white; }
+.btn-solid { padding: 0.55rem 1.25rem; background: var(--primary); color: white; border: none; border-radius: 10px; font-weight: 600; font-size: 0.9rem; text-decoration: none; transition: all 0.2s; font-family: var(--font); cursor: pointer; }
+.btn-solid:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(15,76,92,0.3); }
+
+/* ─── HERO ─── */
+.hero {
+  min-height: 100vh; display: flex; align-items: center; position: relative; overflow: hidden;
+  background: linear-gradient(160deg, #021a22 0%, #062A33 30%, var(--primary-dark) 60%, var(--primary) 100%);
+}
+#neuralCanvas { position: absolute; inset: 0; z-index: 0; }
+.hero::before {
+  content: ''; position: absolute; inset: 0; z-index: 1;
+  background:
+    radial-gradient(ellipse at 15% 25%, rgba(20,255,236,0.12) 0%, transparent 45%),
+    radial-gradient(ellipse at 85% 75%, rgba(167,139,250,0.08) 0%, transparent 45%),
+    radial-gradient(ellipse at 50% 50%, rgba(20,255,236,0.04) 0%, transparent 70%);
+}
+.hero::after {
+  content: ''; position: absolute; inset: 0; z-index: 1;
+  background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%2314FFEC' stroke-opacity='0.04' stroke-width='0.5'%3E%3Cpath d='M20 20L80 20M80 20L80 80M80 80L20 80M20 80L20 20'/%3E%3Ccircle cx='20' cy='20' r='2' fill='%2314FFEC' fill-opacity='0.06'/%3E%3Ccircle cx='80' cy='20' r='2' fill='%2314FFEC' fill-opacity='0.06'/%3E%3Ccircle cx='80' cy='80' r='2' fill='%2314FFEC' fill-opacity='0.06'/%3E%3Ccircle cx='20' cy='80' r='2' fill='%2314FFEC' fill-opacity='0.06'/%3E%3Ccircle cx='50' cy='50' r='1.5' fill='%2314FFEC' fill-opacity='0.05'/%3E%3Cpath d='M20 20L50 50M80 20L50 50M80 80L50 50M20 80L50 50'/%3E%3C/g%3E%3C/svg%3E");
+  animation: gridDrift 30s linear infinite;
+}
+@keyframes gridDrift { from { background-position: 0 0; } to { background-position: 100px 100px; } }
+.hero-glow-orb {
+  position: absolute; border-radius: 50%; filter: blur(80px); z-index: 0; opacity: 0.4;
+}
+@keyframes orbFloat1 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(40px,-30px) scale(1.15); } }
+@keyframes orbFloat2 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-50px,40px) scale(1.1); } }
+@keyframes orbFloat3 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(30px,30px) scale(0.9); } }
+@keyframes pulseRing { 0% { transform: scale(1); opacity: 0.6; } 100% { transform: scale(2.5); opacity: 0; } }
+.hero-pulse-ring {
+  position: absolute; width: 200px; height: 200px; border: 1px solid rgba(20,255,236,0.15);
+  border-radius: 50%; z-index: 0;
+}
+
+/* AI Overview Section */
+.ai-overview { background: #FAFAF9; position: relative; overflow: hidden; }
+.ai-overview::before {
+  content: ''; position: absolute; inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%230F4C5C' fill-opacity='0.02'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/svg%3E");
+}
+.ai-brain-visual {
+  position: relative; width: 100%; max-width: 500px; margin: 0 auto;
+}
+.ai-node {
+  position: absolute; width: 48px; height: 48px; border-radius: 14px;
+  display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08); z-index: 2;
+  animation: nodeFloat 4s ease-in-out infinite;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.ai-node:hover { transform: scale(1.15) !important; box-shadow: 0 8px 30px rgba(15,76,92,0.2); }
+@keyframes nodeFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+.ai-center-brain {
+  width: 90px; height: 90px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.2rem; color: var(--secondary);
+  box-shadow: 0 0 40px rgba(20,255,236,0.2), 0 8px 30px rgba(15,76,92,0.3);
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); z-index: 3;
+  animation: brainPulse 3s ease-in-out infinite;
+}
+@keyframes brainPulse { 0%,100% { box-shadow: 0 0 40px rgba(20,255,236,0.2), 0 8px 30px rgba(15,76,92,0.3); } 50% { box-shadow: 0 0 60px rgba(20,255,236,0.35), 0 8px 30px rgba(15,76,92,0.3); } }
+.ai-connect-line {
+  position: absolute; z-index: 1; opacity: 0.3;
+}
+.hero-inner { max-width: 1200px; margin: 0 auto; padding: 8rem 2rem 6rem; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; position: relative; z-index: 1; }
+.hero-text h1 { font-size: 3.5rem; font-weight: 900; color: white; line-height: 1.1; letter-spacing: -0.03em; margin-bottom: 1.25rem; }
+.hero-text h1 span { color: var(--secondary); }
+.hero-text .hero-sub { font-size: 1.15rem; color: rgba(255,255,255,0.7); line-height: 1.7; margin-bottom: 2rem; max-width: 520px; }
+.hero-buttons { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
+.hero-btn-primary { padding: 0.85rem 2rem; background: var(--secondary); color: var(--primary-dark); border: none; border-radius: 12px; font-size: 1.05rem; font-weight: 700; cursor: pointer; transition: all 0.3s; font-family: var(--font); text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; }
+.hero-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(20,255,236,0.3); }
+.hero-btn-secondary { padding: 0.85rem 2rem; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; font-size: 1.05rem; font-weight: 600; cursor: pointer; transition: all 0.3s; font-family: var(--font); text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; }
+.hero-btn-secondary:hover { background: rgba(255,255,255,0.15); }
+.hero-stats { display: flex; gap: 3rem; }
+.hero-stat-item { display: flex; flex-direction: column; }
+.hero-stat-num { font-size: 2rem; font-weight: 900; color: var(--secondary); line-height: 1; }
+.hero-stat-label { font-size: 0.85rem; color: rgba(255,255,255,0.5); font-weight: 500; margin-top: 0.25rem; }
+.hero-visual { display: flex; justify-content: center; align-items: center; }
+.hero-visual img { max-width: 100%; border-radius: 20px; box-shadow: 0 30px 80px rgba(0,0,0,0.3); }
+.hero-card-mock {
+  width: 100%; max-width: 480px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px; padding: 2rem; backdrop-filter: blur(12px);
+}
+.hero-card-mock h3 { color: white; font-size: 1.1rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+.mock-row { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+.mock-row:last-child { border: none; }
+.mock-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.mock-text { font-size: 0.9rem; color: rgba(255,255,255,0.7); }
+.mock-badge { padding: 0.15rem 0.5rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+
+/* ─── SECTIONS ─── */
+section { padding: 6rem 2rem; }
+.section-inner { max-width: 1200px; margin: 0 auto; }
+.section-label { font-size: 0.85rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
+.section-title { font-size: 2.5rem; font-weight: 900; color: #1C1917; letter-spacing: -0.03em; line-height: 1.2; margin-bottom: 1rem; }
+.section-desc { font-size: 1.1rem; color: #78716C; max-width: 600px; line-height: 1.7; margin-bottom: 3rem; }
+
+/* ─── PROBLEM ─── */
+.problem-section { background: #FAFAF9; }
+.problem-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.problem-card {
+  background: white; border-radius: 16px; padding: 2rem; border: 1px solid #E7E5E4;
+  transition: all 0.3s;
+}
+.problem-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,0.06); }
+.problem-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 1rem; }
+.problem-card h3 { font-size: 1.15rem; font-weight: 700; color: #1C1917; margin-bottom: 0.5rem; }
+.problem-card p { font-size: 0.95rem; color: #78716C; line-height: 1.6; }
+
+/* ─── FEATURES ─── */
+.features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.feature-card {
+  background: white; border-radius: 16px; padding: 2rem; border: 1px solid #E7E5E4;
+  transition: all 0.3s; position: relative; overflow: hidden;
+}
+.feature-card:hover { border-color: rgba(15,76,92,0.2); box-shadow: 0 8px 25px rgba(15,76,92,0.08); }
+.feature-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--primary), var(--secondary)); opacity: 0; transition: opacity 0.3s; }
+.feature-card:hover::before { opacity: 1; }
+.feature-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin-bottom: 1rem; }
+.feature-card h3 { font-size: 1.1rem; font-weight: 700; color: #1C1917; margin-bottom: 0.5rem; }
+.feature-card p { font-size: 0.92rem; color: #78716C; line-height: 1.6; }
+
+/* ─── WORKFLOW ─── */
+.workflow-section { background: linear-gradient(160deg, #062A33, var(--primary-dark), var(--primary)); color: white; position: relative; overflow: hidden; }
+.workflow-section::before { content: ''; position: absolute; inset: 0; background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%2314FFEC' fill-opacity='0.03'%3E%3Ccircle cx='30' cy='30' r='1.5'/%3E%3C/g%3E%3C/svg%3E"); }
+.workflow-section .section-inner { position: relative; z-index: 1; }
+.workflow-section .section-title { color: white; }
+.workflow-section .section-desc { color: rgba(255,255,255,0.6); }
+.workflow-steps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; }
+.workflow-step {
+  text-align: center; padding: 1.5rem 1rem;
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px; transition: all 0.3s;
+}
+.workflow-step:hover { background: rgba(255,255,255,0.1); transform: translateY(-4px); }
+.workflow-num { font-size: 2rem; font-weight: 900; color: var(--secondary); margin-bottom: 0.5rem; }
+.workflow-step h4 { font-size: 1rem; font-weight: 700; margin-bottom: 0.35rem; }
+.workflow-step p { font-size: 0.85rem; color: rgba(255,255,255,0.5); line-height: 1.5; }
+
+/* ─── ROLES ─── */
+.roles-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; }
+.role-card {
+  text-align: center; padding: 2rem 1.5rem; background: white; border: 1px solid #E7E5E4;
+  border-radius: 16px; transition: all 0.3s;
+}
+.role-card:hover { border-color: var(--primary); box-shadow: 0 8px 25px rgba(15,76,92,0.08); }
+.role-icon { width: 56px; height: 56px; border-radius: 16px; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+.role-card h4 { font-size: 1.05rem; font-weight: 700; color: #1C1917; margin-bottom: 0.35rem; }
+.role-card p { font-size: 0.88rem; color: #78716C; line-height: 1.5; }
+
+/* ─── CTA ─── */
+.cta-section { background: #FAFAF9; text-align: center; }
+.cta-box {
+  max-width: 700px; margin: 0 auto; padding: 3rem;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  border-radius: 24px; color: white; position: relative; overflow: hidden;
+}
+.cta-box::before { content: ''; position: absolute; top: -50%; right: -30%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(20,255,236,0.1) 0%, transparent 70%); border-radius: 50%; }
+.cta-box h2 { font-size: 2rem; font-weight: 900; margin-bottom: 0.75rem; position: relative; }
+.cta-box p { font-size: 1.05rem; color: rgba(255,255,255,0.7); margin-bottom: 2rem; position: relative; }
+.cta-buttons { display: flex; gap: 1rem; justify-content: center; position: relative; }
+
+/* ─── FOOTER ─── */
+.land-footer {
+  background: #1C1917; color: rgba(255,255,255,0.5); padding: 3rem 2rem 2rem; text-align: center;
+}
+.land-footer img { height: 28px; margin-bottom: 1rem; }
+.land-footer p { font-size: 0.9rem; margin-bottom: 0.25rem; }
+.land-footer a { color: var(--secondary); text-decoration: none; }
+
+/* ─── ANIMATIONS ─── */
+.fade-up { opacity: 0; transform: translateY(30px); transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+.fade-up.visible { opacity: 1; transform: translateY(0); }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 1024px) {
+  .hero-inner { grid-template-columns: 1fr; text-align: center; }
+  .hero-text h1 { font-size: 2.5rem; }
+  .hero-text .hero-sub { max-width: none; }
+  .hero-buttons { justify-content: center; }
+  .hero-stats { justify-content: center; }
+  .hero-visual { display: none; }
+  .features-grid, .problem-grid { grid-template-columns: 1fr 1fr; }
+  .workflow-steps { grid-template-columns: repeat(3, 1fr); }
+  .roles-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 768px) {
+  .hero-text h1 { font-size: 2rem; }
+  .section-title { font-size: 1.75rem; }
+  .features-grid, .problem-grid { grid-template-columns: 1fr; }
+  .workflow-steps { grid-template-columns: 1fr 1fr; }
+  .roles-grid { grid-template-columns: 1fr 1fr; }
+  .land-nav-links { display: none; }
+  .hero-stats { gap: 1.5rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="land-nav" id="landNav">
+  <div class="land-nav-inner">
+    <a href="/" class="land-nav-logo">
+      <img src="/static/img/logo.png" alt="OncoAI">
+    </a>
+    <div class="land-nav-links">
+      <a href="#ai-system">AI System</a>
+      <a href="#problem">Why OncoAI</a>
+      <a href="#features">Features</a>
+      <a href="#workflow">Workflow</a>
+      <a href="#roles">Who It's For</a>
+      <a href="#connect">Connect</a>
+    </div>
+    <div class="land-nav-cta">
+      <a href="/login" class="btn-outline">Log In</a>
+      <a href="/register" class="btn-solid">Get Started</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <canvas id="neuralCanvas"></canvas>
+  <div class="hero-glow-orb" style="width:400px;height:400px;background:rgba(20,255,236,0.08);top:10%;left:5%;animation:orbFloat1 12s ease-in-out infinite"></div>
+  <div class="hero-glow-orb" style="width:350px;height:350px;background:rgba(167,139,250,0.06);bottom:10%;right:10%;animation:orbFloat2 15s ease-in-out infinite"></div>
+  <div class="hero-glow-orb" style="width:250px;height:250px;background:rgba(59,130,246,0.05);top:50%;left:40%;animation:orbFloat3 18s ease-in-out infinite"></div>
+  <div class="hero-pulse-ring" style="top:20%;right:20%;animation:pulseRing 4s ease-out infinite"></div>
+  <div class="hero-pulse-ring" style="bottom:30%;left:15%;animation:pulseRing 5s ease-out infinite 1.5s"></div>
+  <div class="hero-inner">
+    <div class="hero-text">
+      <h1>AI-Powered<br><span>Oncology</span> Decision<br>Support Platform</h1>
+      <p class="hero-sub">OncoAI transforms head and neck cancer care by connecting surgeons, oncologists, pathologists, radiologists, and patients through intelligent tumor board coordination, AI-driven clinical intelligence, and seamless multidisciplinary collaboration.</p>
+      <div class="hero-buttons">
+        <a href="/register" class="hero-btn-primary"><i class="ri-rocket-line"></i> Start Using OncoAI</a>
+        <a href="#features" class="hero-btn-secondary"><i class="ri-play-circle-line"></i> See How It Works</a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat-item"><span class="hero-stat-num">9</span><span class="hero-stat-label">AI Agents</span></div>
+        <div class="hero-stat-item"><span class="hero-stat-num">70+</span><span class="hero-stat-label">Lab Tests</span></div>
+        <div class="hero-stat-item"><span class="hero-stat-num">22</span><span class="hero-stat-label">H&N Cancer Sites</span></div>
+        <div class="hero-stat-item"><span class="hero-stat-num">10</span><span class="hero-stat-label">Journey Steps</span></div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-card-mock">
+        <h3><i class="ri-dna-line" style="color:var(--secondary)"></i> Live Tumor Board</h3>
+        <div class="mock-row"><div class="mock-dot" style="background:#10B981"></div><span class="mock-text">Dr. Mwakalinga — Oncologist</span><span class="mock-badge" style="background:rgba(20,255,236,0.15);color:var(--secondary)">Present</span></div>
+        <div class="mock-row"><div class="mock-dot" style="background:#10B981"></div><span class="mock-text">Dr. Rashidi — Surgeon</span><span class="mock-badge" style="background:rgba(20,255,236,0.15);color:var(--secondary)">Present</span></div>
+        <div class="mock-row"><div class="mock-dot" style="background:#F59E0B"></div><span class="mock-text">Dr. Kamau — Radiologist</span><span class="mock-badge" style="background:rgba(245,158,11,0.15);color:#F59E0B">On-call</span></div>
+        <div class="mock-row"><div class="mock-dot" style="background:#3B82F6"></div><span class="mock-text">Patient: Mwamba, Rashidi</span><span class="mock-badge" style="background:rgba(59,130,246,0.15);color:#3B82F6">Dialed in</span></div>
+        <div style="margin-top:1rem;padding:0.75rem;background:rgba(20,255,236,0.08);border:1px solid rgba(20,255,236,0.15);border-radius:10px">
+          <div style="font-size:0.8rem;color:rgba(255,255,255,0.5);margin-bottom:0.25rem">AI Recommendation</div>
+          <div style="font-size:0.95rem;color:white">Concurrent chemoradiation — NCCN Category 1</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AI SYSTEM OVERVIEW -->
+<section class="ai-overview" id="ai-system" style="padding:6rem 2rem">
+  <div class="section-inner" style="position:relative;z-index:1">
+    <div style="text-align:center;margin-bottom:3rem">
+      <span class="section-label">How The AI Works</span>
+      <h2 class="section-title" style="margin:0 auto">9 AI Agents Working Together</h2>
+      <p class="section-desc" style="margin:0.75rem auto 0;max-width:700px">OncoAI uses a Stanford Medicine-style multi-agent orchestrator. Specialized AI agents analyze patient data simultaneously, communicate findings to each other, and produce a unified clinical intelligence report.</p>
+    </div>
+
+    <!-- Interactive AI Brain Diagram -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center">
+
+      <!-- 3D Draggable AI Brain -->
+      <div style="height:450px;display:flex;align-items:center;justify-content:center">
+        <canvas id="brain3D" width="500" height="450" style="cursor:grab;border-radius:20px;max-width:100%"></canvas>
+      </div>
+
+      <!-- AI Description -->
+      <div>
+        <h3 style="font-size:1.75rem;font-weight:800;color:#1C1917;margin-bottom:1.25rem;letter-spacing:-0.02em">Intelligent Agent Pipeline</h3>
+        <p style="font-size:1.05rem;color:#57534E;line-height:1.8;margin-bottom:1.5rem">Each patient case flows through a coordinated pipeline of specialized AI agents. The orchestrator analyzes the patient's data — cancer type, stage, lab results, imaging, pathology — and automatically selects which agents to invoke.</p>
+
+        <div style="display:flex;flex-direction:column;gap:0.75rem">
+          <div class="fade-up" style="display:flex;align-items:flex-start;gap:0.85rem;padding:0.85rem;background:white;border:1px solid #E7E5E4;border-radius:12px;transition:all 0.3s">
+            <div style="width:40px;height:40px;border-radius:10px;background:rgba(15,76,92,0.08);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0"><i class="ri-route-line"></i></div>
+            <div><strong style="font-size:0.95rem;color:#1C1917">Smart Routing</strong><p style="font-size:0.88rem;color:#78716C;margin-top:0.15rem">Automatically detects which agents are needed based on available patient data — no manual selection required.</p></div>
+          </div>
+          <div class="fade-up" style="display:flex;align-items:flex-start;gap:0.85rem;padding:0.85rem;background:white;border:1px solid #E7E5E4;border-radius:12px;transition:all 0.3s">
+            <div style="width:40px;height:40px;border-radius:10px;background:rgba(59,130,246,0.08);color:#3B82F6;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0"><i class="ri-chat-3-line"></i></div>
+            <div><strong style="font-size:0.95rem;color:#1C1917">Agent Communication</strong><p style="font-size:0.88rem;color:#78716C;margin-top:0.15rem">Agents share findings with each other — the patient profile informs the trial matcher, risk scores feed into the TB briefing.</p></div>
+          </div>
+          <div class="fade-up" style="display:flex;align-items:flex-start;gap:0.85rem;padding:0.85rem;background:white;border:1px solid #E7E5E4;border-radius:12px;transition:all 0.3s">
+            <div style="width:40px;height:40px;border-radius:10px;background:rgba(16,185,129,0.08);color:#10B981;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0"><i class="ri-shield-check-line"></i></div>
+            <div><strong style="font-size:0.95rem;color:#1C1917">Guideline Compliance</strong><p style="font-size:0.88rem;color:#78716C;margin-top:0.15rem">Every recommendation is validated against NCCN and WHO head & neck cancer guidelines before reaching the tumor board.</p></div>
+          </div>
+          <div class="fade-up" style="display:flex;align-items:flex-start;gap:0.85rem;padding:0.85rem;background:white;border:1px solid #E7E5E4;border-radius:12px;transition:all 0.3s">
+            <div style="width:40px;height:40px;border-radius:10px;background:rgba(239,68,68,0.08);color:#EF4444;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0"><i class="ri-alarm-warning-line"></i></div>
+            <div><strong style="font-size:0.95rem;color:#1C1917">Safety Alerts</strong><p style="font-size:0.88rem;color:#78716C;margin-top:0.15rem">Critical lab values, drug interactions, allergies, and care gaps are flagged in real-time — before they become emergencies.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section class="problem-section" id="problem">
+  <div class="section-inner">
+    <span class="section-label">The Challenge</span>
+    <h2 class="section-title">Why Head & Neck Cancer Care Needs Innovation</h2>
+    <p class="section-desc">At institutions like Muhimbili National Hospital and ORCI, cancer care faces systemic challenges that delay treatment and reduce outcomes.</p>
+    <div class="problem-grid">
+      <div class="problem-card fade-up">
+        <div class="problem-icon" style="background:rgba(239,68,68,0.1);color:#EF4444"><i class="ri-time-line"></i></div>
+        <h3>Late-Stage Presentation</h3>
+        <p>Most patients arrive with Stage III–IV disease due to delays in referral, diagnosis, and financial barriers to care.</p>
+      </div>
+      <div class="problem-card fade-up">
+        <div class="problem-icon" style="background:rgba(245,158,11,0.1);color:#F59E0B"><i class="ri-links-line"></i></div>
+        <h3>Fragmented Care Pathways</h3>
+        <p>Patient records are scattered across facilities. No centralized system tracks workup completion or tumor board readiness.</p>
+      </div>
+      <div class="problem-card fade-up">
+        <div class="problem-icon" style="background:rgba(139,92,246,0.1);color:#8B5CF6"><i class="ri-team-line"></i></div>
+        <h3>Limited Specialist Access</h3>
+        <p>Pathologists and radiologists are scarce. Multidisciplinary coordination is ad-hoc, with no structured discussion or follow-up.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-inner">
+    <span class="section-label">Platform Features</span>
+    <h2 class="section-title">Everything You Need for Cancer Care</h2>
+    <p class="section-desc">OncoAI combines clinical data management, AI intelligence, and team collaboration into one integrated platform.</p>
+    <div class="features-grid">
+      <div class="feature-card fade-up">
+        <div class="feature-icon" style="background:rgba(15,76,92,0.08);color:var(--primary)"><i class="ri-user-heart-line"></i></div>
+        <h3>Patient Tracking Database</h3>
+        <p>Centralized records with demographics, socioeconomic factors, insurance (NHIF), cancer staging, and full medical history.</p>
+      </div>
+      <div class="feature-card fade-up">
+        <div class="feature-icon" style="background:rgba(59,130,246,0.08);color:#3B82F6"><i class="ri-clipboard-line"></i></div>
+        <h3>Workup & Journey Tracker</h3>
+        <p>Visual 10-step patient journey from ENT arrival to treatment. Auto-detects progress from imaging, pathology, and lab records.</p>
+      </div>
+      <div class="feature-card fade-up">
+        <div class="feature-icon" style="background:rgba(139,92,246,0.08);color:#8B5CF6"><i class="ri-dna-line"></i></div>
+        <h3>Tumor Board Coordination</h3>
+        <p>Schedule meetings, video/voice calls via Jitsi, structured discussion checklists, treatment voting, attendance & CME tracking.</p>
+      </div>
+      <div class="feature-card fade-up">
+        <div class="feature-icon" style="background:rgba(16,185,129,0.08);color:#10B981"><i class="ri-robot-2-line"></i></div>
+        <h3>9-Agent AI Orchestrator</h3>
+        <p>Stanford Medicine-style agent pipeline: patient profiling, trial matching, literature search, risk assessment, guideline checking, TB briefing.</p>
+      </div>
+      <div class="feature-card fade-up">
+        <div class="feature-icon" style="background:rgba(245,158,11,0.08);color:#F59E0B"><i class="ri-microscope-line"></i></div>
+        <h3>Structured Pathology Reports</h3>
+        <p>22 H&N specimen sites, histological grading, TNM staging, margin status, LVI/PNI, HPV status, slide image uploads.</p>
+      </div>
+      <div class="feature-card fade-up">
+        <div class="feature-icon" style="background:rgba(239,68,68,0.08);color:#EF4444"><i class="ri-flask-line"></i></div>
+        <h3>70+ Lab Tests with Auto-Status</h3>
+        <p>Hematology, chemistry, liver/renal function, tumor markers, coagulation, thyroid, HIV/infectious — all with reference ranges and live validation.</p>
+      </div>
+      <div class="feature-card fade-up">
+        <div class="feature-icon" style="background:rgba(20,184,166,0.08);color:#14B8A6"><i class="ri-brain-line"></i></div>
+        <h3>Clinical AI Intelligence</h3>
+        <p>Safety alerts, care gap detection, pre-visit summaries, SOAP note generation, post-visit follow-up tasks — all auto-generated.</p>
+      </div>
+      <div class="feature-card fade-up">
+        <div class="feature-icon" style="background:rgba(37,211,102,0.08);color:#25D366"><i class="ri-whatsapp-line"></i></div>
+        <h3>WhatsApp Integration</h3>
+        <p>Send workup reminders, share referral documents, dial patients into TB meetings, and coordinate care teams via WhatsApp.</p>
+      </div>
+      <div class="feature-card fade-up">
+        <div class="feature-icon" style="background:rgba(236,72,153,0.08);color:#EC4899"><i class="ri-survey-line"></i></div>
+        <h3>Patient Preference Survey</h3>
+        <p>Collect concerns about travel, finances, risk tolerance, and radiation openness. Auto-categorize into A/B/C for TB discussion.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WORKFLOW -->
+<section class="workflow-section" id="workflow">
+  <div class="section-inner">
+    <span class="section-label" style="color:var(--secondary)">Patient Journey</span>
+    <h2 class="section-title">From Diagnosis to Treatment in 10 Steps</h2>
+    <p class="section-desc">OncoAI tracks every patient through the complete head & neck cancer care pathway.</p>
+    <div class="workflow-steps">
+      <div class="workflow-step fade-up"><div class="workflow-num">1</div><h4>ENT Arrival</h4><p>Patient registered, initial assessment</p></div>
+      <div class="workflow-step fade-up"><div class="workflow-num">2</div><h4>Evaluation</h4><p>Specialist consultation, cancer suspicion</p></div>
+      <div class="workflow-step fade-up"><div class="workflow-num">3</div><h4>Biopsy & CT</h4><p>Imaging and pathology ordered</p></div>
+      <div class="workflow-step fade-up"><div class="workflow-num">4</div><h4>Results</h4><p>Lab, pathology, imaging reviewed</p></div>
+      <div class="workflow-step fade-up"><div class="workflow-num">5</div><h4>Case Compiled</h4><p>Workup complete, TB ready</p></div>
+      <div class="workflow-step fade-up"><div class="workflow-num">6</div><h4>TB Scheduled</h4><p>Tumor board meeting set</p></div>
+      <div class="workflow-step fade-up"><div class="workflow-num">7</div><h4>TB Presented</h4><p>Case discussed, vote taken</p></div>
+      <div class="workflow-step fade-up"><div class="workflow-num">8</div><h4>Treatment Plan</h4><p>Recommendations finalized</p></div>
+      <div class="workflow-step fade-up"><div class="workflow-num">9</div><h4>Preparation</h4><p>Financial, travel, logistics</p></div>
+      <div class="workflow-step fade-up"><div class="workflow-num">10</div><h4>Treatment</h4><p>Active treatment begins</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ROLES -->
+<section id="roles">
+  <div class="section-inner">
+    <span class="section-label">Who It's For</span>
+    <h2 class="section-title">Built for the Entire Care Team</h2>
+    <p class="section-desc">Every specialist has a role in OncoAI — from the first clinical evaluation to treatment completion.</p>
+    <div class="roles-grid">
+      <div class="role-card fade-up">
+        <div class="role-icon" style="background:rgba(15,76,92,0.08);color:var(--primary)"><i class="ri-stethoscope-line"></i></div>
+        <h4>Oncologists</h4>
+        <p>Lead tumor boards, review AI recommendations, manage treatment plans</p>
+      </div>
+      <div class="role-card fade-up">
+        <div class="role-icon" style="background:rgba(239,68,68,0.08);color:#EF4444"><i class="ri-surgical-mask-line"></i></div>
+        <h4>Surgeons</h4>
+        <p>Review imaging, vote on surgical approach, document operative notes</p>
+      </div>
+      <div class="role-card fade-up">
+        <div class="role-icon" style="background:rgba(59,130,246,0.08);color:#3B82F6"><i class="ri-body-scan-line"></i></div>
+        <h4>Radiologists</h4>
+        <p>Upload imaging, pre-record findings, join TB meetings on-call</p>
+      </div>
+      <div class="role-card fade-up">
+        <div class="role-icon" style="background:rgba(245,158,11,0.08);color:#F59E0B"><i class="ri-microscope-line"></i></div>
+        <h4>Pathologists</h4>
+        <p>Submit structured reports with TNM staging, margins, HPV status</p>
+      </div>
+      <div class="role-card fade-up">
+        <div class="role-icon" style="background:rgba(16,185,129,0.08);color:#10B981"><i class="ri-nurse-line"></i></div>
+        <h4>Nurses</h4>
+        <p>Track patient workup, coordinate appointments, manage follow-ups</p>
+      </div>
+      <div class="role-card fade-up">
+        <div class="role-icon" style="background:rgba(139,92,246,0.08);color:#8B5CF6"><i class="ri-calendar-check-line"></i></div>
+        <h4>TB Coordinators</h4>
+        <p>Schedule meetings, track workup completion, check in with patients</p>
+      </div>
+      <div class="role-card fade-up">
+        <div class="role-icon" style="background:rgba(236,72,153,0.08);color:#EC4899"><i class="ri-heart-2-line"></i></div>
+        <h4>Social Workers</h4>
+        <p>Manage socioeconomic factors, financial assistance, support services</p>
+      </div>
+      <div class="role-card fade-up">
+        <div class="role-icon" style="background:rgba(20,184,166,0.08);color:#14B8A6"><i class="ri-user-heart-line"></i></div>
+        <h4>Patients & Families</h4>
+        <p>Access the Patient Portal to view journey, results, and connect with the care team</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONNECT -->
+<section id="connect" style="background:#FAFAF9">
+  <div class="section-inner">
+    <span class="section-label">Connect With Us</span>
+    <h2 class="section-title">Join the Global Oncology Community</h2>
+    <p class="section-desc">Follow OncoAI on social media, share your experience, and connect with cancer care specialists worldwide.</p>
+
+    <!-- Social Media Links -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem;margin-bottom:3rem">
+      <a href="https://twitter.com/intent/tweet?text=Transforming%20cancer%20care%20with%20AI.%20Check%20out%20OncoAI%20—%20intelligent%20oncology%20%26%20tumor%20board%20platform.&url=https://oncoai.health&hashtags=OncoAI,Oncology,AI,TumorBoard,CancerCare" target="_blank" class="social-card fade-up" style="text-decoration:none;background:white;border:1px solid #E7E5E4;border-radius:16px;padding:1.75rem;text-align:center;transition:all 0.3s;display:block">
+        <div style="width:56px;height:56px;border-radius:16px;background:rgba(29,155,240,0.08);color:#1DA1F2;display:flex;align-items:center;justify-content:center;font-size:1.6rem;margin:0 auto 1rem"><i class="ri-twitter-x-line"></i></div>
+        <h4 style="font-size:1.05rem;font-weight:700;color:#1C1917;margin-bottom:0.35rem">X (Twitter)</h4>
+        <p style="font-size:0.88rem;color:#78716C;line-height:1.5">Share cases, follow oncology updates, join the #OncoAI discussion</p>
+      </a>
+
+      <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://oncoai.health" target="_blank" class="social-card fade-up" style="text-decoration:none;background:white;border:1px solid #E7E5E4;border-radius:16px;padding:1.75rem;text-align:center;transition:all 0.3s;display:block">
+        <div style="width:56px;height:56px;border-radius:16px;background:rgba(10,102,194,0.08);color:#0A66C2;display:flex;align-items:center;justify-content:center;font-size:1.6rem;margin:0 auto 1rem"><i class="ri-linkedin-box-fill"></i></div>
+        <h4 style="font-size:1.05rem;font-weight:700;color:#1C1917;margin-bottom:0.35rem">LinkedIn</h4>
+        <p style="font-size:0.88rem;color:#78716C;line-height:1.5">Connect with oncology professionals, research teams, and health innovators</p>
+      </a>
+
+      <a href="https://www.facebook.com/sharer/sharer.php?u=https://oncoai.health" target="_blank" class="social-card fade-up" style="text-decoration:none;background:white;border:1px solid #E7E5E4;border-radius:16px;padding:1.75rem;text-align:center;transition:all 0.3s;display:block">
+        <div style="width:56px;height:56px;border-radius:16px;background:rgba(24,119,242,0.08);color:#1877F2;display:flex;align-items:center;justify-content:center;font-size:1.6rem;margin:0 auto 1rem"><i class="ri-facebook-circle-fill"></i></div>
+        <h4 style="font-size:1.05rem;font-weight:700;color:#1C1917;margin-bottom:0.35rem">Facebook</h4>
+        <p style="font-size:0.88rem;color:#78716C;line-height:1.5">Join our community page for cancer awareness and patient support stories</p>
+      </a>
+
+      <a href="https://wa.me/?text=Check%20out%20OncoAI%20—%20an%20AI-powered%20oncology%20platform%20for%20tumor%20board%20coordination%20and%20cancer%20care.%20https://oncoai.health" target="_blank" class="social-card fade-up" style="text-decoration:none;background:white;border:1px solid #E7E5E4;border-radius:16px;padding:1.75rem;text-align:center;transition:all 0.3s;display:block">
+        <div style="width:56px;height:56px;border-radius:16px;background:rgba(37,211,102,0.08);color:#25D366;display:flex;align-items:center;justify-content:center;font-size:1.6rem;margin:0 auto 1rem"><i class="ri-whatsapp-fill"></i></div>
+        <h4 style="font-size:1.05rem;font-weight:700;color:#1C1917;margin-bottom:0.35rem">WhatsApp</h4>
+        <p style="font-size:0.88rem;color:#78716C;line-height:1.5">Share OncoAI with colleagues and care teams across Africa and beyond</p>
+      </a>
+    </div>
+
+    <!-- More platforms row -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem;margin-bottom:3rem">
+      <a href="https://www.youtube.com/@OncoAI" target="_blank" class="social-card fade-up" style="text-decoration:none;background:white;border:1px solid #E7E5E4;border-radius:16px;padding:1.5rem;text-align:center;transition:all 0.3s;display:block">
+        <div style="width:48px;height:48px;border-radius:14px;background:rgba(255,0,0,0.08);color:#FF0000;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin:0 auto 0.75rem"><i class="ri-youtube-fill"></i></div>
+        <h4 style="font-size:1rem;font-weight:700;color:#1C1917;margin-bottom:0.25rem">YouTube</h4>
+        <p style="font-size:0.85rem;color:#78716C;line-height:1.5">Watch tumor board demos, training videos, and AI walkthroughs</p>
+      </a>
+
+      <a href="https://www.instagram.com/oncoai.health" target="_blank" class="social-card fade-up" style="text-decoration:none;background:white;border:1px solid #E7E5E4;border-radius:16px;padding:1.5rem;text-align:center;transition:all 0.3s;display:block">
+        <div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,rgba(131,58,180,0.1),rgba(253,29,29,0.08),rgba(252,176,69,0.08));color:#E4405F;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin:0 auto 0.75rem"><i class="ri-instagram-fill"></i></div>
+        <h4 style="font-size:1rem;font-weight:700;color:#1C1917;margin-bottom:0.25rem">Instagram</h4>
+        <p style="font-size:0.85rem;color:#78716C;line-height:1.5">Behind-the-scenes of AI oncology, team stories, and impact visuals</p>
+      </a>
+
+      <a href="https://t.me/oncoai" target="_blank" class="social-card fade-up" style="text-decoration:none;background:white;border:1px solid #E7E5E4;border-radius:16px;padding:1.5rem;text-align:center;transition:all 0.3s;display:block">
+        <div style="width:48px;height:48px;border-radius:14px;background:rgba(38,166,230,0.08);color:#26A5E4;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin:0 auto 0.75rem"><i class="ri-telegram-fill"></i></div>
+        <h4 style="font-size:1rem;font-weight:700;color:#1C1917;margin-bottom:0.25rem">Telegram</h4>
+        <p style="font-size:0.85rem;color:#78716C;line-height:1.5">Join the OncoAI channel for updates, tips, and community discussions</p>
+      </a>
+
+      <a href="mailto:contact@oncoai.health?subject=OncoAI%20Inquiry" class="social-card fade-up" style="text-decoration:none;background:white;border:1px solid #E7E5E4;border-radius:16px;padding:1.5rem;text-align:center;transition:all 0.3s;display:block">
+        <div style="width:48px;height:48px;border-radius:14px;background:rgba(15,76,92,0.08);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin:0 auto 0.75rem"><i class="ri-mail-send-line"></i></div>
+        <h4 style="font-size:1rem;font-weight:700;color:#1C1917;margin-bottom:0.25rem">Email</h4>
+        <p style="font-size:0.85rem;color:#78716C;line-height:1.5">Reach out for partnerships, research collaboration, or support</p>
+      </a>
+    </div>
+
+    <!-- Share Banner -->
+    <div class="fade-up" style="background:white;border:1px solid #E7E5E4;border-radius:16px;padding:2rem;display:flex;align-items:center;gap:2rem">
+      <div style="flex:1">
+        <h3 style="font-size:1.25rem;font-weight:800;color:#1C1917;margin-bottom:0.5rem">Spread the Word</h3>
+        <p style="font-size:0.95rem;color:#78716C;line-height:1.6">Help us reach more specialists and patients. Every share can mean earlier diagnosis and better treatment for someone with head & neck cancer.</p>
+      </div>
+      <div style="display:flex;gap:0.5rem;flex-shrink:0;flex-wrap:wrap">
+        <a href="https://twitter.com/intent/tweet?text=OncoAI%20is%20transforming%20cancer%20care%20with%20AI.%20Free%20tumor%20board%20platform%20for%20oncology%20teams.&url=https://oncoai.health&hashtags=OncoAI,CancerCare" target="_blank" style="width:40px;height:40px;border-radius:10px;background:#1DA1F2;color:white;display:flex;align-items:center;justify-content:center;font-size:1.1rem;text-decoration:none;transition:transform 0.2s" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'"><i class="ri-twitter-x-fill"></i></a>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://oncoai.health" target="_blank" style="width:40px;height:40px;border-radius:10px;background:#0A66C2;color:white;display:flex;align-items:center;justify-content:center;font-size:1.1rem;text-decoration:none;transition:transform 0.2s" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'"><i class="ri-linkedin-box-fill"></i></a>
+        <a href="https://www.facebook.com/sharer/sharer.php?u=https://oncoai.health" target="_blank" style="width:40px;height:40px;border-radius:10px;background:#1877F2;color:white;display:flex;align-items:center;justify-content:center;font-size:1.1rem;text-decoration:none;transition:transform 0.2s" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'"><i class="ri-facebook-circle-fill"></i></a>
+        <a href="https://wa.me/?text=Check%20out%20OncoAI%20—%20AI-powered%20oncology%20platform%20https://oncoai.health" target="_blank" style="width:40px;height:40px;border-radius:10px;background:#25D366;color:white;display:flex;align-items:center;justify-content:center;font-size:1.1rem;text-decoration:none;transition:transform 0.2s" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'"><i class="ri-whatsapp-fill"></i></a>
+        <a href="https://t.me/share/url?url=https://oncoai.health&text=OncoAI%20-%20AI%20Oncology%20Platform" target="_blank" style="width:40px;height:40px;border-radius:10px;background:#26A5E4;color:white;display:flex;align-items:center;justify-content:center;font-size:1.1rem;text-decoration:none;transition:transform 0.2s" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'"><i class="ri-telegram-fill"></i></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="section-inner">
+    <div class="cta-box fade-up">
+      <h2>Ready to Transform Cancer Care?</h2>
+      <p>Join OncoAI and give your patients the best chance at timely, coordinated, evidence-based treatment.</p>
+      <div class="cta-buttons">
+        <a href="/register" class="hero-btn-primary"><i class="ri-rocket-line"></i> Create Account</a>
+        <a href="/patient-portal" class="hero-btn-secondary"><i class="ri-user-heart-line"></i> Patient Portal</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="land-footer">
+  <img src="/static/img/logo-light.png" alt="OncoAI" style="filter:brightness(0) invert(1);opacity:0.6">
+  <p>OncoAI — Intelligent Oncology & Tumor Board Platform</p>
+  <p>Smarter Decisions. Better Outcomes.</p>
+  <div style="display:flex;gap:0.75rem;justify-content:center;margin:1.25rem 0">
+    <a href="https://twitter.com/OncoAI" target="_blank" style="color:rgba(255,255,255,0.4);font-size:1.2rem;transition:color 0.2s;text-decoration:none" onmouseover="this.style.color='#1DA1F2'" onmouseout="this.style.color='rgba(255,255,255,0.4)'"><i class="ri-twitter-x-fill"></i></a>
+    <a href="https://linkedin.com/company/oncoai" target="_blank" style="color:rgba(255,255,255,0.4);font-size:1.2rem;transition:color 0.2s;text-decoration:none" onmouseover="this.style.color='#0A66C2'" onmouseout="this.style.color='rgba(255,255,255,0.4)'"><i class="ri-linkedin-box-fill"></i></a>
+    <a href="https://facebook.com/oncoai" target="_blank" style="color:rgba(255,255,255,0.4);font-size:1.2rem;transition:color 0.2s;text-decoration:none" onmouseover="this.style.color='#1877F2'" onmouseout="this.style.color='rgba(255,255,255,0.4)'"><i class="ri-facebook-circle-fill"></i></a>
+    <a href="https://youtube.com/@OncoAI" target="_blank" style="color:rgba(255,255,255,0.4);font-size:1.2rem;transition:color 0.2s;text-decoration:none" onmouseover="this.style.color='#FF0000'" onmouseout="this.style.color='rgba(255,255,255,0.4)'"><i class="ri-youtube-fill"></i></a>
+    <a href="https://instagram.com/oncoai.health" target="_blank" style="color:rgba(255,255,255,0.4);font-size:1.2rem;transition:color 0.2s;text-decoration:none" onmouseover="this.style.color='#E4405F'" onmouseout="this.style.color='rgba(255,255,255,0.4)'"><i class="ri-instagram-fill"></i></a>
+    <a href="https://t.me/oncoai" target="_blank" style="color:rgba(255,255,255,0.4);font-size:1.2rem;transition:color 0.2s;text-decoration:none" onmouseover="this.style.color='#26A5E4'" onmouseout="this.style.color='rgba(255,255,255,0.4)'"><i class="ri-telegram-fill"></i></a>
+    <a href="https://wa.me/message/oncoai" target="_blank" style="color:rgba(255,255,255,0.4);font-size:1.2rem;transition:color 0.2s;text-decoration:none" onmouseover="this.style.color='#25D366'" onmouseout="this.style.color='rgba(255,255,255,0.4)'"><i class="ri-whatsapp-fill"></i></a>
+    <a href="mailto:contact@oncoai.health" style="color:rgba(255,255,255,0.4);font-size:1.2rem;transition:color 0.2s;text-decoration:none" onmouseover="this.style.color='var(--secondary)'" onmouseout="this.style.color='rgba(255,255,255,0.4)'"><i class="ri-mail-line"></i></a>
+  </div>
+  <p style="font-size:0.8rem;opacity:0.4">&copy; 2026 OncoAI. Built for Muhimbili ORCI Tumor Board.</p>
+</footer>
+
+<script>
+// Navbar scroll effect
+window.addEventListener('scroll', () => {
+  document.getElementById('landNav').classList.toggle('scrolled', window.scrollY > 50);
+});
+
+// Scroll animations
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
+
+// ─── 3D Draggable AI Brain Orbit ───
+(function() {
+  const c = document.getElementById('brain3D');
+  if (!c) return;
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  const cx = W / 2, cy = H / 2;
+
+  const agents = [
+    { icon: '', label: 'Patient Profile',    color: '#0F4C5C', bg: 'rgba(15,76,92,0.12)' },
+    { icon: '', label: 'Document Analyzer',   color: '#3B82F6', bg: 'rgba(59,130,246,0.12)' },
+    { icon: '', label: 'Trial Matcher',       color: '#8B5CF6', bg: 'rgba(139,92,246,0.12)' },
+    { icon: '', label: 'Medication Review',    color: '#F59E0B', bg: 'rgba(245,158,11,0.12)' },
+    { icon: '', label: 'Literature Search',    color: '#10B981', bg: 'rgba(16,185,129,0.12)' },
+    { icon: '', label: 'Treatment AI',         color: '#EF4444', bg: 'rgba(239,68,68,0.12)' },
+    { icon: '', label: 'Guideline Checker',    color: '#14B8A6', bg: 'rgba(20,184,166,0.12)' },
+    { icon: '', label: 'Risk Assessor',        color: '#DC2626', bg: 'rgba(220,38,38,0.12)' },
+    { icon: '', label: 'TB Briefing',          color: '#6366F1', bg: 'rgba(99,102,241,0.12)' },
+  ];
+
+  let rotX = -0.3, rotY = 0;
+  let autoRotY = 0;
+  let dragging = false, lastMX = 0, lastMY = 0;
+  let velX = 0, velY = 0.003;
+  let hoveredIdx = -1;
+
+  function project(x3, y3, z3) {
+    const cosX = Math.cos(rotX), sinX = Math.sin(rotX);
+    const cosY = Math.cos(rotY + autoRotY), sinY = Math.sin(rotY + autoRotY);
+    let y = y3 * cosX - z3 * sinX;
+    let z = y3 * sinX + z3 * cosX;
+    let x = x3 * cosY - z * sinY;
+    z = x3 * sinY + z * cosY;
+    const scale = 600 / (600 + z);
+    return { x: cx + x * scale, y: cy + y * scale, z, scale };
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    if (!dragging) {
+      autoRotY += velY;
+      rotX += velX;
+      velX *= 0.98;
+    }
+
+    // Orbit rings
+    for (let ring = 0; ring < 3; ring++) {
+      const pts = [];
+      const r = 100 + ring * 45;
+      for (let a = 0; a < Math.PI * 2; a += 0.05) {
+        const tiltX = ring === 1 ? Math.PI * 0.3 : ring === 2 ? -Math.PI * 0.25 : 0;
+        const tiltZ = ring === 1 ? Math.PI * 0.15 : ring === 2 ? -Math.PI * 0.1 : 0;
+        let x = Math.cos(a) * r;
+        let y = Math.sin(a) * r * Math.cos(tiltX);
+        let z = Math.sin(a) * r * Math.sin(tiltX) + Math.cos(a) * r * Math.sin(tiltZ) * 0.3;
+        const p = project(x, y, z);
+        pts.push(p);
+      }
+      ctx.beginPath();
+      pts.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+      ctx.closePath();
+      ctx.strokeStyle = 'rgba(20,255,236,0.08)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+
+    // Agent nodes in 3D
+    const radius = 155;
+    const nodeData = agents.map((a, i) => {
+      const angle = (i / agents.length) * Math.PI * 2;
+      const tilt = Math.sin(i * 1.2) * 0.4;
+      const x3 = Math.cos(angle) * radius;
+      const y3 = Math.sin(angle) * radius * Math.cos(tilt) * 0.7;
+      const z3 = Math.sin(angle) * radius * Math.sin(tilt) + Math.cos(angle + i) * 30;
+      const p = project(x3, y3, z3);
+      return { ...a, ...p, idx: i };
+    });
+
+    // Sort by z for proper depth
+    nodeData.sort((a, b) => a.z - b.z);
+
+    // Draw connecting lines from center to each node
+    const center = project(0, 0, 0);
+    nodeData.forEach(n => {
+      const opacity = Math.max(0.05, Math.min(0.25, (n.z + 200) / 400));
+      ctx.beginPath();
+      ctx.moveTo(center.x, center.y);
+      ctx.lineTo(n.x, n.y);
+      ctx.strokeStyle = `rgba(20,255,236,${opacity})`;
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 4]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    });
+
+    // Draw nodes
+    nodeData.forEach(n => {
+      const size = 22 * n.scale;
+      const opacity = Math.max(0.3, Math.min(1, (n.z + 250) / 350));
+      const isHovered = n.idx === hoveredIdx;
+
+      // Glow
+      if (isHovered) {
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, size * 1.8, 0, Math.PI * 2);
+        const glow = ctx.createRadialGradient(n.x, n.y, size * 0.5, n.x, n.y, size * 1.8);
+        glow.addColorStop(0, n.color + '40');
+        glow.addColorStop(1, 'transparent');
+        ctx.fillStyle = glow;
+        ctx.fill();
+      }
+
+      // Node circle
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, size, 0, Math.PI * 2);
+      ctx.fillStyle = isHovered ? n.color : `rgba(255,255,255,${opacity * 0.95})`;
+      ctx.fill();
+      ctx.strokeStyle = n.color + (isHovered ? 'ff' : '60');
+      ctx.lineWidth = isHovered ? 2.5 : 1.5;
+      ctx.stroke();
+
+      // Icon dot
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, size * 0.4, 0, Math.PI * 2);
+      ctx.fillStyle = isHovered ? 'white' : n.color;
+      ctx.fill();
+
+      // Label
+      if (opacity > 0.5 || isHovered) {
+        ctx.font = `${isHovered ? '700' : '600'} ${Math.round(11 * n.scale)}px Inter, sans-serif`;
+        ctx.fillStyle = isHovered ? n.color : `rgba(28,25,23,${opacity})`;
+        ctx.textAlign = 'center';
+        ctx.fillText(n.label, n.x, n.y + size + 14 * n.scale);
+      }
+    });
+
+    // Center brain
+    const cp = project(0, 0, 0);
+    const cSize = 38 * cp.scale;
+
+    // Center glow
+    const cGlow = ctx.createRadialGradient(cp.x, cp.y, cSize * 0.3, cp.x, cp.y, cSize * 2.5);
+    cGlow.addColorStop(0, 'rgba(20,255,236,0.15)');
+    cGlow.addColorStop(1, 'transparent');
+    ctx.beginPath();
+    ctx.arc(cp.x, cp.y, cSize * 2.5, 0, Math.PI * 2);
+    ctx.fillStyle = cGlow;
+    ctx.fill();
+
+    // Pulse ring
+    const pulseR = cSize * (1.5 + Math.sin(Date.now() / 800) * 0.5);
+    ctx.beginPath();
+    ctx.arc(cp.x, cp.y, pulseR, 0, Math.PI * 2);
+    ctx.strokeStyle = `rgba(20,255,236,${0.15 - Math.sin(Date.now() / 800) * 0.1})`;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Center circle
+    const cGrad = ctx.createLinearGradient(cp.x - cSize, cp.y - cSize, cp.x + cSize, cp.y + cSize);
+    cGrad.addColorStop(0, '#0F4C5C');
+    cGrad.addColorStop(1, '#0A3B48');
+    ctx.beginPath();
+    ctx.arc(cp.x, cp.y, cSize, 0, Math.PI * 2);
+    ctx.fillStyle = cGrad;
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(20,255,236,0.4)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Brain text
+    ctx.font = `800 ${Math.round(14 * cp.scale)}px Inter, sans-serif`;
+    ctx.fillStyle = '#14FFEC';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('AI', cp.x, cp.y - 4 * cp.scale);
+    ctx.font = `500 ${Math.round(8 * cp.scale)}px Inter, sans-serif`;
+    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    ctx.fillText('OncoAI', cp.x, cp.y + 12 * cp.scale);
+
+    // Drag hint
+    if (!dragging && autoRotY < 0.5) {
+      ctx.font = '500 12px Inter, sans-serif';
+      ctx.fillStyle = 'rgba(120,113,108,0.5)';
+      ctx.textAlign = 'center';
+      ctx.fillText('Drag to rotate 360°', cx, H - 15);
+    }
+
+    requestAnimationFrame(draw);
+  }
+
+  // Mouse drag
+  c.addEventListener('mousedown', (e) => {
+    dragging = true; c.style.cursor = 'grabbing';
+    lastMX = e.clientX; lastMY = e.clientY;
+  });
+  window.addEventListener('mousemove', (e) => {
+    if (dragging) {
+      const dx = e.clientX - lastMX, dy = e.clientY - lastMY;
+      rotY += dx * 0.008;
+      rotX += dy * 0.008;
+      rotX = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, rotX));
+      lastMX = e.clientX; lastMY = e.clientY;
+    }
+    // Hover detection
+    const rect = c.getBoundingClientRect();
+    const mx = (e.clientX - rect.left) * (W / rect.width);
+    const my = (e.clientY - rect.top) * (H / rect.height);
+    hoveredIdx = -1;
+    agents.forEach((a, i) => {
+      const angle = (i / agents.length) * Math.PI * 2;
+      const tilt = Math.sin(i * 1.2) * 0.4;
+      const p = project(Math.cos(angle)*155, Math.sin(angle)*155*Math.cos(tilt)*0.7, Math.sin(angle)*155*Math.sin(tilt)+Math.cos(angle+i)*30);
+      const dist = Math.sqrt((mx - p.x)**2 + (my - p.y)**2);
+      if (dist < 28 * p.scale) hoveredIdx = i;
+    });
+    c.style.cursor = dragging ? 'grabbing' : hoveredIdx >= 0 ? 'pointer' : 'grab';
+  });
+  window.addEventListener('mouseup', () => { dragging = false; c.style.cursor = 'grab'; });
+
+  // Touch drag
+  c.addEventListener('touchstart', (e) => {
+    dragging = true;
+    lastMX = e.touches[0].clientX; lastMY = e.touches[0].clientY;
+    e.preventDefault();
+  }, { passive: false });
+  c.addEventListener('touchmove', (e) => {
+    if (!dragging) return;
+    const dx = e.touches[0].clientX - lastMX, dy = e.touches[0].clientY - lastMY;
+    rotY += dx * 0.008;
+    rotX += dy * 0.008;
+    rotX = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, rotX));
+    lastMX = e.touches[0].clientX; lastMY = e.touches[0].clientY;
+    e.preventDefault();
+  }, { passive: false });
+  c.addEventListener('touchend', () => { dragging = false; });
+
+  draw();
+})();
+
+// Neural Network Canvas Animation
+(function() {
+  const canvas = document.getElementById('neuralCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let w, h, nodes = [], mouse = { x: -1000, y: -1000 };
+
+  function resize() {
+    w = canvas.width = canvas.offsetWidth;
+    h = canvas.height = canvas.offsetHeight;
+  }
+
+  function initNodes() {
+    nodes = [];
+    const count = Math.floor((w * h) / 12000);
+    for (let i = 0; i < count; i++) {
+      nodes.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.4,
+        r: Math.random() * 2 + 1,
+        color: Math.random() > 0.7 ? 'rgba(20,255,236,' : 'rgba(167,139,250,',
+      });
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, w, h);
+    const maxDist = 120;
+
+    for (let i = 0; i < nodes.length; i++) {
+      const a = nodes[i];
+      a.x += a.vx; a.y += a.vy;
+      if (a.x < 0 || a.x > w) a.vx *= -1;
+      if (a.y < 0 || a.y > h) a.vy *= -1;
+
+      // Draw node
+      ctx.beginPath();
+      ctx.arc(a.x, a.y, a.r, 0, Math.PI * 2);
+      ctx.fillStyle = a.color + '0.5)';
+      ctx.fill();
+
+      // Connect nearby nodes
+      for (let j = i + 1; j < nodes.length; j++) {
+        const b = nodes[j];
+        const dx = a.x - b.x, dy = a.y - b.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < maxDist) {
+          const opacity = (1 - dist / maxDist) * 0.15;
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.strokeStyle = 'rgba(20,255,236,' + opacity + ')';
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+
+      // Mouse interaction
+      const mdx = a.x - mouse.x, mdy = a.y - mouse.y;
+      const mDist = Math.sqrt(mdx * mdx + mdy * mdy);
+      if (mDist < 200) {
+        const opacity = (1 - mDist / 200) * 0.3;
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(mouse.x, mouse.y);
+        ctx.strokeStyle = 'rgba(20,255,236,' + opacity + ')';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        // Glow the node
+        ctx.beginPath();
+        ctx.arc(a.x, a.y, a.r * 2, 0, Math.PI * 2);
+        ctx.fillStyle = a.color + (opacity * 0.5) + ')';
+        ctx.fill();
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', () => { resize(); initNodes(); });
+  canvas.addEventListener('mousemove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    mouse.x = e.clientX - rect.left;
+    mouse.y = e.clientY - rect.top;
+  });
+  canvas.addEventListener('mouseleave', () => { mouse.x = -1000; mouse.y = -1000; });
+
+  resize();
+  initNodes();
+  draw();
+})();
+</script>
+</body>
+</html>

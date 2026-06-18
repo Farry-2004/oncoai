@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: oncoai
+      POSTGRES_USER: oncoai
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-oncoai_secure_2026}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U oncoai"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://oncoai:${DB_PASSWORD:-oncoai_secure_2026}@db:5432/oncoai
+      SECRET_KEY: ${SECRET_KEY:-change-this-in-production}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+    ports:
+      - "${PORT:-8000}:8000"
+    volumes:
+      - uploads:/app/uploads
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # Nginx reverse proxy with SSL
+  nginx:
+    image: nginx:alpine
+    restart: always
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./ssl:/etc/nginx/ssl
+    profiles:
+      - production
+
+volumes:
+  pgdata:
+  uploads:

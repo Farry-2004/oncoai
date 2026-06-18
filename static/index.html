@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OncoAI — AI Oncology Decision Support</title>
+<link rel="icon" type="image/png" href="/static/img/logo.png">
+<meta name="description" content="OncoAI delivers intelligent oncology decision support for tumor board workflows, AI cancer risk prediction, and evidence-based treatment recommendations.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.5.0/remixicon.min.css">
+<link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+<div class="bg-animation">
+  <div class="bg-orb bg-orb-1"></div>
+  <div class="bg-orb bg-orb-2"></div>
+  <div class="bg-orb bg-orb-3"></div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="app-layout">
+
+<!-- ═══ SIDEBAR ═══ -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <img src="/static/img/logo-light.png" alt="OncoAI" class="sidebar-brand-logo">
+  </div>
+
+  <nav class="sidebar-nav" id="navLinks">
+    <div class="sidebar-section-label">Overview</div>
+    <button class="nav-btn active" data-tab="dashboard">
+      <i class="ri-dashboard-3-line"></i><span>Dashboard</span>
+    </button>
+    <button class="nav-btn" data-tab="patients">
+      <i class="ri-user-heart-line"></i><span>Patients</span>
+    </button>
+
+    <div class="sidebar-section-label">Clinical Data</div>
+    <button class="nav-btn" data-tab="documents">
+      <i class="ri-file-text-line"></i><span>Documents</span>
+    </button>
+    <button class="nav-btn" data-tab="referrals">
+      <i class="ri-share-forward-line"></i><span>Referrals</span>
+    </button>
+    <button class="nav-btn" data-tab="lab">
+      <i class="ri-test-tube-line"></i><span>Lab Results</span>
+    </button>
+    <button class="nav-btn" data-tab="pathology">
+      <i class="ri-microscope-line"></i><span>Pathology</span>
+    </button>
+    <button class="nav-btn" data-tab="imaging">
+      <i class="ri-body-scan-line"></i><span>Imaging</span>
+    </button>
+
+    <div class="sidebar-section-label">AI & Analytics</div>
+    <button class="nav-btn" data-tab="recommendations">
+      <i class="ri-lightbulb-line"></i><span>Recommendations</span>
+    </button>
+    <button class="nav-btn" data-tab="tumorboard">
+      <i class="ri-dna-line"></i><span>Tumor Board</span>
+    </button>
+    <button class="nav-btn" data-tab="summary">
+      <i class="ri-brain-line"></i><span>AI Summary</span>
+    </button>
+    <button class="nav-btn" data-tab="orchestrator">
+      <i class="ri-robot-2-line"></i><span>Orchestrator</span>
+    </button>
+
+    <div class="sidebar-section-label">Engagement</div>
+    <button class="nav-btn" data-tab="reviews">
+      <i class="ri-star-line"></i><span>Reviews</span>
+    </button>
+    <button class="nav-btn" data-tab="whatsapp">
+      <i class="ri-whatsapp-line"></i><span>WhatsApp</span>
+    </button>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="sidebar-user" style="margin-bottom:0.65rem">
+      <div class="sidebar-avatar"><i class="ri-user-line"></i></div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name">Dr. Admin</div>
+        <div class="sidebar-user-role">Oncologist</div>
+      </div>
+    </div>
+    <button onclick="logout()" style="width:100%;padding:0.4rem 0.75rem;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.7);border-radius:8px;font-size:0.87rem;font-family:var(--font);cursor:pointer;display:flex;align-items:center;gap:0.4rem;transition:all 0.15s">
+      <i class="ri-logout-box-r-line"></i><span>Sign Out</span>
+    </button>
+  </div>
+</aside>
+
+<!-- ═══ MAIN CONTENT ═══ -->
+<div class="main-wrapper">
+
+  <!-- Top Header -->
+  <header class="top-header">
+    <div class="header-left">
+      <h2 class="header-title" id="pageTitle">Dashboard</h2>
+    </div>
+    <div class="header-right">
+      <div class="header-search">
+        <i class="ri-search-line"></i>
+        <input type="text" placeholder="Search patients, records..." id="globalSearch">
+      </div>
+      <button class="header-icon-btn" title="Notifications" onclick="toggleNotifications()" style="position:relative">
+        <i class="ri-notification-3-line"></i>
+        <span id="notifBadge" style="display:none;position:absolute;top:-2px;right:-2px;width:18px;height:18px;background:var(--danger);color:white;border-radius:50%;font-size:0.65rem;font-weight:700;display:flex;align-items:center;justify-content:center">0</span>
+      </button>
+      <div id="notifPanel" style="display:none;position:absolute;top:calc(var(--header-height) - 4px);right:2rem;width:380px;max-height:480px;overflow-y:auto;background:white;border:1px solid var(--border-color);border-radius:12px;box-shadow:0 15px 40px rgba(0,0,0,0.12);z-index:200">
+        <div style="padding:0.85rem 1rem;border-bottom:1px solid var(--gray-100);display:flex;justify-content:space-between;align-items:center">
+          <h4 style="font-size:1rem;font-weight:700">Notifications</h4>
+          <button class="btn btn-sm btn-secondary" onclick="clearNotifications()">Clear all</button>
+        </div>
+        <div id="notifList" style="padding:0.5rem"></div>
+      </div>
+      <button class="header-icon-btn" title="Settings"><i class="ri-settings-3-line"></i></button>
+    </div>
+  </header>
+
+  <!-- Page Content -->
+  <div class="page-content">
+
+<!-- ════════════════════════════════════════ DASHBOARD ═══ -->
+<div id="tab-dashboard" class="tab-content active">
+
+  <div class="dashboard-hero">
+    <div class="hero-particles"></div>
+    <div class="hero-grid-overlay"></div>
+    <div class="hero-content">
+      <h2>Welcome to OncoAI</h2>
+      <p class="hero-tagline">Intelligent Oncology Platform — Smarter Decisions. Better Outcomes.</p>
+      <p>Intelligent oncology decision support and comprehensive hospital management — patient records, clinical data, AI summaries, and multi-agent orchestration.</p>
+      <div class="hero-stats">
+        <div class="hero-stat"><span class="number" id="heroPatients">—</span><span class="label">Patients</span></div>
+        <div class="hero-stat"><span class="number" id="heroReferrals">—</span><span class="label">Referrals</span></div>
+        <div class="hero-stat"><span class="number" id="heroLab">—</span><span class="label">Lab Results</span></div>
+        <div class="hero-stat"><span class="number" id="heroImaging">—</span><span class="label">Imaging</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-grid" id="dashboardStats">
+    <div class="stat-card animate-in"><div class="stat-icon blue"><i class="ri-user-heart-line"></i></div><div class="stat-info"><h3 id="statPatients">—</h3><p>Total Patients</p></div></div>
+    <div class="stat-card animate-in"><div class="stat-icon teal"><i class="ri-share-forward-line"></i></div><div class="stat-info"><h3 id="statReferrals">—</h3><p>Referrals</p></div></div>
+    <div class="stat-card animate-in"><div class="stat-icon purple"><i class="ri-test-tube-line"></i></div><div class="stat-info"><h3 id="statLab">—</h3><p>Lab Results</p></div></div>
+    <div class="stat-card animate-in"><div class="stat-icon orange"><i class="ri-body-scan-line"></i></div><div class="stat-info"><h3 id="statImaging">—</h3><p>Imaging Reports</p></div></div>
+  </div>
+
+  <div class="quick-actions animate-in">
+    <button class="quick-btn" onclick="switchTab('patients'); openAddPatient()"><i class="ri-add-line"></i> New Patient</button>
+    <button class="quick-btn" onclick="switchTab('reviews')"><i class="ri-star-line"></i> Reviews</button>
+    <button class="quick-btn" onclick="switchTab('whatsapp')"><i class="ri-whatsapp-line"></i> WhatsApp</button>
+    <button class="quick-btn" onclick="switchTab('orchestrator')"><i class="ri-robot-2-line"></i> Run Orchestrator</button>
+  </div>
+
+  <!-- AI Analytics Dashboard -->
+  <div class="section-header animate-in" style="margin-top:1.5rem"><h2><i class="ri-bar-chart-box-line" style="color:var(--primary)"></i> AI Analytics & Predictions</h2></div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.25rem">
+    <!-- Cancer Distribution Chart -->
+    <div class="upload-panel" style="padding:1rem;margin:0">
+      <h4 style="font-size:0.95rem;font-weight:700;margin-bottom:0.75rem"><i class="ri-pie-chart-line" style="color:var(--primary)"></i> Cancer Type Distribution</h4>
+      <div id="cancerDistChart" style="min-height:200px"></div>
+    </div>
+
+    <!-- Treatment Outcomes -->
+    <div class="upload-panel" style="padding:1rem;margin:0">
+      <h4 style="font-size:0.95rem;font-weight:700;margin-bottom:0.75rem"><i class="ri-line-chart-line" style="color:#3B82F6"></i> Patient Journey Progress</h4>
+      <div id="journeyChart" style="min-height:200px"></div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1.25rem">
+    <!-- Stage Distribution -->
+    <div class="upload-panel" style="padding:1rem;margin:0">
+      <h4 style="font-size:0.95rem;font-weight:700;margin-bottom:0.75rem"><i class="ri-bar-chart-grouped-line" style="color:#8B5CF6"></i> Stage at Diagnosis</h4>
+      <div id="stageChart" style="min-height:180px"></div>
+    </div>
+
+    <!-- Workup Completion Rate -->
+    <div class="upload-panel" style="padding:1rem;margin:0">
+      <h4 style="font-size:0.95rem;font-weight:700;margin-bottom:0.75rem"><i class="ri-donut-chart-line" style="color:#10B981"></i> Workup Completion</h4>
+      <div id="workupChart" style="min-height:180px"></div>
+    </div>
+
+    <!-- TB Meeting Stats -->
+    <div class="upload-panel" style="padding:1rem;margin:0">
+      <h4 style="font-size:0.95rem;font-weight:700;margin-bottom:0.75rem"><i class="ri-calendar-check-line" style="color:#F59E0B"></i> Tumor Board Stats</h4>
+      <div id="tbStatsChart" style="min-height:180px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ PATIENTS ═══ -->
+<div id="tab-patients" class="tab-content">
+  <div class="section-header animate-in">
+    <h2>Patient Records</h2>
+    <div style="display:flex;gap:0.5rem">
+      <button class="btn btn-secondary" onclick="openPatientWorkupPanel()"><i class="ri-clipboard-line"></i> Workup Tracker</button>
+      <button class="btn btn-secondary" onclick="openPreferenceSurvey()"><i class="ri-survey-line"></i> Patient Survey</button>
+      <button class="btn btn-primary" id="addPatientBtn"><i class="ri-add-line"></i> Add Patient</button>
+    </div>
+  </div>
+
+  <div class="search-bar"><input type="text" id="patientSearch" placeholder="Search by name, phone, or condition..." oninput="renderPatients()"></div>
+
+  <!-- ── Patient Journey & Workup Panel (Prototype A: Centralized Tracking) ── -->
+  <div id="patientWorkupPanel" class="upload-panel animate-in" style="display:none;margin-bottom:1.25rem">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+      <h3 style="font-size:1.05rem;font-weight:700;display:flex;align-items:center;gap:0.5rem"><i class="ri-clipboard-line" style="color:var(--primary)"></i> Patient Workup & Journey Tracker</h3>
+      <button class="btn btn-sm btn-secondary" onclick="$('#patientWorkupPanel').style.display='none'">&times;</button>
+    </div>
+    <div class="form-group" style="margin-bottom:1rem">
+      <label>Select Patient</label>
+      <select id="workupPatientSelect" onchange="loadPatientWorkup()" style="max-width:360px"></select>
+    </div>
+
+    <!-- Journey Map (from workbook p.3) -->
+    <div id="journeyMap" style="display:flex;align-items:center;gap:0.25rem;overflow-x:auto;padding:0.75rem 0;margin-bottom:1rem">
+      <div class="journey-step" data-step="arrival"><div class="journey-dot"></div><span>ENT Arrival</span></div>
+      <div class="journey-line"></div>
+      <div class="journey-step" data-step="evaluation"><div class="journey-dot"></div><span>Evaluation</span></div>
+      <div class="journey-line"></div>
+      <div class="journey-step" data-step="biopsy_ordered"><div class="journey-dot"></div><span>Biopsy & CT</span></div>
+      <div class="journey-line"></div>
+      <div class="journey-step" data-step="awaiting_results"><div class="journey-dot"></div><span>Awaiting Results</span></div>
+      <div class="journey-line"></div>
+      <div class="journey-step" data-step="case_compiled"><div class="journey-dot"></div><span>Case Compiled</span></div>
+      <div class="journey-line"></div>
+      <div class="journey-step" data-step="tb_scheduled"><div class="journey-dot"></div><span>TB Scheduled</span></div>
+      <div class="journey-line"></div>
+      <div class="journey-step" data-step="tb_presented"><div class="journey-dot"></div><span>TB Presented</span></div>
+      <div class="journey-line"></div>
+      <div class="journey-step" data-step="treatment_planned"><div class="journey-dot"></div><span>Treatment Plan</span></div>
+      <div class="journey-line"></div>
+      <div class="journey-step" data-step="awaiting_treatment"><div class="journey-dot"></div><span>Awaiting Tx</span></div>
+      <div class="journey-line"></div>
+      <div class="journey-step" data-step="in_treatment"><div class="journey-dot"></div><span>In Treatment</span></div>
+    </div>
+
+    <!-- Workup Checklist (Prototype A: tracking workup completion) -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:1rem">
+      <div style="background:var(--gray-50);border-radius:10px;padding:1rem;border:1px solid var(--border-color)">
+        <h4 style="font-size:0.9rem;font-weight:700;margin-bottom:0.65rem"><i class="ri-checkbox-multiple-line" style="color:var(--primary)"></i> Diagnostic Workup</h4>
+        <label class="workup-check"><input type="checkbox" id="wkImaging" onchange="saveWorkupState()"> <i class="ri-body-scan-line"></i> Imaging (CT/MRI)</label>
+        <label class="workup-check"><input type="checkbox" id="wkPathology" onchange="saveWorkupState()"> <i class="ri-microscope-line"></i> Pathology / Biopsy</label>
+        <label class="workup-check"><input type="checkbox" id="wkLab" onchange="saveWorkupState()"> <i class="ri-test-tube-line"></i> Lab Tests</label>
+        <label class="workup-check"><input type="checkbox" id="wkConsult" onchange="saveWorkupState()"> <i class="ri-stethoscope-line"></i> Specialist Consultation</label>
+        <label class="workup-check"><input type="checkbox" id="wkDental" onchange="saveWorkupState()"> <i class="ri-tooth-line"></i> Dental Assessment</label>
+        <div style="margin-top:0.75rem;padding:0.5rem 0.75rem;border-radius:8px;font-size:0.85rem;font-weight:600" id="wkReadyBadge">
+          Workup incomplete
+        </div>
+      </div>
+
+      <!-- Socioeconomic Factors (Prototype A: socioeconomic data) -->
+      <div style="background:var(--gray-50);border-radius:10px;padding:1rem;border:1px solid var(--border-color)">
+        <h4 style="font-size:0.9rem;font-weight:700;margin-bottom:0.65rem"><i class="ri-home-heart-line" style="color:var(--primary)"></i> Socioeconomic Factors</h4>
+        <div class="form-group" style="margin-bottom:0.5rem"><label style="font-size:0.8rem">Transportation</label><select id="seTransport" onchange="saveSocioeconomic()" style="font-size:0.85rem"><option value="">--</option><option>Available</option><option>Limited</option><option>Unavailable</option></select></div>
+        <div class="form-group" style="margin-bottom:0.5rem"><label style="font-size:0.8rem">Housing</label><select id="seHousing" onchange="saveSocioeconomic()" style="font-size:0.85rem"><option value="">--</option><option>Stable</option><option>Temporary</option><option>Unstable</option></select></div>
+        <div class="form-group" style="margin-bottom:0.5rem"><label style="font-size:0.8rem">Financial</label><select id="seFinancial" onchange="saveSocioeconomic()" style="font-size:0.85rem"><option value="">--</option><option>Sufficient</option><option>Constrained</option><option>Insufficient</option></select></div>
+        <div class="form-group" style="margin-bottom:0.5rem"><label style="font-size:0.8rem">Support System</label><select id="seSupport" onchange="saveSocioeconomic()" style="font-size:0.85rem"><option value="">--</option><option>Family</option><option>Community</option><option>Limited</option><option>None</option></select></div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="generatePassport()"><i class="ri-passport-line"></i> Generate Medical Passport</button>
+      <button class="btn btn-secondary" onclick="sendWorkupReminder()"><i class="ri-whatsapp-line"></i> Send Workup Reminder</button>
+    </div>
+  </div>
+
+  <!-- ── Patient Preference Survey (Prototype A from Category 3: Text Message Survey) ── -->
+  <div id="preferenceSurveyPanel" class="upload-panel animate-in" style="display:none;margin-bottom:1.25rem">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+      <h3 style="font-size:1.05rem;font-weight:700;display:flex;align-items:center;gap:0.5rem"><i class="ri-survey-line" style="color:var(--primary)"></i> Patient Preference Survey</h3>
+      <button class="btn btn-sm btn-secondary" onclick="$('#preferenceSurveyPanel').style.display='none'">&times;</button>
+    </div>
+    <p style="font-size:0.85rem;color:var(--gray-500);margin-bottom:1rem">Collect patient concerns before tumor board discussion. Based on answers, patient is categorized into A (Low), B (Moderate), or C (High Concern).</p>
+    <div class="form-group" style="margin-bottom:1rem">
+      <label>Select Patient</label>
+      <select id="prefPatientSelect" onchange="loadPatientPreferences()" style="max-width:360px"></select>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+      <div class="form-group"><label><i class="ri-route-line"></i> How concerned about ability to travel?</label><select id="prefTravel" onchange="savePreferences()"><option value="">--</option><option value="not_concerned">Not Concerned</option><option value="somewhat_concerned">Somewhat Concerned</option><option value="very_concerned">Very Concerned</option></select></div>
+      <div class="form-group"><label><i class="ri-money-dollar-circle-line"></i> How concerned about financial costs?</label><select id="prefFinancial" onchange="savePreferences()"><option value="">--</option><option value="not_concerned">Not Concerned</option><option value="somewhat_concerned">Somewhat Concerned</option><option value="very_concerned">Very Concerned</option></select></div>
+      <div class="form-group"><label><i class="ri-shield-cross-line"></i> Risk tolerance for treatment?</label><select id="prefRisk" onchange="savePreferences()"><option value="">--</option><option value="not_concerned">Not Concerned</option><option value="somewhat_concerned">Somewhat Concerned</option><option value="very_concerned">Very Concerned</option></select></div>
+      <div class="form-group"><label><i class="ri-flashlight-line"></i> Openness to radiation?</label><select id="prefRadiation" onchange="savePreferences()"><option value="">--</option><option value="not_concerned">Not Concerned</option><option value="somewhat_concerned">Somewhat Concerned</option><option value="very_concerned">Very Concerned</option></select></div>
+    </div>
+    <div id="prefCategoryResult" style="padding:0.75rem 1rem;border-radius:10px;background:var(--gray-50);border:1px solid var(--border-color);font-size:0.9rem;display:none">
+      Patient Category: <strong id="prefCategoryLabel">—</strong>
+      <span id="prefCategoryDesc" style="display:block;font-size:0.8rem;color:var(--gray-500);margin-top:0.25rem"></span>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <table><thead><tr>
+      <th>ID</th><th>Name</th><th>Age</th><th>Gender</th><th>Phone</th><th>Condition</th><th>Journey</th><th>Actions</th>
+    </tr></thead><tbody id="patientTable"></tbody></table>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ DOCUMENTS ═══ -->
+<div id="tab-documents" class="tab-content">
+  <div class="section-header animate-in">
+    <h2>Patient Documents</h2>
+  </div>
+  <div class="patient-select-bar">
+    <select id="docPatientSelect" onchange="renderDocuments()"></select>
+  </div>
+  <div class="upload-panel">
+    <div class="form-group">
+      <label>Document Title</label>
+      <input type="text" id="docTitle" placeholder="e.g. Blood Report - March 2026">
+    </div>
+    <div class="upload-zone" id="uploadZone" onclick="document.getElementById('docFile').click()">
+      <div class="upload-icon"><i class="ri-upload-cloud-2-line"></i></div>
+      <p>Drop file here or click to upload</p>
+      <p class="upload-hint">PDF, Images, Documents accepted</p>
+    </div>
+    <input type="file" id="docFile" style="display:none" onchange="uploadDocument()">
+    <button class="btn btn-primary" onclick="uploadDocument()" style="margin-top:0.5rem"><i class="ri-upload-2-line"></i> Upload</button>
+  </div>
+  <div class="search-bar"><input type="text" id="docSearch" placeholder="Search documents..." oninput="renderDocuments()"></div>
+  <div class="table-container">
+    <table><thead><tr><th>ID</th><th>Title</th><th>Filename</th><th>Date</th><th>Actions</th></tr></thead><tbody id="docTable"></tbody></table>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ CLINICAL TABS ═══ -->
+<div id="tab-referrals" class="tab-content">
+  <div class="section-header animate-in">
+    <h2>Referral Letters</h2>
+    <div style="display:flex;gap:0.5rem">
+      <button class="btn btn-secondary" onclick="toggleRefUpload()"><i class="ri-upload-cloud-2-line"></i> Upload Referral Docs</button>
+      <button class="btn btn-primary" onclick="clinical.render('referrals','add')"><i class="ri-add-line"></i> New Referral</button>
+    </div>
+  </div>
+  <div class="patient-select-bar"><select id="refPatientSelect" onchange="clinical.render('referrals');loadRefDocs()"></select></div>
+
+  <!-- Referral Document Upload Panel -->
+  <div id="refUploadPanel" class="upload-panel animate-in" style="display:none;margin-bottom:1.25rem">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem">
+      <h3 style="font-size:1rem;font-weight:700;display:flex;align-items:center;gap:0.5rem;color:var(--gray-800)"><i class="ri-file-transfer-line" style="color:var(--primary)"></i> Referral Document Exchange</h3>
+      <button class="btn btn-sm btn-secondary" onclick="toggleRefUpload()">&times;</button>
+    </div>
+    <p style="font-size:0.85rem;color:var(--gray-500);margin-bottom:1rem">Upload and share referral letters, clinical summaries, and supporting documents between specialists for patient cases.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.75rem;margin-bottom:0.75rem">
+      <div class="form-group" style="margin:0">
+        <label>Patient</label>
+        <select id="refDocPatient" style="width:100%"></select>
+      </div>
+      <div class="form-group" style="margin:0">
+        <label>Document Type</label>
+        <select id="refDocType" style="width:100%">
+          <option value="Referral Letter">Referral Letter</option>
+          <option value="Clinical Summary">Clinical Summary</option>
+          <option value="Discharge Summary">Discharge Summary</option>
+          <option value="Consultation Note">Consultation Note</option>
+          <option value="Treatment Plan">Treatment Plan</option>
+          <option value="Lab Report">Lab Report</option>
+          <option value="Pathology Report">Pathology Report</option>
+          <option value="Imaging Report">Imaging Report</option>
+          <option value="TB Meeting Minutes">TB Meeting Minutes</option>
+          <option value="Operative Note">Operative Note</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin:0">
+        <label>Referred To (Specialist)</label>
+        <input type="text" id="refDocTo" placeholder="e.g. Dr. Kamau, Radiologist">
+      </div>
+    </div>
+    <div class="form-group" style="margin-bottom:0.75rem">
+      <label>Notes / Cover Letter</label>
+      <textarea id="refDocNotes" rows="2" placeholder="Brief description or instructions for the receiving specialist..." style="font-size:0.85rem"></textarea>
+    </div>
+
+    <div class="upload-zone" id="refUploadZone" onclick="document.getElementById('refDocFile').click()" style="padding:1.25rem 1rem;margin-bottom:0.75rem">
+      <div class="upload-icon"><i class="ri-file-upload-line" style="font-size:2rem;color:var(--primary)"></i></div>
+      <p>Drop referral documents here or click to upload</p>
+      <p class="upload-hint">PDF, Word, Images accepted — Multiple files supported</p>
+    </div>
+    <input type="file" id="refDocFile" style="display:none" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt" onchange="handleRefDocUpload()">
+    <div id="refDocPreview" style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.75rem"></div>
+
+    <div style="display:flex;gap:0.5rem;align-items:center">
+      <button class="btn btn-primary" onclick="submitRefDocs()"><i class="ri-send-plane-line"></i> Upload & Share</button>
+      <button class="btn btn-secondary" onclick="shareRefViaWhatsApp()"><i class="ri-whatsapp-line"></i> Share via WhatsApp</button>
+      <span id="refDocStatus" style="font-size:0.85rem;color:var(--gray-500)"></span>
+    </div>
+  </div>
+
+  <!-- Shared Referral Documents List -->
+  <div id="refDocsListPanel" style="margin-bottom:1rem"></div>
+
+  <div class="search-bar"><input type="text" id="refSearch" placeholder="Search referrals..." oninput="clinical.render('referrals')"></div>
+  <div class="table-container"><table><thead><tr><th>ID</th><th>Doctor</th><th>Specialty</th><th>Hospital</th><th>Status</th><th>Date</th><th>Docs</th><th>Actions</th></tr></thead><tbody id="refTable"></tbody></table></div>
+</div>
+
+<div id="tab-lab" class="tab-content">
+  <div class="section-header animate-in">
+    <h2>Lab Results</h2>
+    <div style="display:flex;gap:0.5rem">
+      <button class="btn btn-secondary" onclick="toggleLabQuickAdd()"><i class="ri-flask-line"></i> Quick Add Panel</button>
+      <button class="btn btn-primary" onclick="clinical.render('lab','add')"><i class="ri-add-line"></i> New Lab Result</button>
+    </div>
+  </div>
+  <div class="patient-select-bar"><select id="labPatientSelect" onchange="clinical.render('lab')"></select></div>
+
+  <!-- Quick Add Lab Panel -->
+  <div id="labQuickPanel" class="upload-panel animate-in" style="display:none;margin-bottom:1.25rem">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem">
+      <h3 style="font-size:1rem;font-weight:700;display:flex;align-items:center;gap:0.5rem;color:var(--gray-800)"><i class="ri-flask-line" style="color:var(--primary)"></i> Quick Lab Entry</h3>
+      <button class="btn btn-sm btn-secondary" onclick="toggleLabQuickAdd()">&times;</button>
+    </div>
+    <p style="font-size:0.85rem;color:var(--gray-500);margin-bottom:0.75rem">Select a test category then enter values. Status is auto-detected from reference ranges.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:1rem">
+      <div class="form-group" style="margin:0">
+        <label>Patient</label>
+        <select id="labQuickPatient" style="width:100%"></select>
+      </div>
+      <div class="form-group" style="margin:0">
+        <label>Test Category</label>
+        <select id="labCategory" onchange="renderLabTests()" style="width:100%">
+          <option value="">— Select Category —</option>
+          <option value="hematology">Hematology (CBC)</option>
+          <option value="chemistry">Chemistry / Metabolic</option>
+          <option value="liver">Liver Function (LFT)</option>
+          <option value="renal">Renal Function (RFT)</option>
+          <option value="tumor_markers">Tumor Markers</option>
+          <option value="coagulation">Coagulation</option>
+          <option value="thyroid">Thyroid Function</option>
+          <option value="hiv">HIV / Infectious</option>
+          <option value="urinalysis">Urinalysis</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="labTestsGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:1rem"></div>
+
+    <button class="btn btn-primary" onclick="submitQuickLab()"><i class="ri-save-line"></i> Save All Results</button>
+  </div>
+
+  <div class="search-bar"><input type="text" id="labSearch" placeholder="Search lab results..." oninput="clinical.render('lab')"></div>
+  <div class="table-container"><table><thead><tr><th>ID</th><th>Test</th><th>Value</th><th>Unit</th><th>Reference</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="labTable"></tbody></table></div>
+</div>
+
+<div id="tab-pathology" class="tab-content">
+  <div class="section-header animate-in">
+    <h2>Pathology Reports</h2>
+    <div style="display:flex;gap:0.5rem">
+      <button class="btn btn-secondary" onclick="togglePathPanel()"><i class="ri-microscope-line"></i> Structured Report</button>
+      <button class="btn btn-primary" onclick="clinical.render('pathology','add')"><i class="ri-add-line"></i> New Report</button>
+    </div>
+  </div>
+  <div class="patient-select-bar"><select id="pathPatientSelect" onchange="clinical.render('pathology');loadPathDocs()"></select></div>
+
+  <!-- Structured Pathology Report Panel -->
+  <div id="pathStructPanel" class="upload-panel animate-in" style="display:none;margin-bottom:1.25rem">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem">
+      <h3 style="font-size:1rem;font-weight:700;display:flex;align-items:center;gap:0.5rem;color:var(--gray-800)"><i class="ri-microscope-line" style="color:var(--primary)"></i> Structured Pathology Report</h3>
+      <button class="btn btn-sm btn-secondary" onclick="togglePathPanel()">&times;</button>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:1rem">
+      <div class="form-group" style="margin:0">
+        <label>Patient</label>
+        <select id="pathStructPatient" style="width:100%"></select>
+      </div>
+      <div class="form-group" style="margin:0">
+        <label>Specimen Site (Head & Neck)</label>
+        <select id="pathSite" style="width:100%">
+          <option value="">— Select —</option>
+          <option>Oral Cavity</option>
+          <option>Tongue</option>
+          <option>Floor of Mouth</option>
+          <option>Palate (Hard/Soft)</option>
+          <option>Buccal Mucosa</option>
+          <option>Gingiva / Alveolar Ridge</option>
+          <option>Lip</option>
+          <option>Oropharynx</option>
+          <option>Tonsil</option>
+          <option>Base of Tongue</option>
+          <option>Nasopharynx</option>
+          <option>Hypopharynx</option>
+          <option>Larynx (Supraglottic)</option>
+          <option>Larynx (Glottic)</option>
+          <option>Larynx (Subglottic)</option>
+          <option>Nasal Cavity / Paranasal Sinus</option>
+          <option>Salivary Gland (Parotid)</option>
+          <option>Salivary Gland (Submandibular)</option>
+          <option>Thyroid</option>
+          <option>Lymph Node (Cervical)</option>
+          <option>Skin (Head/Neck)</option>
+          <option>Other</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:1rem">
+      <div class="form-group" style="margin:0">
+        <label>Specimen Type</label>
+        <select id="pathSpecType" style="width:100%">
+          <option value="">— Select —</option>
+          <option>Incisional Biopsy</option>
+          <option>Excisional Biopsy</option>
+          <option>Punch Biopsy</option>
+          <option>Fine Needle Aspiration (FNA)</option>
+          <option>Core Needle Biopsy</option>
+          <option>Resection Specimen</option>
+          <option>Neck Dissection</option>
+          <option>Frozen Section</option>
+          <option>Cytology (Brushing/Wash)</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin:0">
+        <label>Pathologist</label>
+        <input type="text" id="pathDoctor" placeholder="Dr. ...">
+      </div>
+    </div>
+
+    <!-- Histological Diagnosis -->
+    <h4 style="font-size:0.9rem;font-weight:700;color:var(--primary);margin-bottom:0.5rem"><i class="ri-search-eye-line"></i> Histological Diagnosis</h4>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:1rem">
+      <div class="form-group" style="margin:0">
+        <label>Histological Type</label>
+        <select id="pathHistoType" style="width:100%">
+          <option value="">— Select —</option>
+          <option>Squamous Cell Carcinoma (SCC)</option>
+          <option>SCC — Well Differentiated</option>
+          <option>SCC — Moderately Differentiated</option>
+          <option>SCC — Poorly Differentiated</option>
+          <option>Verrucous Carcinoma</option>
+          <option>Adenocarcinoma</option>
+          <option>Adenoid Cystic Carcinoma</option>
+          <option>Mucoepidermoid Carcinoma</option>
+          <option>Acinic Cell Carcinoma</option>
+          <option>Undifferentiated Carcinoma (NPC)</option>
+          <option>Lymphoma</option>
+          <option>Melanoma</option>
+          <option>Sarcoma</option>
+          <option>Papillary Thyroid Carcinoma</option>
+          <option>Follicular Thyroid Carcinoma</option>
+          <option>Medullary Thyroid Carcinoma</option>
+          <option>Benign / No Malignancy</option>
+          <option>Dysplasia (Mild)</option>
+          <option>Dysplasia (Moderate)</option>
+          <option>Dysplasia (Severe / CIS)</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin:0">
+        <label>Grade</label>
+        <select id="pathGrade" style="width:100%">
+          <option value="">— Select —</option>
+          <option>G1 — Well Differentiated</option>
+          <option>G2 — Moderately Differentiated</option>
+          <option>G3 — Poorly Differentiated</option>
+          <option>G4 — Undifferentiated</option>
+          <option>GX — Cannot be assessed</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- TNM Staging -->
+    <h4 style="font-size:0.9rem;font-weight:700;color:var(--primary);margin-bottom:0.5rem"><i class="ri-bar-chart-grouped-line"></i> TNM Pathological Staging</h4>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.75rem;margin-bottom:1rem">
+      <div class="form-group" style="margin:0">
+        <label>pT (Primary Tumor)</label>
+        <select id="pathT" style="width:100%">
+          <option value="">--</option><option>pTX</option><option>pT0</option><option>pTis</option><option>pT1</option><option>pT2</option><option>pT3</option><option>pT4a</option><option>pT4b</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin:0">
+        <label>pN (Lymph Nodes)</label>
+        <select id="pathN" style="width:100%">
+          <option value="">--</option><option>pNX</option><option>pN0</option><option>pN1</option><option>pN2a</option><option>pN2b</option><option>pN2c</option><option>pN3a</option><option>pN3b</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin:0">
+        <label>pM (Distant Metastasis)</label>
+        <select id="pathM" style="width:100%">
+          <option value="">--</option><option>pM0</option><option>pM1</option><option>pMX</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Margins & Features -->
+    <h4 style="font-size:0.9rem;font-weight:700;color:var(--primary);margin-bottom:0.5rem"><i class="ri-focus-3-line"></i> Margins & Key Features</h4>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:1rem">
+      <div class="form-group" style="margin:0">
+        <label>Margin Status</label>
+        <select id="pathMargin" style="width:100%">
+          <option value="">--</option>
+          <option>Negative (Clear) — ≥5mm</option>
+          <option>Negative (Close) — 1–5mm</option>
+          <option>Positive (Involved)</option>
+          <option>Cannot be assessed</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin:0">
+        <label>Lymphovascular Invasion (LVI)</label>
+        <select id="pathLVI" style="width:100%">
+          <option value="">--</option><option>Not identified</option><option>Present</option><option>Cannot be assessed</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin:0">
+        <label>Perineural Invasion (PNI)</label>
+        <select id="pathPNI" style="width:100%">
+          <option value="">--</option><option>Not identified</option><option>Present</option><option>Cannot be assessed</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin:0">
+        <label>HPV Status (p16)</label>
+        <select id="pathHPV" style="width:100%">
+          <option value="">--</option><option>Positive</option><option>Negative</option><option>Not tested</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Gross & Microscopic -->
+    <div class="form-group" style="margin-bottom:0.75rem">
+      <label>Gross Description</label>
+      <textarea id="pathGross" rows="2" placeholder="Specimen size, color, consistency, orientation..." style="font-size:0.85rem"></textarea>
+    </div>
+    <div class="form-group" style="margin-bottom:0.75rem">
+      <label>Microscopic Findings</label>
+      <textarea id="pathMicro" rows="3" placeholder="Detailed microscopic description..." style="font-size:0.85rem"></textarea>
+    </div>
+    <div class="form-group" style="margin-bottom:0.75rem">
+      <label>Final Diagnosis / Comment</label>
+      <textarea id="pathDiagnosis" rows="2" placeholder="Pathological diagnosis summary..." style="font-size:0.85rem"></textarea>
+    </div>
+
+    <!-- Slide Upload -->
+    <div style="margin-bottom:1rem">
+      <label style="margin-bottom:0.4rem;display:block">Upload Slides / Images</label>
+      <div class="upload-zone" id="pathSlideZone" onclick="document.getElementById('pathSlideFile').click()" style="padding:1rem;margin-bottom:0.5rem">
+        <div class="upload-icon"><i class="ri-image-add-line" style="font-size:1.5rem;color:var(--primary)"></i></div>
+        <p style="font-size:0.85rem">Drop pathology slide images here</p>
+        <p class="upload-hint">JPEG, PNG, TIFF, SVS accepted</p>
+      </div>
+      <input type="file" id="pathSlideFile" style="display:none" multiple accept=".jpg,.jpeg,.png,.tiff,.tif,.svs,.pdf" onchange="handlePathSlideUpload()">
+      <div id="pathSlidePreview" style="display:flex;gap:0.5rem;flex-wrap:wrap"></div>
+    </div>
+
+    <div style="display:flex;gap:0.5rem">
+      <button class="btn btn-primary" onclick="submitStructuredPath()"><i class="ri-save-line"></i> Save Report</button>
+      <button class="btn btn-secondary" onclick="sharePathViaWhatsApp()"><i class="ri-whatsapp-line"></i> Share via WhatsApp</button>
+    </div>
+  </div>
+
+  <!-- Shared Pathology Documents -->
+  <div id="pathDocsListPanel" style="margin-bottom:1rem"></div>
+
+  <div class="search-bar"><input type="text" id="pathSearch" placeholder="Search reports..." oninput="clinical.render('pathology')"></div>
+  <div class="table-container"><table><thead><tr><th>ID</th><th>Site</th><th>Histology</th><th>TNM</th><th>Margins</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="pathTable"></tbody></table></div>
+</div>
+
+<div id="tab-imaging" class="tab-content">
+  <div class="section-header animate-in"><h2>Imaging Results</h2><button class="btn btn-primary" onclick="clinical.render('imaging','add')"><i class="ri-add-line"></i> New Imaging</button></div>
+  <div class="patient-select-bar"><select id="imgPatientSelect" onchange="clinical.render('imaging')"></select></div>
+
+  <!-- Imaging Upload Panel -->
+  <div class="upload-panel animate-in" style="margin-bottom:1.25rem">
+    <h3 style="font-size:1rem;font-weight:700;margin-bottom:0.75rem;display:flex;align-items:center;gap:0.5rem;color:var(--gray-800)"><i class="ri-upload-cloud-2-line" style="color:var(--primary)"></i> Upload Imaging Study</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.75rem;margin-bottom:0.75rem">
+      <div class="form-group" style="margin:0">
+        <label>Patient</label>
+        <select id="imgUploadPatient" style="width:100%"></select>
+      </div>
+      <div class="form-group" style="margin:0">
+        <label>Modality</label>
+        <select id="imgUploadModality" style="width:100%">
+          <option value="CT">CT Scan</option>
+          <option value="MRI">MRI</option>
+          <option value="PET-CT">PET-CT</option>
+          <option value="X-Ray">X-Ray</option>
+          <option value="Ultrasound">Ultrasound</option>
+          <option value="Mammography">Mammography</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin:0">
+        <label>Body Part</label>
+        <input type="text" id="imgUploadBodyPart" placeholder="e.g. Head & Neck, Chest">
+      </div>
+    </div>
+    <div class="upload-zone" id="imgUploadZone" onclick="document.getElementById('imgUploadFile').click()" style="padding:1.5rem 1rem;margin-bottom:0.75rem">
+      <div class="upload-icon"><i class="ri-image-add-line" style="font-size:2rem;color:var(--primary)"></i></div>
+      <p>Drop imaging files here or click to upload</p>
+      <p class="upload-hint">DICOM, JPEG, PNG, PDF accepted — Multiple files supported</p>
+    </div>
+    <input type="file" id="imgUploadFile" style="display:none" multiple accept=".dcm,.jpg,.jpeg,.png,.pdf,.dicom" onchange="handleImagingUpload()">
+    <div id="imgUploadPreview" style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-bottom:0.75rem"></div>
+    <div style="display:flex;gap:0.5rem;align-items:center">
+      <button class="btn btn-primary" onclick="submitImagingUpload()"><i class="ri-upload-2-line"></i> Upload & Create Record</button>
+      <span id="imgUploadStatus" style="font-size:0.85rem;color:var(--gray-500)"></span>
+    </div>
+  </div>
+
+  <div class="search-bar"><input type="text" id="imgSearch" placeholder="Search imaging..." oninput="clinical.render('imaging')"></div>
+  <div class="table-container"><table><thead><tr><th>ID</th><th>Study</th><th>Finding</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="imgTable"></tbody></table></div>
+</div>
+
+<div id="tab-recommendations" class="tab-content">
+  <div class="section-header animate-in"><h2>Clinical Recommendations</h2><button class="btn btn-primary" onclick="clinical.render('recommendations','add')"><i class="ri-add-line"></i> New Recommendation</button></div>
+  <div class="patient-select-bar"><select id="recPatientSelect" onchange="clinical.render('recommendations')"></select></div>
+  <div class="search-bar"><input type="text" id="recSearch" placeholder="Search recommendations..." oninput="clinical.render('recommendations')"></div>
+  <div class="table-container"><table><thead><tr><th>ID</th><th>Priority</th><th>Category</th><th>Recommendation</th><th>Date</th><th>Actions</th></tr></thead><tbody id="recTable"></tbody></table></div>
+</div>
+
+<!-- ════════════════════════════════════════ TUMOR BOARD ═══ -->
+<div id="tab-tumorboard" class="tab-content">
+  <div class="section-header animate-in">
+    <h2>Tumor Board Coordination</h2>
+    <div style="display:flex;gap:0.5rem">
+      <button class="btn btn-primary" onclick="openTumorBoardForm()"><i class="ri-add-line"></i> Schedule</button>
+      <button class="btn btn-secondary" onclick="openTrackingForm()"><i class="ri-line-chart-line"></i> Patient Tracking</button>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;align-items:center">
+    <div style="display:flex;gap:2px;background:var(--gray-100);border-radius:var(--radius-sm);padding:2px">
+      <button class="btn btn-sm" style="border:none;background:white;box-shadow:0 1px 2px rgba(0,0,0,0.06)" onclick="switchTBView('list')" data-tbview="list"><i class="ri-list-check-2"></i> List</button>
+      <button class="btn btn-sm" style="border:none;background:transparent" onclick="switchTBView('calendar')" data-tbview="calendar"><i class="ri-calendar-line"></i> Calendar</button>
+      <button class="btn btn-sm" style="border:none;background:transparent" onclick="switchTBView('timeline')" data-tbview="timeline"><i class="ri-time-line"></i> Timeline</button>
+    </div>
+    <div style="display:flex;gap:2px">
+      <button class="btn btn-sm btn-secondary" onclick="filterTumorBoards('all')" data-tbfilter="all">All</button>
+      <button class="btn btn-sm btn-secondary" onclick="filterTumorBoards('scheduled')" data-tbfilter="scheduled">Scheduled</button>
+      <button class="btn btn-sm btn-secondary" onclick="filterTumorBoards('in_progress')" data-tbfilter="in_progress">In Progress</button>
+      <button class="btn btn-sm btn-secondary" onclick="filterTumorBoards('completed')" data-tbfilter="completed">Completed</button>
+    </div>
+  </div>
+
+  <div class="patient-select-bar">
+    <select id="tbPatientSelect" onchange="renderTumorBoards()">
+      <option value="">All Patients</option>
+    </select>
+  </div>
+
+  <!-- ── Meeting Room Panel ── -->
+  <div class="upload-panel animate-in" id="tbMeetingPanel" style="margin-bottom:1.25rem;display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+      <div>
+        <h3 style="font-size:1.05rem;font-weight:700;color:var(--gray-900);display:flex;align-items:center;gap:0.5rem">
+          <i class="ri-vidicon-line" style="color:var(--primary)"></i> Tumor Board Meeting Room
+        </h3>
+        <p style="font-size:0.85rem;color:var(--gray-500);margin-top:0.15rem">Connect specialists and patients for live case discussion</p>
+      </div>
+      <button class="btn btn-sm btn-secondary" onclick="closeMeetingPanel()"><i class="ri-close-line"></i></button>
+    </div>
+
+    <!-- Meeting Info -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+      <div class="form-group" style="margin:0">
+        <label>Select Tumor Board Meeting</label>
+        <select id="meetingTBSelect" onchange="loadMeetingDetails()" style="width:100%">
+          <option value="">— Choose a scheduled meeting —</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin:0">
+        <label>Meeting ID</label>
+        <div style="display:flex;gap:0.5rem">
+          <input type="text" id="meetingRoomId" placeholder="Auto-generated" readonly style="flex:1;background:var(--gray-50)">
+          <button class="btn btn-sm btn-secondary" onclick="copyMeetingLink()" title="Copy meeting link"><i class="ri-file-copy-line"></i></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Participants -->
+    <div style="margin-bottom:1rem">
+      <label style="margin-bottom:0.5rem;display:block">Participants</label>
+      <div id="meetingParticipants" style="display:flex;flex-wrap:wrap;gap:0.5rem;min-height:40px;padding:0.5rem;background:var(--gray-50);border-radius:var(--radius-sm);border:1px solid var(--border-color)">
+        <span style="color:var(--gray-400);font-size:0.85rem">Select a meeting to see participants</span>
+      </div>
+    </div>
+
+    <!-- Call Actions -->
+    <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-bottom:1rem">
+      <button class="btn" onclick="startVideoCall()" style="background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:white;padding:0.65rem 1.25rem;font-size:0.9rem">
+        <i class="ri-vidicon-fill"></i> Start Video Call
+      </button>
+      <button class="btn" onclick="startVoiceCall()" style="background:linear-gradient(135deg,#3B82F6,#2563EB);color:white;padding:0.65rem 1.25rem;font-size:0.9rem">
+        <i class="ri-phone-fill"></i> Voice Call
+      </button>
+      <button class="btn btn-whatsapp" onclick="startWhatsAppGroup()" style="padding:0.65rem 1.25rem;font-size:0.9rem">
+        <i class="ri-whatsapp-fill"></i> WhatsApp Group Call
+      </button>
+      <button class="btn btn-secondary" onclick="dialInPatient()" style="padding:0.65rem 1.25rem;font-size:0.9rem">
+        <i class="ri-user-voice-line"></i> Dial In Patient
+      </button>
+    </div>
+
+    <!-- Discussion Checklist (from workbook) -->
+    <div style="background:var(--gray-50);border-radius:var(--radius-sm);padding:1rem;border:1px solid var(--border-color)">
+      <h4 style="font-size:0.9rem;font-weight:700;color:var(--gray-800);margin-bottom:0.65rem;display:flex;align-items:center;gap:0.4rem">
+        <i class="ri-checkbox-multiple-line" style="color:var(--primary)"></i> Discussion Checklist
+      </h4>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem" id="meetingChecklist">
+        <label style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0.65rem;background:white;border-radius:8px;border:1px solid var(--border-color);cursor:pointer;font-size:0.85rem;font-weight:500;color:var(--gray-700);transition:all 0.15s">
+          <input type="checkbox" id="chkPatientSummary" onchange="updateMeetingChecklist()" style="accent-color:var(--primary);width:16px;height:16px"> Patient Summary
+        </label>
+        <label style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0.65rem;background:white;border-radius:8px;border:1px solid var(--border-color);cursor:pointer;font-size:0.85rem;font-weight:500;color:var(--gray-700);transition:all 0.15s">
+          <input type="checkbox" id="chkDiagnosticReview" onchange="updateMeetingChecklist()" style="accent-color:var(--primary);width:16px;height:16px"> Diagnostic Review
+        </label>
+        <label style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0.65rem;background:white;border-radius:8px;border:1px solid var(--border-color);cursor:pointer;font-size:0.85rem;font-weight:500;color:var(--gray-700);transition:all 0.15s">
+          <input type="checkbox" id="chkTreatment" onchange="updateMeetingChecklist()" style="accent-color:var(--primary);width:16px;height:16px"> Treatment Options
+        </label>
+        <label style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0.65rem;background:white;border-radius:8px;border:1px solid var(--border-color);cursor:pointer;font-size:0.85rem;font-weight:500;color:var(--gray-700);transition:all 0.15s">
+          <input type="checkbox" id="chkRecommendations" onchange="updateMeetingChecklist()" style="accent-color:var(--primary);width:16px;height:16px"> Recommendations & Vote
+        </label>
+        <label style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0.65rem;background:white;border-radius:8px;border:1px solid var(--border-color);cursor:pointer;font-size:0.85rem;font-weight:500;color:var(--gray-700);transition:all 0.15s">
+          <input type="checkbox" id="chkFollowUp" onchange="updateMeetingChecklist()" style="accent-color:var(--primary);width:16px;height:16px"> Follow-up Plan
+        </label>
+        <label style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0.65rem;background:white;border-radius:8px;border:1px solid var(--border-color);cursor:pointer;font-size:0.85rem;font-weight:500;color:var(--gray-700);transition:all 0.15s">
+          <input type="checkbox" id="chkPatientInput" onchange="updateMeetingChecklist()" style="accent-color:var(--primary);width:16px;height:16px"> Patient Input
+        </label>
+      </div>
+      <div style="margin-top:0.75rem;display:flex;gap:0.5rem;align-items:center">
+        <div style="flex:1;height:6px;background:var(--gray-200);border-radius:6px;overflow:hidden">
+          <div id="checklistProgress" style="height:100%;width:0%;background:linear-gradient(90deg,var(--primary),var(--secondary));border-radius:6px;transition:width 0.3s"></div>
+        </div>
+        <span id="checklistPercent" style="font-size:0.8rem;font-weight:600;color:var(--gray-500)">0%</span>
+      </div>
+    </div>
+  </div>
+
+    <!-- Treatment Voting (Workbook Prototype 2A: Voting component) -->
+    <div style="background:var(--gray-50);border-radius:var(--radius-sm);padding:1rem;border:1px solid var(--border-color);margin-top:1rem">
+      <h4 style="font-size:0.9rem;font-weight:700;color:var(--gray-800);margin-bottom:0.65rem;display:flex;align-items:center;gap:0.4rem">
+        <i class="ri-hand-coin-line" style="color:var(--primary)"></i> Treatment Vote
+      </h4>
+      <p style="font-size:0.8rem;color:var(--gray-500);margin-bottom:0.75rem">Each specialist votes on the recommended next action</p>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;margin-bottom:0.75rem" id="voteOptions">
+        <label class="workup-check" style="justify-content:center"><input type="radio" name="tbVote" value="Surgery" style="accent-color:var(--primary)"> Surgery</label>
+        <label class="workup-check" style="justify-content:center"><input type="radio" name="tbVote" value="Radiation Therapy" style="accent-color:var(--primary)"> Radiation</label>
+        <label class="workup-check" style="justify-content:center"><input type="radio" name="tbVote" value="Chemotherapy" style="accent-color:var(--primary)"> Chemotherapy</label>
+        <label class="workup-check" style="justify-content:center"><input type="radio" name="tbVote" value="Clinical Trial" style="accent-color:var(--primary)"> Clinical Trial</label>
+        <label class="workup-check" style="justify-content:center"><input type="radio" name="tbVote" value="Best Supportive Care" style="accent-color:var(--primary)"> Supportive Care</label>
+        <label class="workup-check" style="justify-content:center"><input type="radio" name="tbVote" value="Deferred" style="accent-color:var(--primary)"> Deferred</label>
+      </div>
+      <div class="form-group" style="margin-bottom:0.5rem"><label>Comment (optional)</label><textarea id="voteComment" rows="2" placeholder="Brief rationale for your vote..." style="font-size:0.85rem"></textarea></div>
+      <button class="btn btn-primary" onclick="submitVote()"><i class="ri-check-double-line"></i> Submit Vote</button>
+      <div id="voteResults" style="margin-top:0.75rem;display:none"></div>
+    </div>
+
+    <!-- Attendance & CME (Workbook Prototype 2A) -->
+    <div style="background:var(--gray-50);border-radius:var(--radius-sm);padding:1rem;border:1px solid var(--border-color);margin-top:0.75rem">
+      <h4 style="font-size:0.9rem;font-weight:700;color:var(--gray-800);margin-bottom:0.65rem;display:flex;align-items:center;gap:0.4rem">
+        <i class="ri-award-line" style="color:var(--primary)"></i> Attendance & CME Credits
+      </h4>
+      <p style="font-size:0.8rem;color:var(--gray-500);margin-bottom:0.5rem">1 CME credit earned per meeting attended</p>
+      <div id="attendanceList" style="display:flex;flex-wrap:wrap;gap:0.4rem;min-height:32px">
+        <span style="color:var(--gray-400);font-size:0.85rem">No attendance records yet</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Meeting Start Button (shown when panel is hidden) -->
+  <div id="tbMeetingBtn" style="margin-bottom:1rem">
+    <button class="btn" onclick="openMeetingPanel()" style="background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:white;padding:0.6rem 1.25rem;font-size:0.9rem;box-shadow:0 4px 15px rgba(15,76,92,0.25)">
+      <i class="ri-vidicon-line"></i> Open Meeting Room
+    </button>
+  </div>
+
+  <div id="tbListView" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(400px,1fr));gap:1rem"></div>
+
+  <div id="tbCalendarView" style="display:none">
+    <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem">
+      <button class="btn btn-sm btn-secondary" onclick="shiftTBMonth(-1)"><i class="ri-arrow-left-s-line"></i></button>
+      <h3 id="tbCalendarMonth" style="font-size:0.95rem;min-width:180px;text-align:center;font-weight:600"></h3>
+      <button class="btn btn-sm btn-secondary" onclick="shiftTBMonth(1)"><i class="ri-arrow-right-s-line"></i></button>
+      <button class="btn btn-sm btn-secondary" onclick="todayTBMonth()">Today</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--gray-200);border-radius:var(--radius-sm);overflow:hidden">
+      <div style="background:var(--gray-50);padding:0.5rem;text-align:center;font-size:0.65rem;font-weight:600;color:var(--gray-500);text-transform:uppercase">Sun</div>
+      <div style="background:var(--gray-50);padding:0.5rem;text-align:center;font-size:0.65rem;font-weight:600;color:var(--gray-500);text-transform:uppercase">Mon</div>
+      <div style="background:var(--gray-50);padding:0.5rem;text-align:center;font-size:0.65rem;font-weight:600;color:var(--gray-500);text-transform:uppercase">Tue</div>
+      <div style="background:var(--gray-50);padding:0.5rem;text-align:center;font-size:0.65rem;font-weight:600;color:var(--gray-500);text-transform:uppercase">Wed</div>
+      <div style="background:var(--gray-50);padding:0.5rem;text-align:center;font-size:0.65rem;font-weight:600;color:var(--gray-500);text-transform:uppercase">Thu</div>
+      <div style="background:var(--gray-50);padding:0.5rem;text-align:center;font-size:0.65rem;font-weight:600;color:var(--gray-500);text-transform:uppercase">Fri</div>
+      <div style="background:var(--gray-50);padding:0.5rem;text-align:center;font-size:0.65rem;font-weight:600;color:var(--gray-500);text-transform:uppercase">Sat</div>
+    </div>
+    <div id="tbCalendarGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--gray-200);border-radius:var(--radius-sm);overflow:hidden"></div>
+  </div>
+
+  <div id="tbTimelineView" style="display:none">
+    <div class="patient-select-bar">
+      <select id="tbTimelinePatient" onchange="renderTimeline()">
+        <option value="">— Select Patient —</option>
+      </select>
+    </div>
+    <div id="tbTimelineContent"></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ AI SUMMARY ═══ -->
+<div id="tab-summary" class="tab-content">
+  <div class="section-header animate-in"><h2>Clinical AI Intelligence</h2><p class="section-desc">Stanford Medicine-style ambient intelligence, clinical notes, safety alerts, and AI summaries</p></div>
+  <div class="patient-select-bar">
+    <select id="summaryPatientSelect" onchange="loadSummaryPatients();loadClinicalIntel()"></select>
+    <span id="summaryMethodBadge" style="margin-left:0.5rem;padding:0.1rem 0.45rem;border-radius:999px;font-size:0.72rem;font-weight:600;background:rgba(15,76,92,0.06);color:var(--primary)"></span>
+  </div>
+
+  <!-- Patient Safety Alerts -->
+  <div id="safetyAlerts" style="display:none;margin-bottom:1rem"></div>
+
+  <!-- Care Gap Detection -->
+  <div id="careGaps" style="display:none;margin-bottom:1rem"></div>
+
+  <!-- AI Tools Grid -->
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.75rem;margin-bottom:1.25rem">
+    <!-- Pre-Visit Summary -->
+    <div class="upload-panel animate-in" style="padding:1rem;margin:0">
+      <h4 style="font-size:0.95rem;font-weight:700;display:flex;align-items:center;gap:0.4rem;margin-bottom:0.5rem"><i class="ri-calendar-check-line" style="color:var(--primary)"></i> Pre-Visit Summary</h4>
+      <p style="font-size:0.85rem;color:var(--gray-500);margin-bottom:0.75rem;line-height:1.5">Auto-generate a briefing with patient history, recent results, and pending items before the appointment.</p>
+      <button class="btn btn-primary btn-sm" onclick="generatePreVisit()"><i class="ri-magic-line"></i> Generate</button>
+    </div>
+
+    <!-- SOAP Notes -->
+    <div class="upload-panel animate-in" style="padding:1rem;margin:0">
+      <h4 style="font-size:0.95rem;font-weight:700;display:flex;align-items:center;gap:0.4rem;margin-bottom:0.5rem"><i class="ri-file-edit-line" style="color:#3B82F6"></i> AI Clinical Notes</h4>
+      <p style="font-size:0.85rem;color:var(--gray-500);margin-bottom:0.75rem;line-height:1.5">Generate structured SOAP notes from patient data — Subjective, Objective, Assessment, Plan.</p>
+      <button class="btn btn-sm" onclick="generateSOAP()" style="background:#3B82F6;color:white"><i class="ri-magic-line"></i> Generate</button>
+    </div>
+
+    <!-- Post-Visit Follow-up -->
+    <div class="upload-panel animate-in" style="padding:1rem;margin:0">
+      <h4 style="font-size:0.95rem;font-weight:700;display:flex;align-items:center;gap:0.4rem;margin-bottom:0.5rem"><i class="ri-task-line" style="color:#8B5CF6"></i> Post-Visit Tasks</h4>
+      <p style="font-size:0.85rem;color:var(--gray-500);margin-bottom:0.75rem;line-height:1.5">Auto-generate follow-up orders, referrals needed, and next appointment scheduling.</p>
+      <button class="btn btn-sm" onclick="generatePostVisit()" style="background:#8B5CF6;color:white"><i class="ri-magic-line"></i> Generate</button>
+    </div>
+  </div>
+
+  <!-- AI Output Panel -->
+  <div id="aiOutputPanel" class="upload-panel" style="display:none;margin-bottom:1.25rem">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem">
+      <h3 id="aiOutputTitle" style="font-size:1rem;font-weight:700;display:flex;align-items:center;gap:0.5rem"><i class="ri-robot-2-line" style="color:var(--primary)"></i> AI Output</h3>
+      <div style="display:flex;gap:0.4rem">
+        <button class="btn btn-sm btn-secondary" onclick="copyAIOutput()"><i class="ri-file-copy-line"></i> Copy</button>
+        <button class="btn btn-sm btn-secondary" onclick="$('#aiOutputPanel').style.display='none'">&times;</button>
+      </div>
+    </div>
+    <div id="aiOutputContent" style="background:var(--gray-50);border:1px solid var(--border-color);border-radius:10px;padding:1rem;font-size:0.9rem;line-height:1.7;white-space:pre-wrap;max-height:400px;overflow-y:auto;color:var(--gray-700)"></div>
+  </div>
+
+  <!-- Original Summary Section -->
+  <div class="summary-panel">
+    <div class="form-group">
+      <label>Max Sentences</label>
+      <input type="number" id="summarySentences" value="5" min="1" max="20">
+    </div>
+    <button class="btn btn-primary" id="generate-summary-btn" onclick="generateSummary()"><i class="ri-brain-line"></i> Generate Summary</button>
+  </div>
+  <div class="summary-result hidden" id="summaryResult">
+    <div class="summary-header"><h3>Generated Summary</h3><span class="summary-badge">AI</span></div>
+    <div class="summary-content" id="summaryContent"></div>
+    <div class="summary-meta" id="summaryMeta"></div>
+  </div>
+  <div class="summary-history"><h3>Summary History</h3><div id="summaryHistoryList"></div></div>
+</div>
+
+<!-- ════════════════════════════════════════ ORCHESTRATOR ═══ -->
+<div id="tab-orchestrator" class="tab-content">
+  <div class="section-header animate-in">
+    <h2>Healthcare Agent Orchestrator</h2>
+    <p class="section-desc">Stanford Medicine-style multi-agent AI system for comprehensive clinical intelligence</p>
+  </div>
+
+  <!-- Smart Router Panel -->
+  <div class="orchestrator-controls" style="margin-bottom:1rem">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+      <div class="form-group" style="margin:0">
+        <label>Select Patient</label>
+        <select id="orchPatientSelect" onchange="smartRouteAgents()"><option value="">— Select Patient —</option></select>
+      </div>
+      <div class="form-group" style="margin:0">
+        <label>Orchestration Mode</label>
+        <select id="orchMode" style="width:100%">
+          <option value="full">Full Analysis (All Agents)</option>
+          <option value="smart">Smart Route (Auto-detect needed agents)</option>
+          <option value="pretb">Pre-Tumor Board Briefing</option>
+          <option value="treatment">Treatment Recommendation</option>
+          <option value="custom">Custom Selection</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Smart Route Summary -->
+    <div id="smartRouteSummary" style="display:none;padding:0.75rem 1rem;background:var(--primary-light);border:1px solid rgba(15,76,92,0.15);border-radius:10px;margin-bottom:1rem;font-size:0.9rem">
+      <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem">
+        <i class="ri-route-line" style="color:var(--primary);font-size:1.1rem"></i>
+        <strong style="color:var(--primary)">Smart Route Analysis</strong>
+      </div>
+      <div id="smartRouteDetail" style="color:var(--gray-600)"></div>
+    </div>
+
+    <label style="font-size:0.85rem;font-weight:600;color:var(--gray-700);margin-bottom:0.5rem;display:block">Agent Pipeline:</label>
+    <div class="agent-checkboxes" id="orchAgentCheckboxes"></div>
+
+    <div style="display:flex;gap:0.5rem;margin-top:1rem">
+      <button class="btn btn-primary" id="run-orchestrator" onclick="runOrchestrator()" style="padding:0.65rem 1.5rem;font-size:0.95rem"><i class="ri-play-line"></i> Run Agent Pipeline</button>
+      <button class="btn btn-secondary" onclick="runPreTBBriefing()"><i class="ri-file-paper-2-line"></i> Generate TB Briefing</button>
+    </div>
+  </div>
+
+  <!-- Agent Pipeline Visualization -->
+  <div id="orchPipeline" class="upload-panel" style="display:none;margin-bottom:1rem">
+    <h3 style="font-size:1rem;font-weight:700;display:flex;align-items:center;gap:0.5rem;margin-bottom:1rem"><i class="ri-flow-chart" style="color:var(--primary)"></i> Agent Pipeline — Live Status</h3>
+    <div id="pipelineFlow" style="display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;margin-bottom:1rem"></div>
+    <div style="display:flex;align-items:center;gap:0.75rem">
+      <div style="flex:1;height:8px;background:var(--gray-200);border-radius:8px;overflow:hidden">
+        <div id="orchProgressBar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--primary),var(--secondary));border-radius:8px;transition:width 0.5s"></div>
+      </div>
+      <span id="orchProgressText" style="font-size:0.9rem;font-weight:700;color:var(--primary);min-width:40px">0%</span>
+    </div>
+  </div>
+
+  <!-- Agent Communication Log -->
+  <div id="orchCommLog" class="upload-panel" style="display:none;margin-bottom:1rem">
+    <h3 style="font-size:1rem;font-weight:700;display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem"><i class="ri-chat-3-line" style="color:var(--primary)"></i> Agent Communication Log</h3>
+    <div id="commLogEntries" style="max-height:200px;overflow-y:auto;font-size:0.85rem"></div>
+  </div>
+
+  <!-- Results -->
+  <div class="orchestrator-results hidden" id="orchResults">
+    <div class="orch-status-bar"><span class="orch-status-dot"></span> <span id="orchStatus">All agents completed successfully</span></div>
+
+    <!-- Clinical Intelligence Dashboard -->
+    <div id="clinicalDashboard" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.75rem;margin-bottom:1rem">
+      <div style="background:linear-gradient(135deg,var(--primary),var(--primary-dark));border-radius:12px;padding:1rem;color:white">
+        <div style="font-size:0.8rem;opacity:0.7;margin-bottom:0.25rem">Risk Score</div>
+        <div id="orchRiskScore" style="font-size:2rem;font-weight:800">—</div>
+        <div id="orchRiskLabel" style="font-size:0.85rem;opacity:0.8">Calculating...</div>
+      </div>
+      <div style="background:linear-gradient(135deg,#3B82F6,#2563EB);border-radius:12px;padding:1rem;color:white">
+        <div style="font-size:0.8rem;opacity:0.7;margin-bottom:0.25rem">Guideline Match</div>
+        <div id="orchGuidelineScore" style="font-size:2rem;font-weight:800">—</div>
+        <div id="orchGuidelineLabel" style="font-size:0.85rem;opacity:0.8">NCCN/WHO</div>
+      </div>
+      <div style="background:linear-gradient(135deg,#8B5CF6,#7C3AED);border-radius:12px;padding:1rem;color:white">
+        <div style="font-size:0.8rem;opacity:0.7;margin-bottom:0.25rem">Agents Run</div>
+        <div id="orchAgentCount" style="font-size:2rem;font-weight:800">0</div>
+        <div id="orchAgentTime" style="font-size:0.85rem;opacity:0.8">0s elapsed</div>
+      </div>
+    </div>
+
+    <div class="orch-agent-grid" id="orchAgentGrid"></div>
+
+    <!-- Treatment Recommendation -->
+    <div id="orchTreatmentRec" style="display:none;background:linear-gradient(135deg,rgba(15,76,92,0.04),rgba(20,255,236,0.04));border:1px solid rgba(15,76,92,0.12);border-radius:12px;padding:1.25rem;margin-bottom:1rem">
+      <h3 style="font-size:1rem;font-weight:700;display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem"><i class="ri-lightbulb-flash-line" style="color:var(--primary)"></i> AI Treatment Recommendation</h3>
+      <div id="orchTreatmentText" style="font-size:0.95rem;line-height:1.7;color:var(--gray-700)"></div>
+    </div>
+
+    <div class="orch-compiled-report"><h3><i class="ri-file-list-3-line"></i> Compiled Clinical Report</h3><div class="report-text" id="orchReport"></div></div>
+  </div>
+
+  <div class="orch-loading hidden" id="orchLoading">
+    <div class="orch-spinner"></div>
+    <p>Running agent pipeline...</p>
+    <div class="orch-progress" id="orchProgress"></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ REVIEWS ═══ -->
+<div id="tab-reviews" class="tab-content">
+  <div class="section-header animate-in">
+    <h2>Patient & Doctor Reviews</h2>
+    <button class="btn btn-primary" onclick="openReviewModal()"><i class="ri-add-line"></i> Add Review</button>
+  </div>
+  <div class="reviews-section">
+    <div class="patient-select-bar">
+      <select id="reviewPatientSelect" onchange="renderReviews()"></select>
+    </div>
+    <div class="reviews-grid" id="reviewsGrid"></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ WHATSAPP ═══ -->
+<div id="tab-whatsapp" class="tab-content">
+  <div class="section-header animate-in">
+    <h2>WhatsApp Integration</h2>
+    <p class="section-desc">Send messages to patients and doctors via WhatsApp click-to-chat</p>
+  </div>
+  <div class="whatsapp-panel">
+    <h3><i class="ri-contacts-line"></i> Patient Contacts</h3>
+    <div class="whatsapp-contacts" id="waPatientContacts"></div>
+  </div>
+  <div class="whatsapp-panel">
+    <h3><i class="ri-stethoscope-line"></i> Doctor Contacts</h3>
+    <div class="whatsapp-contacts" id="waDoctorContacts"></div>
+  </div>
+  <div class="whatsapp-panel">
+    <h3><i class="ri-send-plane-line"></i> Quick Message</h3>
+    <div class="form-group">
+      <label>Phone Number (with country code)</label>
+      <input type="text" id="waQuickPhone" placeholder="e.g. 1234567890">
+    </div>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+      <button class="btn btn-whatsapp" onclick="openWhatsAppQuick()"><i class="ri-whatsapp-line"></i> Open WhatsApp</button>
+      <button class="btn btn-secondary" onclick="generateWALink()"><i class="ri-links-line"></i> Copy Link</button>
+    </div>
+  </div>
+</div>
+
+  </div> <!-- /page-content -->
+</div> <!-- /main-wrapper -->
+</div> <!-- /app-layout -->
+
+<!-- ════════════════════ MODAL ═══ -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalTitle">Modal</h3>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<!-- WhatsApp floating button -->
+<button class="whatsapp-float" onclick="switchTab('whatsapp')">
+  <div class="wa-icon"><i class="ri-whatsapp-line"></i></div>
+  <span>WhatsApp</span>
+</button>
+
+<script src="/static/js/animations.js"></script>
+<script>
+// Auth guard
+if (!localStorage.getItem('oncoai_token')) {
+  window.location.href = '/login';
+}
+// Populate user info in sidebar
+const _user = JSON.parse(localStorage.getItem('oncoai_user') || '{}');
+const _nameEl = document.querySelector('.sidebar-user-name');
+const _roleEl = document.querySelector('.sidebar-user-role');
+if (_nameEl && _user.full_name) _nameEl.textContent = _user.full_name;
+if (_roleEl && _user.specialty) _roleEl.textContent = _user.specialty;
+
+function logout() {
+  localStorage.removeItem('oncoai_token');
+  localStorage.removeItem('oncoai_user');
+  window.location.href = '/login';
+}
+</script>
+<script src="/static/js/app.js"></script>
+</body>
+</html>

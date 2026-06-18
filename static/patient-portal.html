@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OncoAI — Patient Portal</title>
+<link rel="icon" type="image/png" href="/static/img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.5.0/remixicon.min.css">
+<style>
+:root {
+  --primary: #0F4C5C;
+  --primary-dark: #0A3B48;
+  --secondary: #14FFEC;
+  --gray-50: #FAFAF9;
+  --gray-100: #F5F5F4;
+  --gray-200: #E7E5E4;
+  --gray-300: #D6D3D1;
+  --gray-400: #A8A29E;
+  --gray-500: #78716C;
+  --gray-700: #44403C;
+  --gray-800: #292524;
+  --gray-900: #1C1917;
+  --danger: #EF4444;
+  --success: #22C55E;
+  --warning: #F59E0B;
+  --font: 'Inter', system-ui, sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--font);
+  min-height: 100vh;
+  background: var(--gray-50);
+  -webkit-font-smoothing: antialiased;
+  color: var(--gray-800);
+}
+
+/* ─── Header ───────────────────────────────────────────── */
+
+.portal-header {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(15,76,92,0.3);
+}
+
+.portal-header img {
+  height: 36px;
+  width: auto;
+}
+
+.portal-header h1 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: white;
+  letter-spacing: -0.01em;
+}
+
+.portal-header h1 span {
+  color: var(--secondary);
+  font-weight: 400;
+  font-size: 0.85rem;
+  margin-left: 0.4rem;
+}
+
+.header-logout {
+  margin-left: auto;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: white;
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-family: var(--font);
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  gap: 0.35rem;
+  transition: background 0.2s;
+}
+
+.header-logout:hover {
+  background: rgba(255,255,255,0.25);
+}
+
+/* ─── Login Section ────────────────────────────────────── */
+
+.login-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 60px);
+  padding: 1.5rem;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  animation: fadeUp 0.5s ease;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.login-card h2 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--gray-900);
+  margin-bottom: 0.35rem;
+  letter-spacing: -0.02em;
+}
+
+.login-card .subtitle {
+  font-size: 0.9rem;
+  color: var(--gray-500);
+  margin-bottom: 1.75rem;
+  line-height: 1.5;
+}
+
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--gray-700);
+  margin-bottom: 0.4rem;
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.input-wrapper i {
+  position: absolute;
+  left: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--gray-400);
+  font-size: 1rem;
+}
+
+.input-wrapper input,
+.input-wrapper select {
+  width: 100%;
+  padding: 0.7rem 0.85rem 0.7rem 2.5rem;
+  border: 1px solid var(--gray-200);
+  border-radius: 10px;
+  font-size: 0.975rem;
+  font-family: var(--font);
+  color: var(--gray-800);
+  background: white;
+  transition: all 0.2s;
+  -webkit-appearance: none;
+}
+
+.input-wrapper input:focus,
+.input-wrapper select:focus {
+  outline: none;
+  border-color: rgba(15,76,92,0.3);
+  box-shadow: 0 0 0 3px rgba(15,76,92,0.08);
+}
+
+.input-wrapper input::placeholder {
+  color: var(--gray-400);
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(15,76,92,0.3);
+}
+
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, transparent 40%, rgba(20,255,236,0.15) 50%, transparent 60%);
+  transform: translateX(-100%);
+  transition: transform 0.6s;
+}
+
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(15,76,92,0.4); }
+.btn-primary:hover::after { transform: translateX(100%); }
+.btn-primary:active { transform: translateY(0); }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+.error-msg {
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  color: #DC2626;
+  padding: 0.6rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  display: none;
+}
+
+.help-text {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--gray-500);
+  margin-top: 1.25rem;
+  line-height: 1.5;
+}
+
+.help-text i {
+  color: var(--primary);
+}
+
+/* ─── Dashboard ────────────────────────────────────────── */
+
+.dashboard {
+  display: none;
+  padding: 1rem;
+  max-width: 600px;
+  margin: 0 auto;
+  padding-bottom: 6rem;
+}
+
+/* Welcome Banner */
+.welcome-banner {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  border-radius: 16px;
+  padding: 1.5rem;
+  color: white;
+  margin-bottom: 1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.welcome-banner::before {
+  content: '';
+  position: absolute;
+  top: -30%;
+  right: -20%;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(20,255,236,0.1) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.welcome-banner h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+  position: relative;
+}
+
+.welcome-banner p {
+  font-size: 0.9rem;
+  opacity: 0.8;
+  position: relative;
+}
+
+.welcome-banner .patient-code-badge {
+  display: inline-block;
+  margin-top: 0.5rem;
+  background: rgba(20,255,236,0.15);
+  border: 1px solid rgba(20,255,236,0.3);
+  padding: 0.25rem 0.65rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: var(--secondary);
+  font-weight: 600;
+  position: relative;
+}
+
+/* Card */
+.card {
+  background: white;
+  border-radius: 14px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.06);
+  border: 1px solid var(--gray-100);
+  animation: fadeUp 0.4s ease;
+}
+
+.card-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.card-title i {
+  width: 30px;
+  height: 30px;
+  background: rgba(15,76,92,0.08);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+/* ─── Journey Tracker ──────────────────────────────────── */
+
+.journey-tracker {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+.journey-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 64px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.journey-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--gray-200);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  color: var(--gray-400);
+  font-weight: 700;
+  position: relative;
+  z-index: 2;
+  transition: all 0.3s;
+}
+
+.journey-step.completed .journey-dot {
+  background: var(--primary);
+  color: white;
+}
+
+.journey-step.current .journey-dot {
+  background: var(--secondary);
+  color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(20,255,236,0.25);
+}
+
+.journey-label {
+  font-size: 0.65rem;
+  color: var(--gray-400);
+  text-align: center;
+  margin-top: 0.4rem;
+  line-height: 1.2;
+  max-width: 60px;
+}
+
+.journey-step.completed .journey-label,
+.journey-step.current .journey-label {
+  color: var(--gray-700);
+  font-weight: 600;
+}
+
+.journey-line {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  width: 100%;
+  height: 3px;
+  background: var(--gray-200);
+  z-index: 1;
+}
+
+.journey-step.completed .journey-line {
+  background: var(--primary);
+}
+
+.journey-step:last-child .journey-line {
+  display: none;
+}
+
+/* ─── Appointments ─────────────────────────────────────── */
+
+.appointment-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.appointment-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.appointment-date {
+  background: rgba(15,76,92,0.06);
+  border-radius: 10px;
+  padding: 0.5rem 0.65rem;
+  text-align: center;
+  min-width: 52px;
+  flex-shrink: 0;
+}
+
+.appointment-date .day {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1;
+}
+
+.appointment-date .month {
+  font-size: 0.65rem;
+  color: var(--gray-500);
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-top: 0.15rem;
+}
+
+.appointment-info h4 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--gray-800);
+  margin-bottom: 0.15rem;
+}
+
+.appointment-info p {
+  font-size: 0.8rem;
+  color: var(--gray-500);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 1.5rem 0.5rem;
+  color: var(--gray-400);
+  font-size: 0.9rem;
+}
+
+.empty-state i {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+/* ─── Test Results ─────────────────────────────────────── */
+
+.result-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.result-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.result-name {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--gray-800);
+}
+
+.result-date {
+  font-size: 0.75rem;
+  color: var(--gray-400);
+}
+
+.status-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.status-badge.pending {
+  background: #FEF3C7;
+  color: #92400E;
+}
+
+.status-badge.completed, .status-badge.complete {
+  background: #DCFCE7;
+  color: #166534;
+}
+
+.status-badge.abnormal {
+  background: #FEE2E2;
+  color: #991B1B;
+}
+
+.status-badge.routine {
+  background: rgba(15,76,92,0.08);
+  color: var(--primary);
+}
+
+/* ─── Preference Survey ────────────────────────────────── */
+
+.survey-completed-msg {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: #DCFCE7;
+  border: 1px solid #BBF7D0;
+  border-radius: 10px;
+  padding: 1rem;
+  color: #166534;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.survey-completed-msg i {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.survey-question {
+  margin-bottom: 1.25rem;
+}
+
+.survey-question label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--gray-700);
+  margin-bottom: 0.5rem;
+}
+
+.survey-question .help {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--gray-400);
+  font-weight: 400;
+  margin-top: 0.15rem;
+}
+
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--gray-200);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+  color: var(--gray-700);
+}
+
+.radio-option:hover {
+  border-color: rgba(15,76,92,0.3);
+  background: rgba(15,76,92,0.02);
+}
+
+.radio-option input[type="radio"] {
+  accent-color: var(--primary);
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.radio-option.selected {
+  border-color: var(--primary);
+  background: rgba(15,76,92,0.04);
+}
+
+.btn-survey {
+  width: 100%;
+  padding: 0.75rem;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: var(--font);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+  box-shadow: 0 2px 10px rgba(15,76,92,0.2);
+}
+
+.btn-survey:hover { background: var(--primary-dark); }
+.btn-survey:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ─── WhatsApp Button ──────────────────────────────────── */
+
+.whatsapp-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.85rem;
+  background: #25D366;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: var(--font);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s;
+  box-shadow: 0 3px 12px rgba(37,211,102,0.3);
+}
+
+.whatsapp-btn:hover {
+  background: #1EB954;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(37,211,102,0.4);
+}
+
+.whatsapp-btn i {
+  font-size: 1.3rem;
+}
+
+/* ─── Footer ───────────────────────────────────────────── */
+
+.portal-footer {
+  text-align: center;
+  padding: 1.5rem 1rem;
+  color: var(--gray-400);
+  font-size: 0.8rem;
+}
+
+.portal-footer span {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* ─── Loading ──────────────────────────────────────────── */
+
+.loading-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.loading-spinner i {
+  font-size: 1.5rem;
+  color: var(--primary);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ─── Responsive ───────────────────────────────────────── */
+
+@media (min-width: 768px) {
+  .portal-header {
+    padding: 1rem 2rem;
+  }
+
+  .portal-header img {
+    height: 42px;
+  }
+
+  .portal-header h1 {
+    font-size: 1.25rem;
+  }
+
+  .dashboard {
+    padding: 1.5rem;
+  }
+
+  .login-card {
+    padding: 2.5rem;
+  }
+
+  .card {
+    padding: 1.5rem;
+  }
+
+  .welcome-banner {
+    padding: 2rem;
+  }
+}
+
+/* Scrollbar for journey tracker on mobile */
+.journey-tracker::-webkit-scrollbar {
+  height: 4px;
+}
+
+.journey-tracker::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.journey-tracker::-webkit-scrollbar-thumb {
+  background: var(--gray-300);
+  border-radius: 4px;
+}
+</style>
+</head>
+<body>
+
+<!-- ─── Header ───────────────────────────────────────────── -->
+<header class="portal-header">
+  <img src="/static/img/logo-light.png" alt="OncoAI">
+  <h1>Patient Portal</h1>
+  <button class="header-logout" id="logoutBtn" onclick="handleLogout()">
+    <i class="ri-logout-box-r-line"></i> Sign out
+  </button>
+</header>
+
+<!-- ─── Login Section ────────────────────────────────────── -->
+<section class="login-section" id="loginSection">
+  <div class="login-card">
+    <h2>Welcome</h2>
+    <p class="subtitle">Enter your patient code and phone number to view your care information.</p>
+
+    <div class="error-msg" id="errorMsg"></div>
+
+    <form id="loginForm" onsubmit="handlePatientLogin(event)">
+      <div class="form-group">
+        <label>Patient Code</label>
+        <div class="input-wrapper">
+          <i class="ri-hashtag"></i>
+          <input type="text" id="patientCode" placeholder="e.g. PAT-0001" required autocomplete="off">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Phone Number</label>
+        <div class="input-wrapper">
+          <i class="ri-phone-line"></i>
+          <input type="tel" id="phoneNumber" placeholder="e.g. 0712345678" required autocomplete="tel">
+        </div>
+      </div>
+
+      <button type="submit" class="btn-primary" id="submitBtn">
+        <i class="ri-shield-check-line"></i> View My Care Info
+      </button>
+    </form>
+
+    <p class="help-text">
+      <i class="ri-information-line"></i> Your patient code was given to you at registration.<br>
+      Ask your care team if you do not have it.
+    </p>
+  </div>
+</section>
+
+<!-- ─── Dashboard (hidden until login) ───────────────────── -->
+<section class="dashboard" id="dashboard">
+
+  <!-- Welcome Banner -->
+  <div class="welcome-banner" id="welcomeBanner">
+    <h2 id="welcomeName">Welcome</h2>
+    <p id="welcomeCondition"></p>
+    <div class="patient-code-badge" id="welcomeCode"></div>
+  </div>
+
+  <!-- Journey Progress -->
+  <div class="card">
+    <div class="card-title">
+      <i class="ri-route-line"></i>
+      Your Care Journey
+    </div>
+    <div class="journey-tracker" id="journeyTracker">
+      <!-- Populated by JS -->
+    </div>
+    <p id="journeyStatusText" style="font-size:0.85rem;color:var(--gray-500);margin-top:0.75rem;text-align:center;"></p>
+  </div>
+
+  <!-- Upcoming Appointments / TB Meetings -->
+  <div class="card">
+    <div class="card-title">
+      <i class="ri-calendar-check-line"></i>
+      Upcoming Appointments
+    </div>
+    <div id="appointmentsList">
+      <div class="loading-spinner"><i class="ri-loader-4-line"></i></div>
+    </div>
+  </div>
+
+  <!-- Test Results -->
+  <div class="card">
+    <div class="card-title">
+      <i class="ri-test-tube-line"></i>
+      Your Test Results
+    </div>
+    <div id="resultsList">
+      <div class="loading-spinner"><i class="ri-loader-4-line"></i></div>
+    </div>
+  </div>
+
+  <!-- Preference Survey -->
+  <div class="card">
+    <div class="card-title">
+      <i class="ri-survey-line"></i>
+      Your Preferences
+    </div>
+    <div id="surveySection">
+      <div class="loading-spinner"><i class="ri-loader-4-line"></i></div>
+    </div>
+  </div>
+
+  <!-- WhatsApp Contact -->
+  <div class="card">
+    <div class="card-title">
+      <i class="ri-customer-service-2-line"></i>
+      Need Help?
+    </div>
+    <p style="font-size:0.9rem;color:var(--gray-500);margin-bottom:1rem;">
+      Reach your TB Coordinator on WhatsApp for questions about your care, appointments, or results.
+    </p>
+    <a href="https://wa.me/255700000000?text=Hello%2C%20I%20am%20a%20patient%20and%20need%20help" target="_blank" class="whatsapp-btn" id="whatsappBtn">
+      <i class="ri-whatsapp-line"></i>
+      Contact TB Coordinator
+    </a>
+  </div>
+
+  <!-- Footer -->
+  <footer class="portal-footer">
+    Powered by <span>OncoAI</span>
+  </footer>
+</section>
+
+<script>
+/* ─── State ────────────────────────────────────────────── */
+let currentPatient = null;
+
+const JOURNEY_STEPS = [
+  { key: 'arrival',            label: 'Arrival' },
+  { key: 'evaluation',         label: 'Evaluation' },
+  { key: 'biopsy_ordered',     label: 'Biopsy' },
+  { key: 'awaiting_results',   label: 'Awaiting Results' },
+  { key: 'case_compiled',      label: 'Case Ready' },
+  { key: 'tb_scheduled',       label: 'Meeting Scheduled' },
+  { key: 'tb_presented',       label: 'Meeting Done' },
+  { key: 'treatment_planned',  label: 'Plan Ready' },
+  { key: 'awaiting_treatment', label: 'Awaiting Treatment' },
+  { key: 'in_treatment',       label: 'In Treatment' },
+];
+
+/* ─── API Helper ───────────────────────────────────────── */
+async function api(url) {
+  const res = await fetch(url);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || `Request failed (${res.status})`);
+  }
+  return res.json();
+}
+
+async function apiPost(url, body) {
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || `Request failed (${res.status})`);
+  }
+  return res.json();
+}
+
+/* ─── Login ────────────────────────────────────────────── */
+async function handlePatientLogin(e) {
+  e.preventDefault();
+  const btn = document.getElementById('submitBtn');
+  const errEl = document.getElementById('errorMsg');
+  errEl.style.display = 'none';
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ri-loader-4-line" style="animation:spin 1s linear infinite"></i> Checking...';
+
+  const code = document.getElementById('patientCode').value.trim().toUpperCase();
+  const phone = document.getElementById('phoneNumber').value.trim();
+
+  try {
+    const patients = await api(`/api/patients?search=${encodeURIComponent(code)}`);
+
+    // Find exact match by patient_code
+    const patient = patients.find(p =>
+      p.patient_code && p.patient_code.toUpperCase() === code
+    );
+
+    if (!patient) {
+      throw new Error('Patient code not found. Please check and try again.');
+    }
+
+    // Verify phone number
+    const patientPhone = (patient.phone || '').replace(/[\s\-\+]/g, '');
+    const inputPhone = phone.replace(/[\s\-\+]/g, '');
+
+    // Allow match on last 9 digits (handles country code differences)
+    const phoneTail = str => str.length >= 9 ? str.slice(-9) : str;
+
+    if (!patientPhone || phoneTail(patientPhone) !== phoneTail(inputPhone)) {
+      throw new Error('Phone number does not match our records. Please try again.');
+    }
+
+    // Success - store and show dashboard
+    currentPatient = patient;
+    sessionStorage.setItem('portal_patient', JSON.stringify(patient));
+    showDashboard();
+
+  } catch (err) {
+    errEl.textContent = err.message;
+    errEl.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="ri-shield-check-line"></i> View My Care Info';
+  }
+}
+
+/* ─── Logout ───────────────────────────────────────────── */
+function handleLogout() {
+  currentPatient = null;
+  sessionStorage.removeItem('portal_patient');
+  document.getElementById('loginSection').style.display = 'flex';
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('logoutBtn').style.display = 'none';
+  document.getElementById('patientCode').value = '';
+  document.getElementById('phoneNumber').value = '';
+}
+
+/* ─── Show Dashboard ───────────────────────────────────── */
+function showDashboard() {
+  const p = currentPatient;
+  if (!p) return;
+
+  document.getElementById('loginSection').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  document.getElementById('logoutBtn').style.display = 'flex';
+
+  // Welcome banner
+  document.getElementById('welcomeName').textContent = `Welcome, ${p.name}`;
+  document.getElementById('welcomeCondition').textContent =
+    p.medical_condition || p.cancer_type || 'Your care team is here for you';
+  document.getElementById('welcomeCode').textContent = p.patient_code;
+
+  // WhatsApp link with patient info
+  const waMsg = encodeURIComponent(`Hello, I am patient ${p.name} (${p.patient_code}). I need help with my care.`);
+  document.getElementById('whatsappBtn').href = `https://wa.me/255700000000?text=${waMsg}`;
+
+  // Render journey
+  renderJourney(p.journey_status || 'arrival');
+
+  // Load data
+  loadAppointments(p.id);
+  loadResults(p.id);
+  loadPreferences(p.id);
+}
+
+/* ─── Journey Tracker ──────────────────────────────────── */
+function renderJourney(currentStatus) {
+  const container = document.getElementById('journeyTracker');
+  const currentIdx = JOURNEY_STEPS.findIndex(s => s.key === currentStatus);
+  const idx = currentIdx >= 0 ? currentIdx : 0;
+
+  let html = '';
+  JOURNEY_STEPS.forEach((step, i) => {
+    let cls = '';
+    if (i < idx) cls = 'completed';
+    else if (i === idx) cls = 'current';
+
+    html += `
+      <div class="journey-step ${cls}">
+        <div class="journey-line"></div>
+        <div class="journey-dot">
+          ${i < idx ? '<i class="ri-check-line" style="font-size:0.75rem"></i>' : (i + 1)}
+        </div>
+        <div class="journey-label">${step.label}</div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+
+  const statusText = document.getElementById('journeyStatusText');
+  const stepLabel = JOURNEY_STEPS[idx] ? JOURNEY_STEPS[idx].label : currentStatus;
+  statusText.textContent = `Current step: ${stepLabel} (${idx + 1} of ${JOURNEY_STEPS.length})`;
+}
+
+/* ─── Appointments / Tumor Board Meetings ──────────────── */
+async function loadAppointments(pid) {
+  const el = document.getElementById('appointmentsList');
+  try {
+    const meetings = await api(`/api/patients/${pid}/tumor-boards`);
+
+    // Filter to upcoming or recent scheduled meetings
+    const now = new Date();
+    const upcoming = meetings.filter(m => {
+      const d = new Date(m.scheduled_date);
+      // Show meetings from 30 days ago to future
+      return d >= new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    }).slice(0, 5);
+
+    if (upcoming.length === 0) {
+      el.innerHTML = `
+        <div class="empty-state">
+          <i class="ri-calendar-line"></i>
+          No upcoming appointments at this time.<br>Your care team will schedule when ready.
+        </div>`;
+      return;
+    }
+
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+    el.innerHTML = upcoming.map(m => {
+      const d = new Date(m.scheduled_date);
+      const isPast = d < now;
+      const statusLabel = m.status === 'completed' ? 'Completed' : (isPast ? 'Past' : 'Upcoming');
+      const statusCls = m.status === 'completed' ? 'completed' : (isPast ? 'routine' : 'pending');
+
+      return `
+        <div class="appointment-item">
+          <div class="appointment-date">
+            <div class="day">${d.getDate()}</div>
+            <div class="month">${months[d.getMonth()]}</div>
+          </div>
+          <div class="appointment-info">
+            <h4>Tumor Board Meeting</h4>
+            <p>
+              ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              ${m.chairperson ? ' &middot; Dr. ' + m.chairperson : ''}
+            </p>
+            <span class="status-badge ${statusCls}" style="margin-top:0.25rem;display:inline-block">${statusLabel}</span>
+          </div>
+        </div>`;
+    }).join('');
+
+  } catch (err) {
+    el.innerHTML = `<div class="empty-state"><i class="ri-calendar-line"></i>Could not load appointments.</div>`;
+  }
+}
+
+/* ─── Test Results ─────────────────────────────────────── */
+async function loadResults(pid) {
+  const el = document.getElementById('resultsList');
+  try {
+    const [labs, pathology, imaging] = await Promise.all([
+      api(`/api/patients/${pid}/lab-results`),
+      api(`/api/patients/${pid}/pathology-reports`),
+      api(`/api/patients/${pid}/imaging-results`),
+    ]);
+
+    const allResults = [];
+
+    labs.forEach(l => {
+      allResults.push({
+        name: l.test_name || 'Lab Test',
+        status: l.status || 'Pending',
+        date: l.created_at,
+        type: 'Lab',
+      });
+    });
+
+    pathology.forEach(p => {
+      allResults.push({
+        name: p.specimen_type || 'Pathology Report',
+        status: p.status || 'Pending',
+        date: p.created_at,
+        type: 'Pathology',
+      });
+    });
+
+    imaging.forEach(im => {
+      allResults.push({
+        name: im.study_type || im.modality || 'Imaging',
+        status: im.status || 'Pending',
+        date: im.created_at,
+        type: 'Imaging',
+      });
+    });
+
+    // Sort by date descending
+    allResults.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    if (allResults.length === 0) {
+      el.innerHTML = `
+        <div class="empty-state">
+          <i class="ri-test-tube-line"></i>
+          No test results yet.<br>Results will appear here when available.
+        </div>`;
+      return;
+    }
+
+    el.innerHTML = allResults.slice(0, 10).map(r => {
+      const statusCls = (r.status || '').toLowerCase() === 'completed' || (r.status || '').toLowerCase() === 'complete'
+        ? 'completed'
+        : (r.status || '').toLowerCase() === 'abnormal' ? 'abnormal' : 'pending';
+
+      const d = new Date(r.date);
+      const dateStr = d.toLocaleDateString([], { day: 'numeric', month: 'short' });
+
+      return `
+        <div class="result-item">
+          <div>
+            <div class="result-name">${r.name}</div>
+            <div class="result-date">${r.type} &middot; ${dateStr}</div>
+          </div>
+          <span class="status-badge ${statusCls}">${r.status}</span>
+        </div>`;
+    }).join('');
+
+  } catch (err) {
+    el.innerHTML = `<div class="empty-state"><i class="ri-test-tube-line"></i>Could not load results.</div>`;
+  }
+}
+
+/* ─── Preference Survey ────────────────────────────────── */
+async function loadPreferences(pid) {
+  const el = document.getElementById('surveySection');
+  try {
+    const prefs = await api(`/api/patients/${pid}/preferences`);
+
+    if (prefs.survey_completed) {
+      el.innerHTML = `
+        <div class="survey-completed-msg">
+          <i class="ri-checkbox-circle-line"></i>
+          <div>
+            <strong>Thank you!</strong> Your preferences have been recorded and will be considered by your care team.
+            ${prefs.category ? '<br>Preference category: <strong>' + prefs.category + '</strong>' : ''}
+          </div>
+        </div>`;
+      return;
+    }
+
+    el.innerHTML = `
+      <p style="font-size:0.9rem;color:var(--gray-500);margin-bottom:1.25rem;line-height:1.5;">
+        Help your care team understand what matters to you. Your answers are private and will be shared only with your doctors.
+      </p>
+
+      <form id="surveyForm" onsubmit="submitSurvey(event)">
+        <div class="survey-question">
+          <label>
+            How concerned are you about travel for treatment?
+            <span class="help">Some treatments require traveling to another city</span>
+          </label>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="travel_concern" value="not_concerned" required>
+              Not concerned - I can travel easily
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="travel_concern" value="somewhat_concerned">
+              Somewhat concerned - Travel is difficult for me
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="travel_concern" value="very_concerned">
+              Very concerned - Travel is a major problem
+            </label>
+          </div>
+        </div>
+
+        <div class="survey-question">
+          <label>
+            How concerned are you about treatment costs?
+            <span class="help">Including medication, hospital stays, and related expenses</span>
+          </label>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="financial_concern" value="not_concerned" required>
+              Not concerned - I have good coverage
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="financial_concern" value="somewhat_concerned">
+              Somewhat concerned - Cost is a factor
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="financial_concern" value="very_concerned">
+              Very concerned - Cost is a major worry
+            </label>
+          </div>
+        </div>
+
+        <div class="survey-question">
+          <label>
+            How do you feel about treatment risks?
+            <span class="help">All treatments have some risks along with benefits</span>
+          </label>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="risk_tolerance" value="not_concerned" required>
+              Not concerned - I trust my doctors to decide
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="risk_tolerance" value="somewhat_concerned">
+              Somewhat concerned - I want to discuss risks first
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="risk_tolerance" value="very_concerned">
+              Very concerned - I prefer the safest option
+            </label>
+          </div>
+        </div>
+
+        <div class="survey-question">
+          <label>
+            How do you feel about radiation therapy?
+            <span class="help">Radiation is a common treatment that uses high-energy beams</span>
+          </label>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="radiation_openness" value="not_concerned" required>
+              Open to it - If my doctors recommend it
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="radiation_openness" value="somewhat_concerned">
+              Somewhat concerned - I have some worries
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="radiation_openness" value="very_concerned">
+              Very concerned - I would prefer to avoid it
+            </label>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-survey" id="surveyBtn">
+          <i class="ri-send-plane-line"></i> Submit My Preferences
+        </button>
+      </form>
+    `;
+
+    // Highlight selected radio options
+    document.querySelectorAll('.radio-option input[type="radio"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        const group = radio.closest('.radio-group');
+        group.querySelectorAll('.radio-option').forEach(opt => opt.classList.remove('selected'));
+        radio.closest('.radio-option').classList.add('selected');
+      });
+    });
+
+    // Pre-fill if partially completed
+    if (prefs.travel_concern) setRadio('travel_concern', prefs.travel_concern);
+    if (prefs.financial_concern) setRadio('financial_concern', prefs.financial_concern);
+    if (prefs.risk_tolerance) setRadio('risk_tolerance', prefs.risk_tolerance);
+    if (prefs.radiation_openness) setRadio('radiation_openness', prefs.radiation_openness);
+
+  } catch (err) {
+    el.innerHTML = `<div class="empty-state"><i class="ri-survey-line"></i>Could not load preferences.</div>`;
+  }
+}
+
+function setRadio(name, value) {
+  const radio = document.querySelector(`input[name="${name}"][value="${value}"]`);
+  if (radio) {
+    radio.checked = true;
+    radio.closest('.radio-option').classList.add('selected');
+  }
+}
+
+async function submitSurvey(e) {
+  e.preventDefault();
+  const btn = document.getElementById('surveyBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ri-loader-4-line" style="animation:spin 1s linear infinite"></i> Saving...';
+
+  const form = document.getElementById('surveyForm');
+  const data = {
+    travel_concern: form.travel_concern.value,
+    financial_concern: form.financial_concern.value,
+    risk_tolerance: form.risk_tolerance.value,
+    radiation_openness: form.radiation_openness.value,
+    survey_completed: true,
+    survey_method: 'patient_portal',
+  };
+
+  try {
+    await apiPost(`/api/patients/${currentPatient.id}/preferences`, data);
+    // Reload preferences to show the thank-you message
+    loadPreferences(currentPatient.id);
+  } catch (err) {
+    alert('Could not save your preferences. Please try again.');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="ri-send-plane-line"></i> Submit My Preferences';
+  }
+}
+
+/* ─── Session Restore ──────────────────────────────────── */
+(function init() {
+  const saved = sessionStorage.getItem('portal_patient');
+  if (saved) {
+    try {
+      currentPatient = JSON.parse(saved);
+      showDashboard();
+    } catch {
+      sessionStorage.removeItem('portal_patient');
+    }
+  }
+})();
+</script>
+</body>
+</html>
