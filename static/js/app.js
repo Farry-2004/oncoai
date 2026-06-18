@@ -2371,6 +2371,146 @@ async function loadRefDocs() {
   } catch { panel.innerHTML = ''; }
 }
 
+// ─── Settings Panel ───
+function toggleSettings() {
+  const p = $('#settingsPanel');
+  if (!p) return;
+  const show = p.style.display === 'none';
+  p.style.display = show ? 'block' : 'none';
+  if (show) { loadSettingsValues(); loadSystemInfo(); }
+}
+
+document.addEventListener('click', (e) => {
+  const p = $('#settingsPanel');
+  if (p && p.style.display !== 'none' && !e.target.closest('#settingsPanel') && !e.target.closest('[title="Settings"]')) p.style.display = 'none';
+});
+
+function loadSettingsValues() {
+  const s = JSON.parse(localStorage.getItem('oncoai_settings') || '{}');
+  const user = JSON.parse(localStorage.getItem('oncoai_user') || '{}');
+  if ($('#setName')) $('#setName').value = user.full_name || '';
+  if ($('#setSpecialty')) $('#setSpecialty').value = user.specialty || '';
+  if ($('#setPhone')) $('#setPhone').value = s.phone || '';
+  if ($('#setInstitution')) $('#setInstitution').value = s.institution || '';
+  if ($('#setDarkMode')) $('#setDarkMode').checked = s.darkMode || false;
+  if ($('#setAnimations')) $('#setAnimations').checked = s.animations !== false;
+  if ($('#setFontSize')) $('#setFontSize').value = s.fontSize || 'normal';
+  if ($('#setLabAlerts')) $('#setLabAlerts').checked = s.labAlerts !== false;
+  if ($('#setTBReminders')) $('#setTBReminders').checked = s.tbReminders !== false;
+  if ($('#setSound')) $('#setSound').checked = s.sound || false;
+  if ($('#setPolling')) $('#setPolling').value = s.polling || '30';
+}
+
+function saveSettings() {
+  const s = { labAlerts: $('#setLabAlerts')?.checked !== false, tbReminders: $('#setTBReminders')?.checked !== false, sound: $('#setSound')?.checked || false, polling: $('#setPolling')?.value || '30', darkMode: $('#setDarkMode')?.checked || false, animations: $('#setAnimations')?.checked !== false, fontSize: $('#setFontSize')?.value || 'normal', phone: $('#setPhone')?.value || '', institution: $('#setInstitution')?.value || '' };
+  localStorage.setItem('oncoai_settings', JSON.stringify(s));
+}
+
+async function saveProfile() {
+  const user = JSON.parse(localStorage.getItem('oncoai_user') || '{}');
+  const name = $('#setName')?.value; const specialty = $('#setSpecialty')?.value;
+  if (name) user.full_name = name;
+  if (specialty) user.specialty = specialty;
+  localStorage.setItem('oncoai_user', JSON.stringify(user));
+  const nameEl = document.querySelector('.sidebar-user-name');
+  const roleEl = document.querySelector('.sidebar-user-role');
+  if (nameEl && name) nameEl.textContent = name;
+  if (roleEl && specialty) roleEl.textContent = specialty;
+  saveSettings();
+  toast('Profile saved');
+}
+
+function toggleDarkMode() {
+  const dark = $('#setDarkMode')?.checked;
+  if (dark) {
+    document.documentElement.style.setProperty('--gray-50', '#1C1917');
+    document.documentElement.style.setProperty('--gray-100', '#292524');
+    document.documentElement.style.setProperty('--gray-200', '#44403C');
+    document.documentElement.style.setProperty('--gray-800', '#E7E5E4');
+    document.documentElement.style.setProperty('--gray-900', '#FAFAF9');
+    document.documentElement.style.setProperty('--border-color', '#44403C');
+    document.body.style.background = '#1C1917';
+  } else {
+    document.documentElement.style.setProperty('--gray-50', '#FAFAF9');
+    document.documentElement.style.setProperty('--gray-100', '#F5F5F4');
+    document.documentElement.style.setProperty('--gray-200', '#E7E5E4');
+    document.documentElement.style.setProperty('--gray-800', '#292524');
+    document.documentElement.style.setProperty('--gray-900', '#1C1917');
+    document.documentElement.style.setProperty('--border-color', '#e5e7eb');
+    document.body.style.background = '';
+  }
+  saveSettings();
+}
+
+function toggleAnimations() {
+  const on = $('#setAnimations')?.checked;
+  if (!on) { document.querySelectorAll('.animate-in').forEach(el => el.classList.add('visible')); document.body.classList.add('no-animations'); }
+  else document.body.classList.remove('no-animations');
+  saveSettings();
+}
+
+function changeFontSize() {
+  const sizes = { normal: '100%', large: '112%', xlarge: '125%' };
+  document.documentElement.style.fontSize = sizes[$('#setFontSize')?.value] || '100%';
+  saveSettings();
+}
+
+async function loadSystemInfo() {
+  const el = $('#systemInfo'); if (!el) return;
+  el.innerHTML = '<div style="color:var(--gray-400)">Loading...</div>';
+  try {
+    const [health, patients, labs, tbs, users] = await Promise.all([api('/api/health').catch(() => ({status:'error'})), api('/api/patients').catch(() => []), api('/api/lab-results').catch(() => []), api('/api/tumor-boards').catch(() => []), api('/api/auth/users').catch(() => [])]);
+    el.innerHTML = [
+      ['API Status', `<span style="color:${health.status==='ok'?'var(--success)':'var(--danger)'};font-weight:700">${health.status==='ok'?'● Online':'● Offline'}</span>`],
+      ['Version', '<span style="font-weight:600">1.0.0</span>'],
+      ['Patients', `<span style="font-weight:600">${patients.length}</span>`],
+      ['Lab Results', `<span style="font-weight:600">${labs.length}</span>`],
+      ['Tumor Boards', `<span style="font-weight:600">${tbs.length}</span>`],
+      ['Users', `<span style="font-weight:600">${users.length}</span>`],
+      ['Platform', '<span style="font-weight:600">OncoAI PWA</span>'],
+    ].map(([k,v]) => `<div style="display:flex;justify-content:space-between;padding:0.35rem 0;border-bottom:1px solid var(--gray-100)"><span>${k}</span>${v}</div>`).join('');
+  } catch { el.innerHTML = '<div style="color:var(--danger)">Failed to load</div>'; }
+}
+
+async function exportAllData() {
+  toast('Exporting...'); try {
+    const [patients,labs,path,imaging,refs,tbs,reviews] = await Promise.all([api('/api/patients').catch(()=>[]),api('/api/lab-results').catch(()=>[]),api('/api/pathology-reports').catch(()=>[]),api('/api/imaging-results').catch(()=>[]),api('/api/referrals').catch(()=>[]),api('/api/tumor-boards').catch(()=>[]),api('/api/reviews').catch(()=>[])]);
+    const blob = new Blob([JSON.stringify({exported_at:new Date().toISOString(),version:'1.0.0',patients,lab_results:labs,pathology_reports:path,imaging_results:imaging,referrals:refs,tumor_boards:tbs,reviews},null,2)],{type:'application/json'});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `oncoai_export_${new Date().toISOString().slice(0,10)}.json`; a.click();
+    toast('Data exported');
+  } catch(e) { toast(e.message,'error'); }
+}
+
+async function viewRegisteredUsers() {
+  try {
+    const users = await api('/api/auth/users');
+    openModal('Registered Users ('+users.length+')', `<div style="max-height:400px;overflow-y:auto">${users.map(u=>`<div style="display:flex;align-items:center;gap:0.75rem;padding:0.75rem;border-bottom:1px solid var(--gray-100)"><div style="width:40px;height:40px;border-radius:10px;background:rgba(15,76,92,0.08);display:flex;align-items:center;justify-content:center;color:var(--primary);font-size:1.1rem"><i class="ri-user-line"></i></div><div style="flex:1"><div style="font-weight:700;font-size:0.95rem">${esc(u.full_name)}</div><div style="font-size:0.85rem;color:var(--gray-500)">${esc(u.email)} · ${esc(u.specialty||'')}</div></div><span class="status-badge ${u.is_active?'success':'routine'}">${u.is_active?'Active':'Disabled'}</span></div>`).join('')||'<p style="text-align:center;color:var(--gray-400);padding:2rem">No users</p>'}</div>`);
+  } catch(e) { toast(e.message,'error'); }
+}
+
+async function viewSystemStats() {
+  try {
+    const [p,l,pa,i,r,t] = await Promise.all([api('/api/patients').catch(()=>[]),api('/api/lab-results').catch(()=>[]),api('/api/pathology-reports').catch(()=>[]),api('/api/imaging-results').catch(()=>[]),api('/api/referrals').catch(()=>[]),api('/api/tumor-boards').catch(()=>[])]);
+    const stats = [[p.length,'Total Patients','var(--primary)','var(--primary-light)'],[p.filter(x=>x.cancer_stage==='Stage IV').length,'Stage IV','#EF4444','rgba(239,68,68,0.08)'],[l.length,'Lab Results','#3B82F6','rgba(59,130,246,0.08)'],[l.filter(x=>x.status==='Critical').length,'Critical Labs','#F59E0B','rgba(245,158,11,0.08)'],[pa.length,'Pathology','#8B5CF6','rgba(139,92,246,0.08)'],[t.filter(x=>x.status==='completed').length,'TB Done','#10B981','rgba(16,185,129,0.08)'],[i.length,'Imaging','#14B8A6','rgba(20,184,166,0.08)'],[r.length,'Referrals','#EC4899','rgba(236,72,153,0.08)']];
+    openModal('System Statistics',`<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem">${stats.map(([v,label,color,bg])=>`<div style="background:${bg};border-radius:12px;padding:1rem;text-align:center"><div style="font-size:2rem;font-weight:900;color:${color}">${v}</div><div style="font-size:0.9rem;color:var(--gray-600)">${label}</div></div>`).join('')}</div>`);
+  } catch(e) { toast(e.message,'error'); }
+}
+
+function clearAllCache() {
+  if (!confirm('Clear all local data? You will need to log in again.')) return;
+  localStorage.removeItem('oncoai_notifs'); localStorage.removeItem('oncoai_settings');
+  if ('caches' in window) caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
+  toast('Cache cleared');
+}
+
+// Apply saved settings on load
+(function() {
+  const s = JSON.parse(localStorage.getItem('oncoai_settings') || '{}');
+  if (s.darkMode) { document.documentElement.style.setProperty('--gray-50','#1C1917'); document.documentElement.style.setProperty('--gray-100','#292524'); document.documentElement.style.setProperty('--gray-200','#44403C'); document.documentElement.style.setProperty('--gray-800','#E7E5E4'); document.documentElement.style.setProperty('--gray-900','#FAFAF9'); document.documentElement.style.setProperty('--border-color','#44403C'); document.body.style.background='#1C1917'; }
+  if (s.fontSize && s.fontSize !== 'normal') { const sizes = { large:'112%', xlarge:'125%' }; document.documentElement.style.fontSize = sizes[s.fontSize] || '100%'; }
+  if (s.animations === false) document.body.classList.add('no-animations');
+})();
+
 // ─── Workup Tracker & Journey (Workbook Prototype 1A) ───
 function openPatientWorkupPanel() {
   $('#patientWorkupPanel').style.display = 'block';

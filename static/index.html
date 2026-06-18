@@ -123,7 +123,98 @@
         </div>
         <div id="notifList" style="padding:0.5rem"></div>
       </div>
-      <button class="header-icon-btn" title="Settings"><i class="ri-settings-3-line"></i></button>
+      <button class="header-icon-btn" title="Settings" onclick="toggleSettings()"><i class="ri-settings-3-line"></i></button>
+      <div id="settingsPanel" style="display:none;position:absolute;top:calc(var(--header-height) - 4px);right:2rem;width:420px;max-height:85vh;overflow-y:auto;background:white;border:1px solid var(--border-color);border-radius:12px;box-shadow:0 15px 40px rgba(0,0,0,0.12);z-index:200;padding:0">
+
+        <!-- Settings Header -->
+        <div style="padding:1rem 1.25rem;border-bottom:1px solid var(--gray-100);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:white;z-index:1;border-radius:12px 12px 0 0">
+          <h4 style="font-size:1.1rem;font-weight:700"><i class="ri-settings-3-line" style="color:var(--primary)"></i> Settings</h4>
+          <button class="btn btn-sm btn-secondary" onclick="toggleSettings()">&times;</button>
+        </div>
+
+        <!-- Profile Section -->
+        <div style="padding:1rem 1.25rem;border-bottom:1px solid var(--gray-100)">
+          <h5 style="font-size:0.95rem;font-weight:700;color:var(--gray-800);margin-bottom:0.75rem;display:flex;align-items:center;gap:0.4rem"><i class="ri-user-line" style="color:var(--primary)"></i> Profile</h5>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem">
+            <div class="form-group" style="margin:0"><label>Full Name</label><input id="setName" placeholder="Dr. ..."></div>
+            <div class="form-group" style="margin:0"><label>Specialty</label><input id="setSpecialty" placeholder="Oncologist"></div>
+            <div class="form-group" style="margin:0"><label>Phone</label><input id="setPhone" placeholder="+255..."></div>
+            <div class="form-group" style="margin:0"><label>Institution</label><input id="setInstitution" placeholder="Hospital name"></div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="saveProfile()" style="margin-top:0.65rem"><i class="ri-save-line"></i> Save Profile</button>
+        </div>
+
+        <!-- Appearance Section -->
+        <div style="padding:1rem 1.25rem;border-bottom:1px solid var(--gray-100)">
+          <h5 style="font-size:0.95rem;font-weight:700;color:var(--gray-800);margin-bottom:0.75rem;display:flex;align-items:center;gap:0.4rem"><i class="ri-palette-line" style="color:#8B5CF6"></i> Appearance</h5>
+          <div style="display:flex;flex-direction:column;gap:0.5rem">
+            <label style="display:flex;align-items:center;justify-content:space-between;padding:0.5rem 0.75rem;background:var(--gray-50);border-radius:8px;border:1px solid var(--border-color);cursor:pointer">
+              <span style="font-size:0.9rem;font-weight:500;color:var(--gray-700)"><i class="ri-moon-line"></i> Dark Mode</span>
+              <input type="checkbox" id="setDarkMode" onchange="toggleDarkMode()" style="accent-color:var(--primary);width:18px;height:18px">
+            </label>
+            <label style="display:flex;align-items:center;justify-content:space-between;padding:0.5rem 0.75rem;background:var(--gray-50);border-radius:8px;border:1px solid var(--border-color);cursor:pointer">
+              <span style="font-size:0.9rem;font-weight:500;color:var(--gray-700)"><i class="ri-sparkling-line"></i> Animations</span>
+              <input type="checkbox" id="setAnimations" checked onchange="toggleAnimations()" style="accent-color:var(--primary);width:18px;height:18px">
+            </label>
+            <div class="form-group" style="margin:0">
+              <label>Font Size</label>
+              <select id="setFontSize" onchange="changeFontSize()" style="width:100%">
+                <option value="normal">Normal</option>
+                <option value="large">Large</option>
+                <option value="xlarge">Extra Large</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notifications Section -->
+        <div style="padding:1rem 1.25rem;border-bottom:1px solid var(--gray-100)">
+          <h5 style="font-size:0.95rem;font-weight:700;color:var(--gray-800);margin-bottom:0.75rem;display:flex;align-items:center;gap:0.4rem"><i class="ri-notification-3-line" style="color:#F59E0B"></i> Notifications</h5>
+          <div style="display:flex;flex-direction:column;gap:0.5rem">
+            <label style="display:flex;align-items:center;justify-content:space-between;padding:0.5rem 0.75rem;background:var(--gray-50);border-radius:8px;border:1px solid var(--border-color);cursor:pointer">
+              <span style="font-size:0.9rem;font-weight:500;color:var(--gray-700)"><i class="ri-alarm-warning-line"></i> Critical Lab Alerts</span>
+              <input type="checkbox" id="setLabAlerts" checked onchange="saveSettings()" style="accent-color:var(--primary);width:18px;height:18px">
+            </label>
+            <label style="display:flex;align-items:center;justify-content:space-between;padding:0.5rem 0.75rem;background:var(--gray-50);border-radius:8px;border:1px solid var(--border-color);cursor:pointer">
+              <span style="font-size:0.9rem;font-weight:500;color:var(--gray-700)"><i class="ri-calendar-check-line"></i> TB Meeting Reminders</span>
+              <input type="checkbox" id="setTBReminders" checked onchange="saveSettings()" style="accent-color:var(--primary);width:18px;height:18px">
+            </label>
+            <label style="display:flex;align-items:center;justify-content:space-between;padding:0.5rem 0.75rem;background:var(--gray-50);border-radius:8px;border:1px solid var(--border-color);cursor:pointer">
+              <span style="font-size:0.9rem;font-weight:500;color:var(--gray-700)"><i class="ri-sound-module-line"></i> Sound</span>
+              <input type="checkbox" id="setSound" onchange="saveSettings()" style="accent-color:var(--primary);width:18px;height:18px">
+            </label>
+            <div class="form-group" style="margin:0">
+              <label>Auto-check interval</label>
+              <select id="setPolling" onchange="saveSettings()" style="width:100%">
+                <option value="15">Every 15 seconds</option>
+                <option value="30" selected>Every 30 seconds</option>
+                <option value="60">Every 1 minute</option>
+                <option value="300">Every 5 minutes</option>
+                <option value="0">Disabled</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- System Info Section -->
+        <div style="padding:1rem 1.25rem;border-bottom:1px solid var(--gray-100)">
+          <h5 style="font-size:0.95rem;font-weight:700;color:var(--gray-800);margin-bottom:0.75rem;display:flex;align-items:center;gap:0.4rem"><i class="ri-information-line" style="color:#3B82F6"></i> System Info</h5>
+          <div id="systemInfo" style="font-size:0.88rem;color:var(--gray-600);display:grid;gap:0.4rem"></div>
+          <button class="btn btn-sm btn-secondary" onclick="loadSystemInfo()" style="margin-top:0.5rem"><i class="ri-refresh-line"></i> Refresh</button>
+        </div>
+
+        <!-- Admin Section -->
+        <div style="padding:1rem 1.25rem">
+          <h5 style="font-size:0.95rem;font-weight:700;color:var(--gray-800);margin-bottom:0.75rem;display:flex;align-items:center;gap:0.4rem"><i class="ri-shield-user-line" style="color:#EF4444"></i> Admin</h5>
+          <div style="display:flex;flex-direction:column;gap:0.5rem">
+            <button class="btn btn-sm btn-secondary" onclick="exportAllData()" style="width:100%;justify-content:flex-start"><i class="ri-download-2-line"></i> Export All Data (JSON)</button>
+            <button class="btn btn-sm btn-secondary" onclick="viewRegisteredUsers()" style="width:100%;justify-content:flex-start"><i class="ri-team-line"></i> View Registered Users</button>
+            <button class="btn btn-sm btn-secondary" onclick="viewSystemStats()" style="width:100%;justify-content:flex-start"><i class="ri-bar-chart-box-line"></i> System Statistics</button>
+            <button class="btn btn-sm" onclick="clearAllCache()" style="width:100%;justify-content:flex-start;background:var(--danger-light);color:#DC2626;border:1px solid #FECACA"><i class="ri-delete-bin-line"></i> Clear Local Cache</button>
+          </div>
+        </div>
+
+      </div>
     </div>
   </header>
 
