@@ -7,3 +7,8 @@ uploads/
 ssl/
 *.log
 .claude/
+mobile/node_modules/
+mobile/android/.gradle/
+mobile/android/app/build/
+mobile/android/build/
+.vscode/
