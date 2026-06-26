@@ -209,7 +209,7 @@ class _Section extends StatelessWidget {
         ),
         Card(child: Padding(
           padding: const EdgeInsets.all(12),
-          child: Column(children: children.where((c) => c is _InfoRow && (c as _InfoRow).value != null).toList()),
+          child: Column(children: children.where((c) => c is! _InfoRow || c.value != null).toList()),
         )),
         const SizedBox(height: 8),
       ],

@@ -13,7 +13,7 @@ class OncoAITheme {
 
   static ThemeData get lightTheme => ThemeData(
     useMaterial3: true,
-    colorScheme: ColorScheme.light(
+    colorScheme: const ColorScheme.light(
       primary: primary,
       secondary: secondary,
       error: danger,
@@ -65,11 +65,11 @@ class OncoAITheme {
   static ThemeData get darkTheme => ThemeData(
     useMaterial3: true,
     brightness: Brightness.dark,
-    colorScheme: ColorScheme.dark(
+    colorScheme: const ColorScheme.dark(
       primary: secondary,
       secondary: primary,
       error: danger,
-      surface: const Color(0xFF1A1A2E),
+      surface: Color(0xFF1A1A2E),
     ),
     textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme),
     appBarTheme: const AppBarTheme(

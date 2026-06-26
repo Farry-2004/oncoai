@@ -37,10 +37,10 @@ class _TumorBoardListScreenState extends State<TumorBoardListScreen> {
             padding: const EdgeInsets.all(12),
             child: Row(
               children: [
-                _FilterChip('All', 'all'),
-                _FilterChip('Scheduled', 'scheduled'),
-                _FilterChip('In Progress', 'in_progress'),
-                _FilterChip('Completed', 'completed'),
+                _filterChip('All', 'all'),
+                _filterChip('Scheduled', 'scheduled'),
+                _filterChip('In Progress', 'in_progress'),
+                _filterChip('Completed', 'completed'),
               ],
             ),
           ),
@@ -63,7 +63,7 @@ class _TumorBoardListScreenState extends State<TumorBoardListScreen> {
     );
   }
 
-  Widget _FilterChip(String label, String value) {
+  Widget _filterChip(String label, String value) {
     return Padding(
       padding: const EdgeInsets.only(right: 8),
       child: ChoiceChip(

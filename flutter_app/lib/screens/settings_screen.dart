@@ -71,7 +71,7 @@ class SettingsScreen extends ConsumerWidget {
           SwitchListTile(secondary: const Icon(Icons.calendar_today), title: const Text('TB Meeting Reminders'), value: true, onChanged: (_) {}),
           SwitchListTile(secondary: const Icon(Icons.volume_up), title: const Text('Sound'), value: true, onChanged: (_) {}),
           const _SectionHeader('About'),
-          ListTile(leading: const Icon(Icons.info_outline), title: const Text('Version'), subtitle: const Text('1.0.0')),
+          const ListTile(leading: Icon(Icons.info_outline), title: Text('Version'), subtitle: Text('1.0.0')),
           ListTile(leading: const Icon(Icons.shield_outlined), title: const Text('Privacy Policy'), onTap: () {}),
           const _SectionHeader('Account'),
           ListTile(

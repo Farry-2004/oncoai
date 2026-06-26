@@ -32,7 +32,9 @@ class _LabEntryScreenState extends State<LabEntryScreen> {
 
   @override
   void dispose() {
-    for (final c in _controllers.values) c.dispose();
+    for (final c in _controllers.values) {
+      c.dispose();
+    }
     super.dispose();
   }
 
@@ -117,7 +119,7 @@ class _LabEntryScreenState extends State<LabEntryScreen> {
                     labelText: test,
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                     suffixIcon: _ctrl(test).text.isNotEmpty
-                        ? Icon(Icons.check_circle, color: OncoAITheme.success)
+                        ? const Icon(Icons.check_circle, color: OncoAITheme.success)
                         : null,
                   ),
                   onChanged: (_) => setState(() {}),

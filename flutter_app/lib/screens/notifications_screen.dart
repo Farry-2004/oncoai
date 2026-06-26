@@ -38,21 +38,28 @@ class NotificationsScreen extends ConsumerWidget {
               padding: const EdgeInsets.all(12),
               itemBuilder: (_, i) {
                 final n = notifications[i];
-                final isRead = n['isRead'] ?? false;
                 return Card(
                   margin: const EdgeInsets.only(bottom: 8),
-                  color: isRead ? null : OncoAITheme.primary.withValues(alpha: 0.05),
+                  color: n.isRead ? null : OncoAITheme.primary.withValues(alpha: 0.05),
                   child: ListTile(
-                    leading: _icon(n['type'] ?? 'info'),
-                    title: Text(n['title'] ?? 'Notification', style: TextStyle(fontWeight: isRead ? FontWeight.normal : FontWeight.w600)),
-                    subtitle: Text(n['message'] ?? '', maxLines: 2, overflow: TextOverflow.ellipsis),
-                    trailing: Text(n['time'] ?? '', style: TextStyle(fontSize: 12, color: Colors.grey[500])),
-                    onTap: () => ref.read(notificationProvider.notifier).markRead(i),
+                    leading: _icon(n.type ?? 'info'),
+                    title: Text(n.title.isEmpty ? 'Notification' : n.title, style: TextStyle(fontWeight: n.isRead ? FontWeight.normal : FontWeight.w600)),
+                    subtitle: Text(n.body, maxLines: 2, overflow: TextOverflow.ellipsis),
+                    trailing: Text(_formatTime(n.createdAt), style: TextStyle(fontSize: 12, color: Colors.grey[500])),
+                    onTap: () => ref.read(notificationProvider.notifier).markRead(n.id),
                   ),
                 );
               },
             ),
     );
+  }
+
+  String _formatTime(DateTime dt) {
+    final diff = DateTime.now().difference(dt);
+    if (diff.inMinutes < 1) return 'now';
+    if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
+    if (diff.inHours < 24) return '${diff.inHours}h ago';
+    return '${diff.inDays}d ago';
   }
 
   Widget _icon(String type) {

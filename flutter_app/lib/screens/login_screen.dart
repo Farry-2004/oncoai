@@ -19,7 +19,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   Future<void> _login() async {
     if (!_formKey.currentState!.validate()) return;
-    await ref.read(authProvider.notifier).login(_emailCtrl.text.trim(), _passwordCtrl.text);
+    await ref.read(authProvider.notifier).login(email: _emailCtrl.text.trim(), password: _passwordCtrl.text);
     if (!mounted) return;
     final state = ref.read(authProvider);
     if (state.isLoggedIn) {

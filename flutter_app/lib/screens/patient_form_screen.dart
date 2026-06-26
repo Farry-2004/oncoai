@@ -114,7 +114,11 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
         key: _formKey,
         child: Stepper(
           currentStep: _step,
-          onStepContinue: () { if (_step < 3) setState(() => _step++); else _save(); },
+          onStepContinue: () { if (_step < 3) {
+            setState(() => _step++);
+          } else {
+            _save();
+          } },
           onStepCancel: () { if (_step > 0) setState(() => _step--); },
           controlsBuilder: (_, details) => Padding(
             padding: const EdgeInsets.only(top: 16),
