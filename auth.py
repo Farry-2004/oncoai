@@ -90,7 +90,7 @@ def get_current_user(request: Request, token: Optional[str] = Depends(oauth2_sch
         return None
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id: int = payload.get("sub")
+        user_id = payload.get("sub")
         if user_id is None:
             return None
     except JWTError:

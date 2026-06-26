@@ -145,7 +145,7 @@ def register(data: RegisterRequest, request: Request, db: Session = Depends(get_
     db.commit()
     db.refresh(user)
     log_action(db, request, user, "REGISTER", "user", user.id)
-    token = create_access_token({"sub": user.id, "role": role})
+    token = create_access_token({"sub": str(user.id), "role": role})
     return TokenResponse(
         access_token=token,
         user={"id": user.id, "email": user.email, "full_name": user.full_name, "specialty": user.specialty, "role": role},
@@ -161,7 +161,7 @@ def login(data: LoginRequest, request: Request, db: Session = Depends(get_db)):
         raise HTTPException(403, "Account is disabled")
     role = get_user_role(user)
     log_action(db, request, user, "LOGIN", "user", user.id)
-    token = create_access_token({"sub": user.id, "role": role})
+    token = create_access_token({"sub": str(user.id), "role": role})
     return TokenResponse(
         access_token=token,
         user={"id": user.id, "email": user.email, "full_name": user.full_name, "specialty": user.specialty, "role": role},
