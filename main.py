@@ -4,10 +4,12 @@ import logging
 from datetime import datetime, timezone
 from typing import List, Optional
 
-from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, Form, Query, Request
+from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, Form, Query, Request, WebSocket, WebSocketDisconnect
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 
 from database import engine, get_db, Base
 from models import (
@@ -15,12 +17,16 @@ from models import (
     Referral, LabResult, PathologyReport, ImagingResult,
     Recommendation, TumorBoard, Review, PatientDocument, Summary,
     WorkupTracking, SocioeconomicFactors, PatientPreference, PatientTracking,
+    AuditLog,
 )
 from auth import (
     RegisterRequest, LoginRequest, TokenResponse, UserResponse,
     hash_password, verify_password, create_access_token,
     get_current_user, require_auth, SPECIALTIES,
 )
+from rbac import require_permission, SPECIALTY_TO_ROLE, get_user_role
+from audit import log_action
+from websocket_manager import manager as ws_manager
 from schemas import (
     PatientCreate, PatientResponse,
     CaseResponse, CaseDetailResponse,
@@ -48,6 +54,14 @@ logger = logging.getLogger(__name__)
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="OncoAI — Oncology Decision Support")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=os.getenv("CORS_ORIGINS", "*").split(","),
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
@@ -113,39 +127,44 @@ def list_specialties():
 
 
 @app.post("/api/auth/register", response_model=TokenResponse)
-def register(data: RegisterRequest, db: Session = Depends(get_db)):
+def register(data: RegisterRequest, request: Request, db: Session = Depends(get_db)):
     existing = db.query(User).filter(User.email == data.email).first()
     if existing:
         raise HTTPException(400, "Email already registered")
+    role = SPECIALTY_TO_ROLE.get(data.specialty, "medical_officer")
     user = User(
         email=data.email.lower().strip(),
         password_hash=hash_password(data.password),
         full_name=data.full_name,
         specialty=data.specialty,
+        role=role,
         phone=data.phone,
         institution=data.institution,
     )
     db.add(user)
     db.commit()
     db.refresh(user)
-    token = create_access_token({"sub": user.id})
+    log_action(db, request, user, "REGISTER", "user", user.id)
+    token = create_access_token({"sub": user.id, "role": role})
     return TokenResponse(
         access_token=token,
-        user={"id": user.id, "email": user.email, "full_name": user.full_name, "specialty": user.specialty},
+        user={"id": user.id, "email": user.email, "full_name": user.full_name, "specialty": user.specialty, "role": role},
     )
 
 
 @app.post("/api/auth/login", response_model=TokenResponse)
-def login(data: LoginRequest, db: Session = Depends(get_db)):
+def login(data: LoginRequest, request: Request, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == data.email.lower().strip()).first()
     if not user or not verify_password(data.password, user.password_hash):
         raise HTTPException(401, "Invalid email or password")
     if not user.is_active:
         raise HTTPException(403, "Account is disabled")
-    token = create_access_token({"sub": user.id})
+    role = get_user_role(user)
+    log_action(db, request, user, "LOGIN", "user", user.id)
+    token = create_access_token({"sub": user.id, "role": role})
     return TokenResponse(
         access_token=token,
-        user={"id": user.id, "email": user.email, "full_name": user.full_name, "specialty": user.specialty},
+        user={"id": user.id, "email": user.email, "full_name": user.full_name, "specialty": user.specialty, "role": role},
     )
 
 
@@ -238,7 +257,7 @@ def _parse_dt(s: Optional[str]) -> Optional[datetime]:
 # ─── Patient CRUD ───────────────────────────────────────────
 
 @app.post("/api/patients", response_model=PatientResponse, status_code=201)
-def create_patient(data: PatientCreate, db: Session = Depends(get_db)):
+def create_patient(data: PatientCreate, request: Request, db: Session = Depends(get_db), user=Depends(require_permission("patients", "write"))):
     d = data.model_dump(exclude_unset=True)
     if not d.get("patient_code"):
         count = db.query(Patient).count()
@@ -247,6 +266,7 @@ def create_patient(data: PatientCreate, db: Session = Depends(get_db)):
     db.add(patient)
     db.commit()
     db.refresh(patient)
+    log_action(db, request, user, "CREATE", "patient", patient.id)
     return patient
 
 
@@ -274,7 +294,7 @@ def get_patient(patient_id: int, db: Session = Depends(get_db)):
 
 
 @app.put("/api/patients/{patient_id}", response_model=PatientResponse)
-def update_patient(patient_id: int, data: PatientCreate, db: Session = Depends(get_db)):
+def update_patient(patient_id: int, data: PatientCreate, request: Request, db: Session = Depends(get_db), user=Depends(require_permission("patients", "write"))):
     patient = _get_patient(patient_id, db)
     for k, v in data.model_dump(exclude_unset=True).items():
         setattr(patient, k, v)
@@ -284,7 +304,7 @@ def update_patient(patient_id: int, data: PatientCreate, db: Session = Depends(g
 
 
 @app.delete("/api/patients/{patient_id}")
-def delete_patient(patient_id: int, db: Session = Depends(get_db)):
+def delete_patient(patient_id: int, request: Request, db: Session = Depends(get_db), user=Depends(require_permission("patients", "write"))):
     patient = _get_patient(patient_id, db)
     db.delete(patient)
     db.commit()
@@ -940,6 +960,188 @@ def list_cases(search: str = Query(None), skip: int = Query(0, ge=0), limit: int
 @app.get("/case/{case_id}", response_model=CaseDetailResponse)
 def get_case(case_id: int, db: Session = Depends(get_db)):
     return _get_case(case_id, db)
+
+
+# ─── WebSocket Real-Time ───────────────────────────────────
+
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket, token: str = Query(None), db: Session = Depends(get_db)):
+    if not token:
+        await websocket.close(code=4001)
+        return
+    from jose import jwt, JWTError
+    from auth import SECRET_KEY, ALGORITHM
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id = payload.get("sub")
+        if not user_id:
+            await websocket.close(code=4001)
+            return
+    except JWTError:
+        await websocket.close(code=4001)
+        return
+    await ws_manager.connect(websocket, int(user_id))
+    try:
+        while True:
+            data = await websocket.receive_text()
+            if data == "ping":
+                await websocket.send_text("pong")
+    except WebSocketDisconnect:
+        ws_manager.disconnect(websocket, int(user_id))
+
+
+# ─── Analytics Endpoints ───────────────────────────────────
+
+@app.get("/api/analytics/cancer-distribution")
+def analytics_cancer_distribution(db: Session = Depends(get_db), user=Depends(require_permission("analytics", "read"))):
+    results = db.query(Patient.cancer_type, func.count(Patient.id)).filter(
+        Patient.cancer_type.isnot(None), Patient.cancer_type != ""
+    ).group_by(Patient.cancer_type).all()
+    return {"data": [{"type": r[0], "count": r[1]} for r in results]}
+
+
+@app.get("/api/analytics/journey-progress")
+def analytics_journey_progress(db: Session = Depends(get_db), user=Depends(require_permission("analytics", "read"))):
+    results = db.query(Patient.journey_status, func.count(Patient.id)).group_by(Patient.journey_status).all()
+    return {"data": [{"status": r[0] or "unknown", "count": r[1]} for r in results]}
+
+
+@app.get("/api/analytics/stage-distribution")
+def analytics_stage_distribution(db: Session = Depends(get_db), user=Depends(require_permission("analytics", "read"))):
+    results = db.query(Patient.cancer_stage, func.count(Patient.id)).filter(
+        Patient.cancer_stage.isnot(None), Patient.cancer_stage != ""
+    ).group_by(Patient.cancer_stage).all()
+    return {"data": [{"stage": r[0], "count": r[1]} for r in results]}
+
+
+@app.get("/api/analytics/workup-completion")
+def analytics_workup_completion(db: Session = Depends(get_db), user=Depends(require_permission("analytics", "read"))):
+    total = db.query(WorkupTracking).count()
+    complete = db.query(WorkupTracking).filter(WorkupTracking.tb_ready == True).count()
+    return {"total": total, "complete": complete, "percentage": round((complete / total * 100) if total else 0, 1)}
+
+
+@app.get("/api/analytics/tb-stats")
+def analytics_tb_stats(db: Session = Depends(get_db), user=Depends(require_permission("analytics", "read"))):
+    results = db.query(TumorBoard.status, func.count(TumorBoard.id)).group_by(TumorBoard.status).all()
+    stats = {r[0]: r[1] for r in results}
+    return {"scheduled": stats.get("scheduled", 0), "in_progress": stats.get("in_progress", 0), "completed": stats.get("completed", 0), "total": sum(stats.values())}
+
+
+@app.get("/api/analytics/demographics")
+def analytics_demographics(db: Session = Depends(get_db), user=Depends(require_permission("analytics", "read"))):
+    gender_results = db.query(Patient.gender, func.count(Patient.id)).filter(
+        Patient.gender.isnot(None)
+    ).group_by(Patient.gender).all()
+    age_ranges = [
+        ("0-17", 0, 17), ("18-30", 18, 30), ("31-45", 31, 45),
+        ("46-60", 46, 60), ("61-75", 61, 75), ("76+", 76, 200),
+    ]
+    age_data = []
+    for label, low, high in age_ranges:
+        count = db.query(Patient).filter(Patient.age >= low, Patient.age <= high).count()
+        if count > 0:
+            age_data.append({"range": label, "count": count})
+    return {
+        "gender": [{"gender": r[0], "count": r[1]} for r in gender_results],
+        "age_groups": age_data,
+    }
+
+
+@app.get("/api/analytics/trends")
+def analytics_trends(period: str = Query("monthly"), db: Session = Depends(get_db), user=Depends(require_permission("analytics", "read"))):
+    patients = db.query(Patient).order_by(Patient.created_at).all()
+    monthly = {}
+    for p in patients:
+        if p.created_at:
+            key = p.created_at.strftime("%Y-%m")
+            monthly[key] = monthly.get(key, 0) + 1
+    return {"data": [{"month": k, "patients": v} for k, v in sorted(monthly.items())]}
+
+
+# ─── Admin Endpoints ───────────────────────────────────────
+
+@app.get("/api/admin/audit-logs")
+def get_audit_logs(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=200),
+    action: str = Query(None),
+    resource_type: str = Query(None),
+    user_email: str = Query(None),
+    db: Session = Depends(get_db),
+    user=Depends(require_permission("admin", "read")),
+):
+    q = db.query(AuditLog)
+    if action:
+        q = q.filter(AuditLog.action == action)
+    if resource_type:
+        q = q.filter(AuditLog.resource_type == resource_type)
+    if user_email:
+        q = q.filter(AuditLog.user_email.ilike(f"%{user_email}%"))
+    total = q.count()
+    logs = q.order_by(AuditLog.created_at.desc()).offset(skip).limit(limit).all()
+    return {
+        "total": total,
+        "logs": [
+            {
+                "id": l.id, "user_email": l.user_email, "action": l.action,
+                "resource_type": l.resource_type, "resource_id": l.resource_id,
+                "details": l.details, "ip_address": l.ip_address,
+                "created_at": l.created_at.isoformat() if l.created_at else None,
+            }
+            for l in logs
+        ],
+    }
+
+
+@app.get("/api/admin/stats")
+def admin_stats(db: Session = Depends(get_db), user=Depends(require_permission("admin", "read"))):
+    return {
+        "users": db.query(User).filter(User.is_active == True).count(),
+        "patients": db.query(Patient).count(),
+        "tumor_boards": db.query(TumorBoard).count(),
+        "lab_results": db.query(LabResult).count(),
+        "pathology_reports": db.query(PathologyReport).count(),
+        "imaging_results": db.query(ImagingResult).count(),
+        "referrals": db.query(Referral).count(),
+        "documents": db.query(PatientDocument).count(),
+        "audit_logs": db.query(AuditLog).count(),
+        "ws_connections": ws_manager.connection_count,
+    }
+
+
+# ─── Email Notification Endpoints ──────────────────────────
+
+@app.post("/api/auth/forgot-password")
+def forgot_password(data: dict, db: Session = Depends(get_db)):
+    import secrets
+    email = data.get("email", "").lower().strip()
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        return {"detail": "If the email exists, a reset link has been sent"}
+    token = secrets.token_urlsafe(32)
+    user.password_reset_token = token
+    user.password_reset_expires = datetime.now(timezone.utc) + __import__("datetime").timedelta(hours=1)
+    db.commit()
+    # TODO: Send email with reset link when SMTP is configured
+    logger.info(f"Password reset token generated for {email}")
+    return {"detail": "If the email exists, a reset link has been sent"}
+
+
+@app.post("/api/auth/reset-password")
+def reset_password(data: dict, db: Session = Depends(get_db)):
+    token = data.get("token", "")
+    new_password = data.get("password", "")
+    if not token or not new_password:
+        raise HTTPException(400, "Token and password required")
+    user = db.query(User).filter(User.password_reset_token == token).first()
+    if not user or not user.password_reset_expires or user.password_reset_expires < datetime.now(timezone.utc):
+        raise HTTPException(400, "Invalid or expired reset token")
+    user.password_hash = hash_password(new_password)
+    user.password_reset_token = None
+    user.password_reset_expires = None
+    db.commit()
+    return {"detail": "Password reset successful"}
 
 
 if __name__ == "__main__":

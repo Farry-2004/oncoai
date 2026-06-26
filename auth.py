@@ -58,6 +58,7 @@ class UserResponse(BaseModel):
     email: str
     full_name: str
     specialty: str
+    role: Optional[str] = "medical_officer"
     phone: Optional[str] = None
     institution: Optional[str] = None
     is_active: bool

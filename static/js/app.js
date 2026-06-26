@@ -6,12 +6,18 @@
 const $ = (sel, ctx = document) => ctx.querySelector(sel);
 const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
 
-const api = (path, opts = {}) =>
-  fetch(path, { headers: { 'Content-Type': 'application/json' }, ...opts }).then(r => {
+const api = (path, opts = {}) => {
+  const token = localStorage.getItem('oncoai_token');
+  const headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  return fetch(path, { ...opts, headers }).then(r => {
+    if (r.status === 401) { localStorage.removeItem('oncoai_token'); window.location.href = '/login'; throw new Error('Session expired'); }
+    if (r.status === 403) { toast('Permission denied', 'error'); throw new Error('Forbidden'); }
     if (!r.ok) return r.text().then(t => { throw new Error(t || r.statusText); });
     const ct = r.headers.get('content-type') || '';
     return ct.includes('json') ? r.json() : r.text();
   });
+};
 
 function toast(msg, type = 'success') {
   const el = document.createElement('div');
@@ -59,6 +65,36 @@ function switchTab(name) {
   if (name === 'tumorboard') renderTumorBoards();
 }
 
+// ─── WebSocket Real-Time ───
+let _ws = null;
+function connectWebSocket() {
+  const token = localStorage.getItem('oncoai_token');
+  if (!token) return;
+  const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+  _ws = new WebSocket(`${proto}//${location.host}/ws?token=${token}`);
+  _ws.onopen = () => console.log('WS connected');
+  _ws.onmessage = (event) => {
+    try {
+      const data = JSON.parse(event.data);
+      handleRealtimeEvent(data);
+    } catch {}
+  };
+  _ws.onclose = () => { _ws = null; setTimeout(connectWebSocket, 5000); };
+  _ws.onerror = () => { if (_ws) _ws.close(); };
+  setInterval(() => { if (_ws && _ws.readyState === 1) _ws.send('ping'); }, 30000);
+}
+function handleRealtimeEvent(data) {
+  const msg = data.message || `${data.action || 'Update'}: ${data.resource_type || ''}`;
+  addNotification(data.title || 'Update', msg, data.severity || 'info');
+  if (data.type === 'lab_result' || data.type === 'patient') loadDashboard();
+  if (data.type === 'tumor_board') renderTumorBoards();
+}
+
+// ─── User Role UI ───
+function getUserRole() {
+  try { return JSON.parse(localStorage.getItem('oncoai_user') || '{}').role || 'medical_officer'; } catch { return 'medical_officer'; }
+}
+
 // ─── Init ───
 document.addEventListener('DOMContentLoaded', () => {
   $$('.nav-btn').forEach(b => b.addEventListener('click', () => switchTab(b.dataset.tab)));
@@ -76,8 +112,8 @@ document.addEventListener('DOMContentLoaded', () => {
   renderTumorBoards();
   loadImagingUploadPatients();
   initImagingDragDrop();
-  // Highlight default filter
   $$('[data-tbfilter="all"]').forEach(b => b.classList.add('btn-primary'));
+  connectWebSocket();
 });
 
 // ─── Dashboard ───
