@@ -3,7 +3,9 @@ __pycache__/
 *.pyc
 .env
 hospital.db
+oncoai.db
 uploads/
+flutter/
 ssl/
 *.log
 .claude/
