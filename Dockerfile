@@ -11,8 +11,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Application code
+# Application code (exclude flutter SDK and db files)
 COPY . .
+RUN rm -rf flutter flutter_app *.db
 
 # Create uploads directory
 RUN mkdir -p uploads
@@ -21,14 +22,7 @@ RUN mkdir -p uploads
 RUN useradd -m oncoai && chown -R oncoai:oncoai /app
 USER oncoai
 
+ENV PORT=8000
 EXPOSE 8000
 
-HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
-    CMD curl -f http://localhost:8000/api/health || exit 1
-
-CMD ["gunicorn", "main:app", \
-     "-w", "4", \
-     "-k", "uvicorn.workers.UvicornWorker", \
-     "-b", "0.0.0.0:8000", \
-     "--timeout", "120", \
-     "--access-logfile", "-"]
+CMD gunicorn main:app -w 4 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:$PORT --timeout 120 --access-logfile -

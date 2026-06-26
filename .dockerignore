@@ -4,6 +4,12 @@ __pycache__
 .git
 .env
 hospital.db
+oncoai.db
+*.db
 ssl/
 *.log
 .claude/
+flutter/
+flutter_app/
+mobile/
+.vscode/
