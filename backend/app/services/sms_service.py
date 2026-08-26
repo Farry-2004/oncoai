@@ -1,3 +1,6 @@
+import base64
+import hashlib
+import hmac
 import logging
 from typing import Protocol
 
@@ -45,3 +48,20 @@ def get_sms_provider() -> SmsProvider:
             settings.twilio_from_number,  # type: ignore[arg-type]
         )
     return NoOpSmsProvider()
+
+
+def verify_twilio_signature(
+    url: str, params: list[tuple[str, str]], signature: str, auth_token: str
+) -> bool:
+    """Twilio's request-validation algorithm: sort POST params by key, append
+    each key+value (no delimiter) to the exact webhook URL Twilio invoked,
+    HMAC-SHA1 that with the auth token, base64-encode, and compare to the
+    X-Twilio-Signature header. See https://www.twilio.com/docs/usage/security
+    Implemented by hand (rather than the `twilio` SDK) so verification has
+    no dependency footprint until Twilio is actually configured.
+    """
+    data = url + "".join(f"{k}{v}" for k, v in sorted(params, key=lambda kv: kv[0]))
+    expected = base64.b64encode(
+        hmac.new(auth_token.encode("utf-8"), data.encode("utf-8"), hashlib.sha1).digest()
+    ).decode("utf-8")
+    return hmac.compare_digest(expected, signature)
