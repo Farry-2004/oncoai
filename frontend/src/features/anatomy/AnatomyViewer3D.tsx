@@ -34,31 +34,30 @@ function matchSite(cancerSite: string): SiteMarker | undefined {
   return SITE_MARKERS.find((m) => normalized.includes(m.key) || m.key.includes(normalized))
 }
 
+const MESH_MATERIAL_PROPS = {
+  color: '#1a5563',
+  emissive: '#2dd4bf',
+  emissiveIntensity: 0.5,
+  wireframe: true,
+  transparent: true,
+  opacity: 0.65,
+  side: THREE.DoubleSide,
+} as const
+
 function HeadNeckMesh() {
-  const material = (
-    <meshStandardMaterial
-      color="#0d323a"
-      emissive="#134752"
-      emissiveIntensity={0.4}
-      wireframe
-      transparent
-      opacity={0.55}
-      side={THREE.DoubleSide}
-    />
-  )
   return (
     <group>
       <mesh position={[0, 1.2, 0]}>
         <sphereGeometry args={[0.62, 22, 22]} />
-        {material}
+        <meshStandardMaterial {...MESH_MATERIAL_PROPS} />
       </mesh>
       <mesh position={[0, 0.35, 0]}>
         <cylinderGeometry args={[0.34, 0.4, 0.9, 18, 1, true]} />
-        {material}
+        <meshStandardMaterial {...MESH_MATERIAL_PROPS} />
       </mesh>
       <mesh position={[0, -0.18, 0]}>
         <cylinderGeometry args={[0.9, 0.95, 0.3, 22, 1, true]} />
-        {material}
+        <meshStandardMaterial {...MESH_MATERIAL_PROPS} />
       </mesh>
     </group>
   )
