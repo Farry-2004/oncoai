@@ -1,0 +1,56 @@
+.wrap {
+  margin-top: 14px;
+  border-top: 1px solid var(--cream-100);
+  padding-top: 14px;
+}
+.toggle {
+  background: none;
+  border: none;
+  color: var(--teal-600);
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 0;
+}
+.panel { margin-top: 12px; }
+.checklist {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 20px;
+  margin-bottom: 16px;
+}
+.checkItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--ink-700);
+}
+.checkItem input { width: 16px; height: 16px; accent-color: var(--teal-500); }
+.progress {
+  font-size: 0.8rem;
+  color: var(--gray-500);
+  margin-bottom: 14px;
+}
+.progress strong { color: var(--teal-600); }
+
+.decisionCard {
+  background: var(--success-bg);
+  border: 1px solid #bfe6d9;
+  border-radius: var(--radius-sm);
+  padding: 16px;
+}
+.decisionHead {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--success-fg);
+  margin-bottom: 10px;
+}
+.decisionRow { margin-bottom: 8px; font-size: 0.88rem; }
+.decisionRow strong { display: block; font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.03em; color: var(--gray-500); margin-bottom: 2px; }
+.decisionMeta { margin-top: 10px; font-size: 0.78rem; color: var(--gray-500); }
+
+@media (max-width: 640px) {
+  .checklist { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,38 @@
+.chart { display: flex; flex-direction: column; }
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 5px 0;
+}
+.label {
+  width: 130px;
+  flex-shrink: 0;
+  font-size: 0.82rem;
+  color: var(--ink-700);
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.track {
+  flex: 1;
+  position: relative;
+  height: 20px;
+  background: var(--cream-100);
+  border-radius: 4px;
+}
+.bar {
+  height: 20px;
+  border-radius: 0 4px 4px 0;
+  min-width: 3px;
+  transition: width 0.3s ease;
+}
+.value {
+  width: 34px;
+  flex-shrink: 0;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--ink-900);
+}
+.empty { color: var(--gray-500); font-size: 0.88rem; padding: 8px 0; }

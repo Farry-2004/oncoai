@@ -1,0 +1,14 @@
+.list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+.entry {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  background: var(--white);
+}
+.entryHead { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.entryTitle { font-weight: 700; font-size: 0.94rem; }
+.entryDate { font-size: 0.78rem; color: var(--gray-500); white-space: nowrap; }
+.entryFindings { margin-top: 6px; font-size: 0.88rem; color: var(--ink-700); line-height: 1.55; white-space: pre-wrap; }
+.entryMeta { margin-top: 8px; font-size: 0.78rem; color: var(--gray-500); }
+.empty { color: var(--gray-500); font-size: 0.9rem; padding: 8px 0 20px; }
+.formCard { background: var(--cream-50); border: 1px dashed var(--border); border-radius: var(--radius-sm); padding: 16px; }

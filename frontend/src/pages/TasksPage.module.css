@@ -1,0 +1,30 @@
+.filters { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+.filters select {
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  font-size: 0.9rem;
+  background: var(--white);
+  min-width: 160px;
+}
+.statusSelect {
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: var(--white);
+}
+.linkChip {
+  font-size: 0.76rem;
+  color: var(--teal-600);
+  font-weight: 600;
+}
+.expandRow { background: var(--cream-50); }
+.expandCell { padding: 16px 20px !important; }
+.comment { padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
+.comment:last-child { border-bottom: none; }
+.commentMeta { font-size: 0.75rem; color: var(--gray-500); margin-bottom: 2px; }
+.commentForm { display: flex; gap: 8px; margin-top: 10px; }
+.commentForm input { flex: 1; padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border); font-size: 0.85rem; }
+.expandToggle { background: none; border: none; color: var(--teal-600); font-weight: 600; font-size: 0.8rem; }

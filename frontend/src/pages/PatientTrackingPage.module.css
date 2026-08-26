@@ -1,0 +1,27 @@
+.filters {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+.filters input, .filters select {
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  font-size: 0.9rem;
+  background: var(--white);
+  min-width: 180px;
+}
+
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  font-size: 0.85rem;
+  color: var(--gray-500);
+}
+.pagination .btns { display: flex; gap: 8px; }
+
+.rowLink { cursor: pointer; }
+.rowLink:hover { background: var(--cream-50); }

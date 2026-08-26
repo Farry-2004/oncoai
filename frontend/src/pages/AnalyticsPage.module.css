@@ -1,0 +1,27 @@
+.statGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.statCard {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+}
+.statCard .num { font-size: 1.55rem; font-weight: 800; }
+.statCard .name { font-size: 0.82rem; font-weight: 600; margin-top: 4px; color: var(--ink-700); }
+.statCard .sub { font-size: 0.74rem; color: var(--gray-500); margin-top: 2px; }
+
+.chartGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.chartGrid > :global(.panel):first-child { grid-column: 1 / -1; }
+
+@media (max-width: 960px) {
+  .statGrid { grid-template-columns: repeat(2, 1fr); }
+  .chartGrid { grid-template-columns: 1fr; }
+}

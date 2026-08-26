@@ -1,0 +1,121 @@
+.sessionPicker {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.sessionTab {
+  padding: 9px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--white);
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--ink-700);
+}
+.sessionTabActive {
+  background: var(--navy-950);
+  color: var(--white);
+  border-color: var(--navy-950);
+}
+
+.sessionHeader {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 22px 24px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.sessionHeader h2 { font-size: 1.25rem; font-weight: 800; }
+.sessionMeta {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  font-size: 0.86rem;
+  color: var(--gray-500);
+}
+.sessionMeta strong { color: var(--ink-900); font-weight: 600; }
+
+.caseList { display: flex; flex-direction: column; gap: 14px; }
+.caseCard {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 20px 22px;
+}
+.caseCardTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.caseCardLeft { display: flex; gap: 14px; align-items: flex-start; }
+.queueNum {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--cream-100);
+  color: var(--ink-700);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+.patientName { font-weight: 700; font-size: 1rem; }
+.patientMeta { font-size: 0.84rem; color: var(--gray-500); margin-top: 2px; }
+.caseCardActions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+.summary { margin-top: 14px; font-size: 0.9rem; color: var(--ink-700); line-height: 1.55; }
+
+.aiBox {
+  margin-top: 14px;
+  background: var(--cream-50);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+}
+.aiBoxHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--teal-600);
+}
+.aiDemoTag {
+  background: var(--warning-bg);
+  color: var(--warning-fg);
+  font-size: 0.66rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  text-transform: uppercase;
+}
+.aiText { font-size: 0.85rem; color: var(--ink-700); line-height: 1.6; }
+.aiDisclaimer {
+  margin-top: 10px;
+  font-size: 0.78rem;
+  color: var(--gray-500);
+  font-style: italic;
+}
+
+.addCaseRow {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+.addCaseRow select { padding: 9px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border); font-size: 0.86rem; }

@@ -1,0 +1,18 @@
+.mark {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: var(--teal-400);
+  color: var(--navy-950);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-right: 8px;
+}
+.mark svg { width: 15px; height: 15px; stroke-width: 2.4; }
+.markOnDark {
+  background: rgba(45, 212, 191, 0.16);
+  border: 1px solid rgba(45, 212, 191, 0.4);
+  color: var(--teal-400);
+}

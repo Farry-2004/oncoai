@@ -1,0 +1,31 @@
+.filters { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+.filters select {
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  font-size: 0.9rem;
+  background: var(--white);
+  min-width: 180px;
+}
+.statusPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+.statusPill.draft { background: var(--warning-bg); color: var(--warning-fg); }
+.statusPill.approved { background: var(--success-bg); color: var(--success-fg); }
+.aiTag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--teal-600);
+  margin-left: 6px;
+}
+.rowLink { cursor: pointer; }
+.rowLink:hover { background: var(--cream-50); }

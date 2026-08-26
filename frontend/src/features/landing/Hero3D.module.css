@@ -1,0 +1,15 @@
+.fallback {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(120% 140% at 15% 10%, #113842 0%, var(--navy-900) 45%, var(--navy-950) 100%);
+  overflow: hidden;
+}
+
+.canvasWrap {
+  position: absolute;
+  inset: 0;
+}
+
+.canvasWrap canvas {
+  display: block;
+}
