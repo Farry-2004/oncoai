@@ -7,6 +7,7 @@ from app.models.tumor_board import CaseStatusEnum, TumorBoardCase, TumorBoardSes
 from app.models.tumor_board_decision import TumorBoardDecision
 from app.models.user import User
 from app.schemas.tumor_board_decision import TumorBoardDecisionCreate, TumorBoardDecisionRead
+from app.services.ai_orchestrator import OrchestrationTrigger, run_orchestration
 from app.services.audit_service import write_audit_event
 from app.services.notification_service import create_notification
 
@@ -95,6 +96,8 @@ def record_decision(
 
     session = db.get(TumorBoardSession, session_id)
     patient = db.get(Patient, case.patient_id)
+    if patient:
+        run_orchestration(db, patient, OrchestrationTrigger.decision_recorded)
     patient_name = patient.full_name if patient else "the patient"
     for recipient_id in {session.coordinator_id if session else None, patient.primary_physician_id if patient else None}:
         if recipient_id and recipient_id != current_user.id:

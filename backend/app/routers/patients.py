@@ -16,6 +16,7 @@ from app.schemas.tumor_board import TumorBoardCaseRead
 from app.schemas.workup import WorkupItemCreate, WorkupItemRead, WorkupItemUpdate
 from app.models.tumor_board import TumorBoardCase
 from app.models.workup import WorkupItem, WorkupStatusEnum
+from app.services.ai_orchestrator import OrchestrationTrigger, run_orchestration
 from app.services.audit_service import write_audit_event
 from app.services.concern_survey_service import advance_survey, start_survey
 from app.services.notification_service import create_notification
@@ -186,6 +187,7 @@ def update_workup(
         if all_items and all(w.status == WorkupStatusEnum.completed for w in all_items):
             patient.status = PatientStatusEnum.ready_for_board
             db.commit()
+            run_orchestration(db, patient, OrchestrationTrigger.workup_completed)
             recipients = {patient.primary_physician_id}
             recipients |= {
                 u.id for u in db.query(User).filter(User.role == RoleEnum.tumor_board_coordinator).all()

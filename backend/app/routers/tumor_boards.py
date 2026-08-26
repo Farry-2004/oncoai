@@ -22,6 +22,7 @@ from app.schemas.tumor_board import (
     TumorBoardSessionRead,
 )
 from app.schemas.tumor_board_attendance import AttendanceCreate, AttendanceRead
+from app.services.ai_orchestrator import OrchestrationTrigger, run_orchestration
 from app.services.audit_service import write_audit_event
 from app.services.notification_service import create_notification
 
@@ -149,6 +150,7 @@ def add_case(
         entity_id=case.id,
         metadata={"session_id": session_id, "patient_id": payload.patient_id},
     )
+    run_orchestration(db, patient, OrchestrationTrigger.case_added_to_board, tb_case=case)
     if case.presenter_id and case.presenter_id != current_user.id:
         create_notification(
             db,

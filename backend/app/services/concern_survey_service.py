@@ -2,8 +2,9 @@ from sqlalchemy.orm import Session
 
 from app.models.concern_survey import ConcernSurvey, SurveyStatusEnum
 from app.models.patient import Patient
-from app.models.patient_concern import ConcernLevelEnum, PatientConcerns
+from app.models.patient_concern import ConcernCategoryEnum, ConcernLevelEnum, PatientConcerns
 from app.models.user import _now
+from app.services.ai_orchestrator import OrchestrationTrigger, run_orchestration
 from app.services.sms_service import get_sms_provider
 
 QUESTION_FIELDS = [
@@ -65,7 +66,7 @@ def start_survey(db: Session, patient: Patient, started_by_id: str | None) -> Co
     return survey
 
 
-def _apply_to_patient_concerns(db: Session, survey: ConcernSurvey) -> None:
+def _apply_to_patient_concerns(db: Session, survey: ConcernSurvey) -> PatientConcerns:
     entry = db.query(PatientConcerns).filter(PatientConcerns.patient_id == survey.patient_id).first()
     if not entry:
         entry = PatientConcerns(patient_id=survey.patient_id)
@@ -75,6 +76,7 @@ def _apply_to_patient_concerns(db: Session, survey: ConcernSurvey) -> None:
     entry.risk_tolerance_concern = survey.risk_tolerance_concern
     entry.radiation_openness_concern = survey.radiation_openness_concern
     entry.updated_by_id = survey.started_by_id
+    return entry
 
 
 def advance_survey(db: Session, survey: ConcernSurvey, reply_body: str) -> ConcernSurvey:
@@ -91,10 +93,11 @@ def advance_survey(db: Session, survey: ConcernSurvey, reply_body: str) -> Conce
     setattr(survey, field, level)
     survey.current_question_index += 1
 
+    concerns: PatientConcerns | None = None
     if survey.current_question_index >= len(QUESTION_FIELDS):
         survey.status = SurveyStatusEnum.completed
         survey.completed_at = _now()
-        _apply_to_patient_concerns(db, survey)
+        concerns = _apply_to_patient_concerns(db, survey)
         provider.send(survey.phone_number, CLOSING_TEXT)
     else:
         next_field = QUESTION_FIELDS[survey.current_question_index]
@@ -102,4 +105,10 @@ def advance_survey(db: Session, survey: ConcernSurvey, reply_body: str) -> Conce
 
     db.commit()
     db.refresh(survey)
+
+    if concerns is not None and concerns.concern_category == ConcernCategoryEnum.high:
+        patient = db.get(Patient, survey.patient_id)
+        if patient:
+            run_orchestration(db, patient, OrchestrationTrigger.high_concern_survey)
+
     return survey
