@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useTasks } from '@/hooks/useTasks'
 import { useUsers } from '@/hooks/useUsers'
 import { DemoDataBanner } from '@/components/ui/DemoDataBanner'
+import { TableRowsSkeleton } from '@/components/ui/Skeleton'
 import { NewTaskDrawer } from '@/features/tasks/NewTaskDrawer'
 import { TaskRow } from '@/features/tasks/TaskRow'
 import type { TaskStatus } from '@/types/api'
@@ -78,11 +79,7 @@ export function TasksPage() {
               </tr>
             </thead>
             <tbody>
-              {isLoading && (
-                <tr>
-                  <td colSpan={5}>Loading tasks…</td>
-                </tr>
-              )}
+              {isLoading && <TableRowsSkeleton columns={5} />}
               {!isLoading && !tasks?.length && (
                 <tr>
                   <td colSpan={5}>No tasks match these filters.</td>

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useReports } from '@/hooks/useReports'
 import { DemoDataBanner } from '@/components/ui/DemoDataBanner'
+import { TableRowsSkeleton } from '@/components/ui/Skeleton'
 import { GenerateReportDrawer } from '@/features/reports/GenerateReportDrawer'
 import { REPORT_TYPE_LABELS } from '@/types/api'
 import type { ReportType } from '@/types/api'
@@ -66,11 +67,7 @@ export function ReportsPage() {
               </tr>
             </thead>
             <tbody>
-              {isLoading && (
-                <tr>
-                  <td colSpan={6}>Loading reports…</td>
-                </tr>
-              )}
+              {isLoading && <TableRowsSkeleton columns={6} />}
               {!isLoading && !reports?.length && (
                 <tr>
                   <td colSpan={6}>No reports yet. Generate one to get started.</td>

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useCreateWorkup, usePatientWorkups, useUpdateWorkup } from '@/hooks/usePatientProfile'
+import { TableRowsSkeleton } from '@/components/ui/Skeleton'
 import type { WorkupItemType, WorkupStatus } from '@/types/api'
 import styles from './InvestigationsTab.module.css'
 
@@ -44,11 +45,7 @@ export function InvestigationsTab({ patientId }: { patientId: string }) {
             </tr>
           </thead>
           <tbody>
-            {isLoading && (
-              <tr>
-                <td colSpan={4}>Loading…</td>
-              </tr>
-            )}
+            {isLoading && <TableRowsSkeleton columns={4} />}
             {!isLoading && !workups?.length && (
               <tr>
                 <td colSpan={4}>No investigations recorded yet.</td>

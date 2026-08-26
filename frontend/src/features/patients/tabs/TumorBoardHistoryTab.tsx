@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { usePatientCases } from '@/hooks/usePatientProfile'
 import { PriorityPill } from '@/components/ui/PriorityPill'
+import { TableRowsSkeleton } from '@/components/ui/Skeleton'
 
 export function TumorBoardHistoryTab({ patientId }: { patientId: string }) {
   const { data: cases, isLoading } = usePatientCases(patientId)
@@ -18,11 +19,7 @@ export function TumorBoardHistoryTab({ patientId }: { patientId: string }) {
           </tr>
         </thead>
         <tbody>
-          {isLoading && (
-            <tr>
-              <td colSpan={5}>Loading…</td>
-            </tr>
-          )}
+          {isLoading && <TableRowsSkeleton columns={5} />}
           {!isLoading && !cases?.length && (
             <tr>
               <td colSpan={5}>This patient has not been presented at a tumor board yet.</td>

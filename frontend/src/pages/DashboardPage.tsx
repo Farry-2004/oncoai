@@ -3,6 +3,8 @@ import { useAuth } from '@/context/AuthContext'
 import { useDashboardSummary } from '@/hooks/useDashboardSummary'
 import { DemoDataBanner } from '@/components/ui/DemoDataBanner'
 import { PriorityPill } from '@/components/ui/PriorityPill'
+import { LoadingRow } from '@/components/ui/Spinner'
+import { TableRowsSkeleton } from '@/components/ui/Skeleton'
 import { CareNetwork3D } from '@/features/dashboard/CareNetwork3D'
 
 function timeAgo(iso: string): string {
@@ -138,11 +140,7 @@ export function DashboardPage() {
                 </tr>
               </thead>
               <tbody>
-                {isLoading && (
-                  <tr>
-                    <td colSpan={5}>Loading cases…</td>
-                  </tr>
-                )}
+                {isLoading && <TableRowsSkeleton columns={5} />}
                 {!isLoading && !data?.recent_cases.length && (
                   <tr>
                     <td colSpan={5}>No cases yet.</td>
@@ -179,7 +177,11 @@ export function DashboardPage() {
                 Recent Activity
               </div>
             </div>
-            {isLoading && <div className="activity-item">Loading…</div>}
+            {isLoading && (
+              <div className="activity-item">
+                <LoadingRow />
+              </div>
+            )}
             {data?.recent_activity.map((a) => (
               <div key={a.id} className="activity-item">
                 <div className="activity-icon">

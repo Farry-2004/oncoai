@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { usePatients } from '@/hooks/usePatients'
 import { DemoDataBanner } from '@/components/ui/DemoDataBanner'
 import { StatusBadge } from '@/components/ui/StatusBadge'
+import { TableRowsSkeleton } from '@/components/ui/Skeleton'
 import { NewPatientDrawer } from '@/features/patients/NewPatientDrawer'
 import type { PatientStatus } from '@/types/api'
 import styles from './PatientTrackingPage.module.css'
@@ -105,11 +106,7 @@ export function PatientTrackingPage() {
               </tr>
             </thead>
             <tbody>
-              {isLoading && (
-                <tr>
-                  <td colSpan={8}>Loading patients…</td>
-                </tr>
-              )}
+              {isLoading && <TableRowsSkeleton columns={8} />}
               {!isLoading && !data?.items.length && (
                 <tr>
                   <td colSpan={8}>No patients match these filters.</td>

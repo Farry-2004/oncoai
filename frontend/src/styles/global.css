@@ -33,6 +33,7 @@ button { font-family: inherit; cursor: pointer; }
   white-space: nowrap;
 }
 .btn:hover { transform: translateY(-1px); }
+.btn:active { transform: scale(0.97); }
 .btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
 .btn-primary { background: var(--teal-400); color: var(--navy-950); }
 .btn-primary:hover { background: var(--teal-500); box-shadow: var(--shadow-md); }
@@ -830,6 +831,11 @@ span.badge {
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 24px;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.panel:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+@media (prefers-reduced-motion: reduce) {
+  .panel:hover { transform: none; }
 }
 .panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 10px; }
 .panel-head .title { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.02rem; }

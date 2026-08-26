@@ -1,5 +1,6 @@
 import { useAnalytics } from '@/hooks/useAnalytics'
 import { DemoDataBanner } from '@/components/ui/DemoDataBanner'
+import { LoadingRow } from '@/components/ui/Spinner'
 import { HorizontalBarChart } from '@/components/charts/HorizontalBarChart'
 import type { BarDatum } from '@/components/charts/HorizontalBarChart'
 import styles from './AnalyticsPage.module.css'
@@ -114,7 +115,7 @@ export function AnalyticsPage() {
               Patients by Cancer Site
             </div>
           </div>
-          {isLoading ? <div>Loading…</div> : <HorizontalBarChart data={siteBars} />}
+          {isLoading ? <LoadingRow /> : <HorizontalBarChart data={siteBars} />}
         </div>
 
         <div className="panel">
@@ -129,7 +130,7 @@ export function AnalyticsPage() {
               Investigations by Status
             </div>
           </div>
-          {isLoading ? <div>Loading…</div> : <HorizontalBarChart data={workupBars} />}
+          {isLoading ? <LoadingRow /> : <HorizontalBarChart data={workupBars} />}
         </div>
 
         <div className="panel">
@@ -145,7 +146,7 @@ export function AnalyticsPage() {
               Tumor Board Cases by Priority
             </div>
           </div>
-          {isLoading ? <div>Loading…</div> : <HorizontalBarChart data={priorityBars} />}
+          {isLoading ? <LoadingRow /> : <HorizontalBarChart data={priorityBars} />}
         </div>
       </div>
     </div>

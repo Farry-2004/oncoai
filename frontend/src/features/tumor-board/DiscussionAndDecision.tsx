@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useRecordDecision, useTumorBoardDecision } from '@/hooks/useTumorBoardDecision'
 import { ApiError } from '@/lib/api'
+import { LoadingRow } from '@/components/ui/Spinner'
 import { CHECKLIST_LABELS, EMPTY_CHECKLIST } from '@/types/api'
 import type { DiscussionChecklist } from '@/types/api'
 import styles from './DiscussionAndDecision.module.css'
@@ -50,7 +51,7 @@ export function DiscussionAndDecision({ sessionId, caseId }: { sessionId: string
 
       {expanded && (
         <div className={styles.panel}>
-          {isLoading && <div>Loading…</div>}
+          {isLoading && <LoadingRow />}
 
           {!isLoading && decision && (
             <div className={styles.decisionCard}>

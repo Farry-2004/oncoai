@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
+import { Spinner } from '@/components/ui/Spinner'
 
 export function ProtectedRoute({ children }: { children: ReactNode }) {
   const { status } = useAuth()
@@ -8,8 +9,8 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
 
   if (status === 'loading') {
     return (
-      <div style={{ display: 'flex', minHeight: '60vh', alignItems: 'center', justifyContent: 'center', color: 'var(--gray-500)' }}>
-        Loading…
+      <div style={{ display: 'flex', minHeight: '60vh', alignItems: 'center', justifyContent: 'center' }}>
+        <Spinner size={28} />
       </div>
     )
   }

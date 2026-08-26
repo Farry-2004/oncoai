@@ -5,6 +5,7 @@ import {
   useFamilyConferences,
   useFollowUps,
 } from '@/hooks/usePatientProfile'
+import { LoadingRow } from '@/components/ui/Spinner'
 import type { FamilyConferenceOutcome } from '@/types/api'
 import styles from './RecordListTab.module.css'
 
@@ -52,7 +53,11 @@ export function FollowUpTab({ patientId }: { patientId: string }) {
   return (
     <div>
       <div className={styles.list}>
-        {isLoading && <div className={styles.empty}>Loading…</div>}
+        {isLoading && (
+          <div className={styles.empty}>
+            <LoadingRow />
+          </div>
+        )}
         {!isLoading && !followUps?.length && <div className={styles.empty}>No follow-ups scheduled yet.</div>}
         {followUps?.map((f) => (
           <div key={f.id} className={styles.entry}>
@@ -103,7 +108,11 @@ export function FollowUpTab({ patientId }: { patientId: string }) {
         <div className="title">Family Conferences (Post-TB)</div>
       </div>
       <div className={styles.list}>
-        {conferencesLoading && <div className={styles.empty}>Loading…</div>}
+        {conferencesLoading && (
+          <div className={styles.empty}>
+            <LoadingRow />
+          </div>
+        )}
         {!conferencesLoading && !conferences?.length && (
           <div className={styles.empty}>No family conference calls logged yet.</div>
         )}

@@ -16,6 +16,7 @@ import { useUsers } from '@/hooks/useUsers'
 import { useAuth } from '@/context/AuthContext'
 import { DemoDataBanner } from '@/components/ui/DemoDataBanner'
 import { PriorityPill } from '@/components/ui/PriorityPill'
+import { LoadingRow } from '@/components/ui/Spinner'
 import { NewTaskDrawer } from '@/features/tasks/NewTaskDrawer'
 import { CaseFindingsSection } from '@/features/tumor-board/CaseFindingsSection'
 import { DiscussionAndDecision } from '@/features/tumor-board/DiscussionAndDecision'
@@ -102,7 +103,11 @@ export function TumorBoardWorkspacePage() {
         </div>
       )}
 
-      {isLoading && <div className="panel">Loading tumor board…</div>}
+      {isLoading && (
+        <div className="panel">
+          <LoadingRow label="Loading tumor board…" />
+        </div>
+      )}
       {isError && <div className="form-error">Couldn't load this tumor board session.</div>}
 
       {session && (

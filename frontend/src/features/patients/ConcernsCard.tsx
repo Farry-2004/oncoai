@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { usePatientConcerns, useSavePatientConcerns } from '@/hooks/usePatientProfile'
+import { LoadingRow } from '@/components/ui/Spinner'
 import type { ConcernCategory, ConcernLevel, PatientConcernsInput } from '@/types/api'
 
 const EMPTY_INPUT: PatientConcernsInput = {
@@ -70,7 +71,7 @@ export function ConcernsCard({ patientId }: { patientId: string }) {
         {concerns && <span className={`pill ${CATEGORY_PILL[concerns.concern_category]}`}>{concerns.concern_category} concern</span>}
       </div>
 
-      {isLoading && <div style={{ fontSize: '0.85rem', color: 'var(--gray-500)' }}>Loading…</div>}
+      {isLoading && <LoadingRow />}
 
       {!isLoading && !editing && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: '0.88rem' }}>

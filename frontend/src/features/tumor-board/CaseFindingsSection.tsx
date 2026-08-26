@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useAddCaseFinding, useCaseFindings } from '@/hooks/useTumorBoard'
+import { LoadingRow } from '@/components/ui/Spinner'
 import type { FindingFormat, FindingType } from '@/types/api'
 import styles from './DiscussionAndDecision.module.css'
 
@@ -36,7 +37,7 @@ export function CaseFindingsSection({ sessionId, caseId }: { sessionId: string; 
 
       {expanded && (
         <div className={styles.panel}>
-          {isLoading && <div style={{ fontSize: '0.85rem', color: 'var(--gray-500)' }}>Loading…</div>}
+          {isLoading && <LoadingRow />}
           {!isLoading && !findings?.length && (
             <div style={{ fontSize: '0.85rem', color: 'var(--gray-500)', marginBottom: 12 }}>
               No pre-recorded findings or remote consults logged yet.
