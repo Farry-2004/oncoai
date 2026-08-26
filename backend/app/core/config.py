@@ -23,5 +23,11 @@ class Settings(BaseSettings):
     twilio_auth_token: str | None = None
     twilio_from_number: str | None = None
 
+    # Where uploaded imaging attachments are stored. On Railway this should
+    # point at the persistent volume (e.g. /data/uploads) so files survive
+    # redeploys, same as the SQLite database.
+    uploads_dir: str = "uploads"
+    max_upload_bytes: int = 8 * 1024 * 1024
+
 
 settings = Settings()

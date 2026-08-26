@@ -8,6 +8,7 @@ import { NewTaskDrawer } from '@/features/tasks/NewTaskDrawer'
 import { GenerateReportDrawer } from '@/features/reports/GenerateReportDrawer'
 import { OverviewTab } from '@/features/patients/tabs/OverviewTab'
 import { RecordListTab } from '@/features/patients/tabs/RecordListTab'
+import { ImagingTab } from '@/features/patients/tabs/ImagingTab'
 import { InvestigationsTab } from '@/features/patients/tabs/InvestigationsTab'
 import { TumorBoardHistoryTab } from '@/features/patients/tabs/TumorBoardHistoryTab'
 import { FollowUpTab } from '@/features/patients/tabs/FollowUpTab'
@@ -108,14 +109,7 @@ export function PatientProfilePage() {
         />
       )}
       {activeTab === 'Investigations' && <InvestigationsTab patientId={patient.id} />}
-      {activeTab === 'Imaging' && (
-        <RecordListTab
-          patientId={patient.id}
-          recordType="imaging"
-          titlePlaceholder="e.g. Contrast CT Neck"
-          findingsPlaceholder="Imaging findings..."
-        />
-      )}
+      {activeTab === 'Imaging' && <ImagingTab patientId={patient.id} />}
       {activeTab === 'Pathology' && (
         <RecordListTab
           patientId={patient.id}

@@ -175,6 +175,17 @@ export interface PatientRecordCreateInput {
   findings: string
 }
 
+export interface RecordImage {
+  id: string
+  patient_record_id: string
+  filename: string
+  content_type: string
+  file_size: number
+  uploaded_by_id?: string | null
+  uploaded_by_name?: string | null
+  created_at: string
+}
+
 export type FollowUpStatus = 'scheduled' | 'completed' | 'missed' | 'cancelled'
 
 export interface FollowUp {

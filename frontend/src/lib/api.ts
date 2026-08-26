@@ -42,17 +42,22 @@ interface RequestOptions {
   method?: string
   body?: unknown
   form?: Record<string, string>
+  formData?: FormData
   auth?: boolean
+  responseType?: 'json' | 'blob'
 }
 
 async function request<T>(path: string, options: RequestOptions = {}, isRetry = false): Promise<T> {
-  const { method = 'GET', body, form, auth = true } = options
+  const { method = 'GET', body, form, formData, auth = true, responseType = 'json' } = options
 
   const headers: Record<string, string> = {}
   if (auth && accessToken) headers.Authorization = `Bearer ${accessToken}`
 
   let requestBody: BodyInit | undefined
-  if (form) {
+  if (formData) {
+    // Leave Content-Type unset — the browser fills in the multipart boundary itself.
+    requestBody = formData
+  } else if (form) {
     headers['Content-Type'] = 'application/x-www-form-urlencoded'
     requestBody = new URLSearchParams(form).toString()
   } else if (body !== undefined) {
@@ -79,6 +84,7 @@ async function request<T>(path: string, options: RequestOptions = {}, isRetry = 
   }
 
   if (res.status === 204) return undefined as T
+  if (responseType === 'blob') return (await res.blob()) as unknown as T
   return res.json() as Promise<T>
 }
 
@@ -91,4 +97,6 @@ export const api = {
   postForm: <T>(path: string, form: Record<string, string>) =>
     request<T>(path, { method: 'POST', form, auth: false }),
   postPublic: <T>(path: string, body?: unknown) => request<T>(path, { method: 'POST', body, auth: false }),
+  postFile: <T>(path: string, formData: FormData) => request<T>(path, { method: 'POST', formData }),
+  getBlob: (path: string) => request<Blob>(path, { responseType: 'blob' }),
 }

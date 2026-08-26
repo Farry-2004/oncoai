@@ -12,3 +12,6 @@ wheels/
 # Secrets
 .env
 *.db
+
+# Local uploaded files (Railway points this at the persistent volume instead)
+uploads/

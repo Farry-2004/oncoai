@@ -8,6 +8,7 @@ from app.models.patient import Patient, PatientStatusEnum, SexEnum
 from app.models.patient_concern import ConcernCategoryEnum, ConcernLevelEnum, PatientConcerns
 from app.models.notification import Notification
 from app.models.patient_record import PatientRecord, RecordTypeEnum
+from app.models.record_image import RecordImage
 from app.models.report import Report, ReportStatusEnum, ReportTypeEnum
 from app.models.session_meeting_link import SessionMeetingLink
 from app.models.task import Task, TaskComment, TaskPriorityEnum, TaskStatusEnum
@@ -45,6 +46,7 @@ __all__ = [
     "PatientConcerns",
     "PatientRecord",
     "RecordTypeEnum",
+    "RecordImage",
     "Report",
     "ReportStatusEnum",
     "ReportTypeEnum",
