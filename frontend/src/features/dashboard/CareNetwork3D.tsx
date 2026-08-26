@@ -18,18 +18,48 @@ const ROLE_NODES = [
   { label: 'Coordinator', angle: 288 },
 ]
 const ORBIT_RADIUS = 2.4
+const TRAVEL_SECONDS = 0.9
+const DWELL_SECONDS = 0.6
 
-function RoleNode({ angle, label }: { angle: number; label: string }) {
+interface OrchestrationState {
+  phase: 'traveling' | 'dwelling'
+  targetIndex: number
+  progress: number
+}
+
+function roleWorldPosition(angle: number): THREE.Vector3 {
   const rad = (angle * Math.PI) / 180
-  const position: [number, number, number] = [
-    Math.cos(rad) * ORBIT_RADIUS,
-    Math.sin(rad) * 0.4,
-    Math.sin(rad) * ORBIT_RADIUS,
-  ]
+  return new THREE.Vector3(Math.cos(rad) * ORBIT_RADIUS, Math.sin(rad) * 0.4, Math.sin(rad) * ORBIT_RADIUS)
+}
+
+function RoleNode({
+  angle,
+  label,
+  index,
+  state,
+}: {
+  angle: number
+  label: string
+  index: number
+  state: React.MutableRefObject<OrchestrationState>
+}) {
+  const position = roleWorldPosition(angle)
+  const meshRef = useRef<THREE.Mesh>(null)
+
+  useFrame(({ clock }) => {
+    const mesh = meshRef.current
+    if (!mesh) return
+    const breathing = 1 + Math.sin(clock.elapsedTime * 1.6 + index) * 0.06
+    const isActive = state.current.phase === 'dwelling' && state.current.targetIndex === index
+    mesh.scale.setScalar(0.16 * breathing * (isActive ? 1.35 : 1))
+    const material = mesh.material as THREE.MeshStandardMaterial
+    material.emissiveIntensity = isActive ? 1.6 : 0.7
+  })
+
   return (
     <group position={position}>
-      <mesh>
-        <sphereGeometry args={[0.16, 20, 20]} />
+      <mesh ref={meshRef}>
+        <sphereGeometry args={[1, 20, 20]} />
         <meshStandardMaterial color="#2dd4bf" emissive="#2dd4bf" emissiveIntensity={0.7} toneMapped={false} />
       </mesh>
       <Html center style={{ pointerEvents: 'none' }}>
@@ -40,9 +70,13 @@ function RoleNode({ angle, label }: { angle: number; label: string }) {
 }
 
 function CenterCase() {
+  const meshRef = useRef<THREE.Mesh>(null)
+  useFrame((_, delta) => {
+    if (meshRef.current) meshRef.current.rotation.y += delta * 0.4
+  })
   return (
     <group>
-      <mesh>
+      <mesh ref={meshRef}>
         <icosahedronGeometry args={[0.34, 1]} />
         <meshStandardMaterial color="#0d323a" emissive="#16b8a6" emissiveIntensity={0.35} />
       </mesh>
@@ -57,8 +91,8 @@ function Edges() {
   const geometry = useMemo(() => {
     const positions: number[] = []
     ROLE_NODES.forEach(({ angle }) => {
-      const rad = (angle * Math.PI) / 180
-      positions.push(0, 0, 0, Math.cos(rad) * ORBIT_RADIUS, Math.sin(rad) * 0.4, Math.sin(rad) * ORBIT_RADIUS)
+      const p = roleWorldPosition(angle)
+      positions.push(0, 0, 0, p.x, p.y, p.z)
     })
     const geo = new THREE.BufferGeometry()
     geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(positions), 3))
@@ -71,18 +105,60 @@ function Edges() {
   )
 }
 
+// Echoes the AI orchestrator handing a case between roles in sequence —
+// abstract motion only, not driven by any real orchestration run.
+function OrchestrationPulse({ state }: { state: React.MutableRefObject<OrchestrationState> }) {
+  const meshRef = useRef<THREE.Mesh>(null)
+  const origin = useMemo(() => new THREE.Vector3(0, 0, 0), [])
+
+  useFrame((_, delta) => {
+    const mesh = meshRef.current
+    if (!mesh) return
+    const s = state.current
+    const target = roleWorldPosition(ROLE_NODES[s.targetIndex].angle)
+
+    if (s.phase === 'traveling') {
+      s.progress += delta / TRAVEL_SECONDS
+      if (s.progress >= 1) {
+        s.progress = 0
+        s.phase = 'dwelling'
+      }
+      mesh.position.lerpVectors(origin, target, Math.min(s.progress, 1))
+    } else {
+      mesh.position.copy(target)
+      s.progress += delta / DWELL_SECONDS
+      if (s.progress >= 1) {
+        s.progress = 0
+        s.phase = 'traveling'
+        s.targetIndex = (s.targetIndex + 1) % ROLE_NODES.length
+      }
+    }
+  })
+
+  return (
+    <mesh ref={meshRef}>
+      <sphereGeometry args={[0.08, 12, 12]} />
+      <meshStandardMaterial color="#e8fffb" emissive="#5eead4" emissiveIntensity={2.6} toneMapped={false} />
+    </mesh>
+  )
+}
+
 function SpinningGroup() {
   const ref = useRef<THREE.Group>(null)
+  const orchestrationState = useRef<OrchestrationState>({ phase: 'traveling', targetIndex: 0, progress: 0 })
+
   useFrame((_, delta) => {
     if (ref.current) ref.current.rotation.y += delta * 0.12
   })
+
   return (
     <group ref={ref}>
       <Edges />
       <CenterCase />
-      {ROLE_NODES.map((n) => (
-        <RoleNode key={n.label} {...n} />
+      {ROLE_NODES.map((n, i) => (
+        <RoleNode key={n.label} {...n} index={i} state={orchestrationState} />
       ))}
+      <OrchestrationPulse state={orchestrationState} />
     </group>
   )
 }

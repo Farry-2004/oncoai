@@ -13,6 +13,12 @@ import styles from './Hero3D.module.css'
 const NODE_COUNT = 48
 const RADIUS = 4.2
 const CONNECT_DISTANCE = 1.9
+const PULSE_COUNT = 5
+const PULSE_SPEED = 0.55
+
+function easeOutCubic(t: number): number {
+  return 1 - Math.pow(1 - t, 3)
+}
 
 function useNetworkGeometry() {
   return useMemo(() => {
@@ -90,21 +96,69 @@ function NetworkEdges({ edges }: { edges: [THREE.Vector3, THREE.Vector3][] }) {
   )
 }
 
+// Small bright sparks that travel along random edges — a visual echo of the
+// AI orchestrator handing a case between steps/specialists, kept abstract
+// rather than tied to any real data (per the design boundary above).
+function OrchestrationPulses({ edges }: { edges: [THREE.Vector3, THREE.Vector3][] }) {
+  const meshRef = useRef<THREE.InstancedMesh>(null)
+  const state = useMemo(
+    () =>
+      Array.from({ length: PULSE_COUNT }, () => ({
+        edge: edges[Math.floor(Math.random() * edges.length)],
+        progress: Math.random(),
+      })),
+    [edges],
+  )
+
+  useFrame((_, delta) => {
+    const mesh = meshRef.current
+    if (!mesh) return
+    const dummy = new THREE.Object3D()
+    state.forEach((s, i) => {
+      s.progress += delta * PULSE_SPEED
+      if (s.progress >= 1) {
+        s.progress = 0
+        s.edge = edges[Math.floor(Math.random() * edges.length)]
+      }
+      const [a, b] = s.edge
+      dummy.position.lerpVectors(a, b, s.progress)
+      const flicker = 0.045 + Math.sin(s.progress * Math.PI) * 0.035
+      dummy.scale.setScalar(flicker)
+      dummy.updateMatrix()
+      mesh.setMatrixAt(i, dummy.matrix)
+    })
+    mesh.instanceMatrix.needsUpdate = true
+  })
+
+  return (
+    <instancedMesh ref={meshRef} args={[undefined, undefined, PULSE_COUNT]}>
+      <sphereGeometry args={[1, 10, 10]} />
+      <meshStandardMaterial color="#e8fffb" emissive="#5eead4" emissiveIntensity={2.4} toneMapped={false} />
+    </instancedMesh>
+  )
+}
+
 function RotatingGroup({ mouse }: { mouse: { x: number; y: number } }) {
   const groupRef = useRef<THREE.Group>(null)
+  const elapsed = useRef(0)
   const { points, edges } = useNetworkGeometry()
 
   useFrame((_, delta) => {
     if (!groupRef.current) return
+    elapsed.current += delta
     groupRef.current.rotation.y += delta * 0.08
     groupRef.current.rotation.x += (mouse.y * 0.15 - groupRef.current.rotation.x) * 0.03
     groupRef.current.rotation.z += (mouse.x * 0.08 - groupRef.current.rotation.z) * 0.03
+    // Entrance: ease the whole network in from a soft bloom rather than a hard cut.
+    const scale = 0.55 + easeOutCubic(Math.min(elapsed.current / 1.4, 1)) * 0.45
+    groupRef.current.scale.setScalar(scale)
   })
 
   return (
     <group ref={groupRef}>
       <NetworkNodes points={points} />
       <NetworkEdges edges={edges} />
+      <OrchestrationPulses edges={edges} />
     </group>
   )
 }
@@ -130,6 +184,7 @@ function Scene() {
         <fog attach="fog" args={['#071b1f', 6, 13]} />
         <ambientLight intensity={0.6} />
         <pointLight position={[5, 5, 5]} intensity={40} color="#2dd4bf" />
+        <pointLight position={[-6, -3, -4]} intensity={14} color="#5eead4" />
         <RotatingGroup mouse={mouse} />
       </Canvas>
     </div>
