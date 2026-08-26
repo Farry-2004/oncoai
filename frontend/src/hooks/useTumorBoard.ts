@@ -1,6 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/lib/api'
-import type { CasePriority, CaseStatus, TumorBoardSession, TumorBoardSessionDetail } from '@/types/api'
+import type {
+  CasePriority,
+  CaseStatus,
+  TumorBoardAttendance,
+  TumorBoardSession,
+  TumorBoardSessionDetail,
+} from '@/types/api'
 
 export function useTumorBoardSessions() {
   return useQuery({
@@ -43,6 +49,36 @@ export function useAddCaseToQueue(sessionId: string | undefined) {
       api.post(`/tumor-boards/${sessionId}/cases`, input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tumor-board-session', sessionId] })
+    },
+  })
+}
+
+export function useTumorBoardAttendance(sessionId: string | undefined) {
+  return useQuery({
+    queryKey: ['tumor-board-attendance', sessionId],
+    queryFn: () => api.get<TumorBoardAttendance[]>(`/tumor-boards/${sessionId}/attendance`),
+    enabled: !!sessionId,
+  })
+}
+
+export function useMarkAttendance(sessionId: string | undefined) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (input: { user_id: string; cme_credit?: number }) =>
+      api.post<TumorBoardAttendance>(`/tumor-boards/${sessionId}/attendance`, input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tumor-board-attendance', sessionId] })
+    },
+  })
+}
+
+export function useRemoveAttendance(sessionId: string | undefined) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (attendanceId: string) =>
+      api.delete(`/tumor-boards/${sessionId}/attendance/${attendanceId}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tumor-board-attendance', sessionId] })
     },
   })
 }

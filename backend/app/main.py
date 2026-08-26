@@ -9,6 +9,7 @@ from app.routers import (
     audit,
     auth,
     dashboard,
+    family_conferences,
     follow_ups,
     notifications,
     patient_records,
@@ -56,6 +57,7 @@ app.include_router(tumor_board_decisions.router)
 app.include_router(audit.router)
 app.include_router(patient_records.router)
 app.include_router(follow_ups.router)
+app.include_router(family_conferences.router)
 app.include_router(ai.router)
 app.include_router(tasks.router)
 app.include_router(reports.router)

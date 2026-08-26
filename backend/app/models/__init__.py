@@ -1,7 +1,9 @@
 from app.models.ai_analysis import AIAnalysis, AnalysisTypeEnum
 from app.models.audit import AuditLog
+from app.models.family_conference import FamilyConference, FamilyConferenceOutcomeEnum
 from app.models.follow_up import FollowUp, FollowUpStatusEnum
 from app.models.patient import Patient, PatientStatusEnum, SexEnum
+from app.models.patient_concern import ConcernCategoryEnum, ConcernLevelEnum, PatientConcerns
 from app.models.notification import Notification
 from app.models.patient_record import PatientRecord, RecordTypeEnum
 from app.models.report import Report, ReportStatusEnum, ReportTypeEnum
@@ -13,6 +15,7 @@ from app.models.tumor_board import (
     TumorBoardCase,
     TumorBoardSession,
 )
+from app.models.tumor_board_attendance import TumorBoardAttendance
 from app.models.tumor_board_decision import TumorBoardDecision
 from app.models.user import RoleEnum, User
 from app.models.workup import WorkupItem, WorkupItemTypeEnum, WorkupStatusEnum
@@ -21,12 +24,17 @@ __all__ = [
     "AIAnalysis",
     "AnalysisTypeEnum",
     "AuditLog",
+    "FamilyConference",
+    "FamilyConferenceOutcomeEnum",
     "FollowUp",
     "FollowUpStatusEnum",
     "Notification",
     "Patient",
     "PatientStatusEnum",
     "SexEnum",
+    "ConcernCategoryEnum",
+    "ConcernLevelEnum",
+    "PatientConcerns",
     "PatientRecord",
     "RecordTypeEnum",
     "Report",
@@ -39,6 +47,7 @@ __all__ = [
     "CasePriorityEnum",
     "CaseStatusEnum",
     "SessionStatusEnum",
+    "TumorBoardAttendance",
     "TumorBoardCase",
     "TumorBoardSession",
     "TumorBoardDecision",

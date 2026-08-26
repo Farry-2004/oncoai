@@ -3,9 +3,13 @@ import { api } from '@/lib/api'
 import type {
   AIAnalysis,
   AnalysisType,
+  FamilyConference,
+  FamilyConferenceCreateInput,
   FollowUp,
   FollowUpCreateInput,
   Patient,
+  PatientConcerns,
+  PatientConcernsInput,
   PatientRecord,
   PatientRecordCreateInput,
   RecordType,
@@ -100,6 +104,44 @@ export function useCreateFollowUp(patientId: string | undefined) {
       api.post<FollowUp>(`/patients/${patientId}/follow-ups`, input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['follow-ups', patientId] })
+    },
+  })
+}
+
+export function usePatientConcerns(patientId: string | undefined) {
+  return useQuery({
+    queryKey: ['patient-concerns', patientId],
+    queryFn: () => api.get<PatientConcerns | null>(`/patients/${patientId}/concerns`),
+    enabled: !!patientId,
+  })
+}
+
+export function useSavePatientConcerns(patientId: string | undefined) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (input: PatientConcernsInput) =>
+      api.put<PatientConcerns>(`/patients/${patientId}/concerns`, input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['patient-concerns', patientId] })
+    },
+  })
+}
+
+export function useFamilyConferences(patientId: string | undefined) {
+  return useQuery({
+    queryKey: ['family-conferences', patientId],
+    queryFn: () => api.get<FamilyConference[]>(`/patients/${patientId}/family-conferences`),
+    enabled: !!patientId,
+  })
+}
+
+export function useCreateFamilyConference(patientId: string | undefined) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (input: FamilyConferenceCreateInput) =>
+      api.post<FamilyConference>(`/patients/${patientId}/family-conferences`, input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['family-conferences', patientId] })
     },
   })
 }

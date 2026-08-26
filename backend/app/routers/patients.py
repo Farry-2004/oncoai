@@ -6,8 +6,10 @@ from sqlalchemy.orm import Session
 
 from app.core.deps import get_current_user, get_db, require_role
 from app.models.patient import Patient, PatientStatusEnum
+from app.models.patient_concern import PatientConcerns
 from app.models.user import RoleEnum, User
 from app.schemas.patient import PatientCreate, PatientListResponse, PatientRead, PatientUpdate
+from app.schemas.patient_concern import PatientConcernsRead, PatientConcernsUpsert
 from app.schemas.tumor_board import TumorBoardCaseRead
 from app.schemas.workup import WorkupItemCreate, WorkupItemRead, WorkupItemUpdate
 from app.models.tumor_board import TumorBoardCase
@@ -194,6 +196,56 @@ def update_workup(
                     )
 
     return item
+
+
+def concerns_to_read(entry: PatientConcerns, db: Session) -> PatientConcernsRead:
+    read = PatientConcernsRead.model_validate(entry)
+    if entry.updated_by_id:
+        editor = db.get(User, entry.updated_by_id)
+        if editor:
+            read.updated_by_name = editor.full_name
+    return read
+
+
+@router.get("/{patient_id}/concerns", response_model=PatientConcernsRead | None)
+def get_patient_concerns(
+    patient_id: str,
+    db: Session = Depends(get_db),
+    _current_user: User = Depends(get_current_user),
+) -> PatientConcernsRead | None:
+    entry = db.query(PatientConcerns).filter(PatientConcerns.patient_id == patient_id).first()
+    return concerns_to_read(entry, db) if entry else None
+
+
+@router.put("/{patient_id}/concerns", response_model=PatientConcernsRead)
+def upsert_patient_concerns(
+    patient_id: str,
+    payload: PatientConcernsUpsert,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> PatientConcernsRead:
+    patient = db.get(Patient, patient_id)
+    if not patient:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found.")
+
+    entry = db.query(PatientConcerns).filter(PatientConcerns.patient_id == patient_id).first()
+    if not entry:
+        entry = PatientConcerns(patient_id=patient_id)
+        db.add(entry)
+    for field, value in payload.model_dump().items():
+        setattr(entry, field, value)
+    entry.updated_by_id = current_user.id
+    db.commit()
+    db.refresh(entry)
+    write_audit_event(
+        db,
+        actor_id=current_user.id,
+        action="patient.concerns_update",
+        entity_type="patient_concerns",
+        entity_id=entry.id,
+        metadata={"patient_id": patient_id, "concern_category": entry.concern_category.value},
+    )
+    return concerns_to_read(entry, db)
 
 
 @router.get("/{patient_id}/cases", response_model=list[TumorBoardCaseRead])

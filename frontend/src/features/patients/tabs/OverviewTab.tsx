@@ -1,5 +1,6 @@
 import { usePatientCases, usePatientWorkups, useFollowUps } from '@/hooks/usePatientProfile'
 import { StatusBadge } from '@/components/ui/StatusBadge'
+import { ConcernsCard } from '@/features/patients/ConcernsCard'
 import type { Patient } from '@/types/api'
 
 function calculateAge(dob: string): number {
@@ -72,6 +73,7 @@ export function OverviewTab({ patient }: { patient: Patient }) {
             {upcomingFollowUp ? new Date(upcomingFollowUp.follow_up_date).toLocaleDateString() : 'None scheduled'}
           </div>
         </div>
+        <ConcernsCard patientId={patient.id} />
       </div>
     </div>
   )

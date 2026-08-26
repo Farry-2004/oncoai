@@ -2,11 +2,16 @@ import { useEffect, useState } from 'react'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import {
   useAddCaseToQueue,
+  useMarkAttendance,
+  useRemoveAttendance,
+  useTumorBoardAttendance,
   useTumorBoardSession,
   useTumorBoardSessions,
   useUpdateCase,
 } from '@/hooks/useTumorBoard'
 import { usePatients } from '@/hooks/usePatients'
+import { useUsers } from '@/hooks/useUsers'
+import { useAuth } from '@/context/AuthContext'
 import { DemoDataBanner } from '@/components/ui/DemoDataBanner'
 import { PriorityPill } from '@/components/ui/PriorityPill'
 import { NewTaskDrawer } from '@/features/tasks/NewTaskDrawer'
@@ -14,6 +19,8 @@ import { DiscussionAndDecision } from '@/features/tumor-board/DiscussionAndDecis
 import { GenerateReportDrawer } from '@/features/reports/GenerateReportDrawer'
 import type { CasePriority, CaseStatus, TumorBoardCase } from '@/types/api'
 import styles from './TumorBoardWorkspacePage.module.css'
+
+const CAN_MANAGE_ATTENDANCE = new Set(['tumor_board_coordinator', 'administrator'])
 
 const NEXT_STATUS: Record<CaseStatus, CaseStatus | null> = {
   pending: 'presenting',
@@ -49,6 +56,15 @@ export function TumorBoardWorkspacePage() {
   const updateCase = useUpdateCase(activeSessionId)
   const addCase = useAddCaseToQueue(activeSessionId)
   const { data: allPatients } = usePatients({ page_size: 100 })
+
+  const { user } = useAuth()
+  const canManageAttendance = !!user && CAN_MANAGE_ATTENDANCE.has(user.role)
+  const { data: attendance } = useTumorBoardAttendance(activeSessionId)
+  const { data: allUsers } = useUsers()
+  const markAttendance = useMarkAttendance(activeSessionId)
+  const removeAttendance = useRemoveAttendance(activeSessionId)
+  const [attendeeId, setAttendeeId] = useState('')
+  const attendeeOptions = (allUsers ?? []).filter((u) => !attendance?.some((a) => a.user_id === u.id))
 
   const isLoading = sessionsLoading || sessionLoading
 
@@ -224,6 +240,57 @@ export function TumorBoardWorkspacePage() {
                 {addCase.isPending ? 'Adding…' : 'Add to Queue'}
               </button>
             </div>
+          </div>
+
+          <div className="panel" style={{ marginTop: 20 }}>
+            <div className="panel-head">
+              <div className="title">Attendance &amp; CME Credit</div>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: canManageAttendance ? 14 : 0 }}>
+              {!attendance?.length && <div style={{ fontSize: '0.85rem', color: 'var(--gray-500)' }}>No attendance recorded yet.</div>}
+              {attendance?.map((a) => (
+                <div key={a.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.88rem' }}>
+                  <span>
+                    {a.user_name ?? 'Unknown'} <span style={{ color: 'var(--gray-500)' }}>({a.user_role?.replace(/_/g, ' ')})</span>
+                  </span>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <span className="pill medium">{a.cme_credit} CME</span>
+                    {canManageAttendance && (
+                      <button
+                        type="button"
+                        className="btn btn-ghost btn-sm"
+                        disabled={removeAttendance.isPending}
+                        onClick={() => removeAttendance.mutate(a.id)}
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </span>
+                </div>
+              ))}
+            </div>
+            {canManageAttendance && (
+              <div className={styles.addCaseRow}>
+                <select value={attendeeId} onChange={(e) => setAttendeeId(e.target.value)}>
+                  <option value="">Select attendee…</option>
+                  {attendeeOptions.map((u) => (
+                    <option key={u.id} value={u.id}>
+                      {u.full_name} ({u.role.replace(/_/g, ' ')})
+                    </option>
+                  ))}
+                </select>
+                <button
+                  className="btn btn-primary btn-sm"
+                  type="button"
+                  disabled={!attendeeId || markAttendance.isPending}
+                  onClick={() => {
+                    markAttendance.mutate({ user_id: attendeeId }, { onSuccess: () => setAttendeeId('') })
+                  }}
+                >
+                  {markAttendance.isPending ? 'Marking…' : 'Mark Present'}
+                </button>
+              </div>
+            )}
           </div>
         </>
       )}

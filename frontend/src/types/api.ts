@@ -189,6 +189,71 @@ export interface FollowUp {
   created_at: string
 }
 
+export type ConcernLevel = 'not_concerned' | 'somewhat_concerned' | 'very_concerned'
+export type ConcernCategory = 'low' | 'moderate' | 'high'
+
+export interface PatientConcerns {
+  id: string
+  patient_id: string
+  transportation_barrier: boolean
+  housing_barrier: boolean
+  financial_barrier: boolean
+  dependent_care_barrier: boolean
+  other_barrier_notes?: string | null
+  travel_concern: ConcernLevel
+  financial_concern: ConcernLevel
+  risk_tolerance_concern: ConcernLevel
+  radiation_openness_concern: ConcernLevel
+  concern_category: ConcernCategory
+  updated_by_id?: string | null
+  updated_by_name?: string | null
+  updated_at: string
+}
+
+export interface PatientConcernsInput {
+  transportation_barrier: boolean
+  housing_barrier: boolean
+  financial_barrier: boolean
+  dependent_care_barrier: boolean
+  other_barrier_notes?: string
+  travel_concern: ConcernLevel
+  financial_concern: ConcernLevel
+  risk_tolerance_concern: ConcernLevel
+  radiation_openness_concern: ConcernLevel
+}
+
+export type FamilyConferenceOutcome = 'proceeding' | 'needs_more_time' | 'declined'
+
+export interface FamilyConference {
+  id: string
+  patient_id: string
+  tumor_board_decision_id?: string | null
+  conducted_at: string
+  participants: string
+  questions_raised?: string | null
+  outcome: FamilyConferenceOutcome
+  conducted_by_id?: string | null
+  conducted_by_name?: string | null
+  created_at: string
+}
+
+export interface FamilyConferenceCreateInput {
+  participants: string
+  questions_raised?: string
+  outcome?: FamilyConferenceOutcome
+  tumor_board_decision_id?: string
+}
+
+export interface TumorBoardAttendance {
+  id: string
+  session_id: string
+  user_id: string
+  user_name?: string | null
+  user_role?: string | null
+  cme_credit: number
+  created_at: string
+}
+
 export interface FollowUpCreateInput {
   follow_up_date: string
   notes?: string

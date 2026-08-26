@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.core.deps import get_current_user, get_db, require_role
 from app.models.patient import Patient
 from app.models.tumor_board import TumorBoardCase, TumorBoardSession
+from app.models.tumor_board_attendance import TumorBoardAttendance
 from app.models.user import RoleEnum, User
 from app.routers.patients import patient_to_read
 from app.schemas.tumor_board import (
@@ -16,6 +17,7 @@ from app.schemas.tumor_board import (
     TumorBoardSessionDetail,
     TumorBoardSessionRead,
 )
+from app.schemas.tumor_board_attendance import AttendanceCreate, AttendanceRead
 from app.services.audit_service import write_audit_event
 from app.services.notification_service import create_notification
 
@@ -178,3 +180,89 @@ def update_case(
         metadata=changes,
     )
     return case_to_read(case, db)
+
+
+def _attendance_to_read(entry: TumorBoardAttendance, db: Session) -> AttendanceRead:
+    read = AttendanceRead.model_validate(entry)
+    attendee = db.get(User, entry.user_id)
+    if attendee:
+        read.user_name = attendee.full_name
+        read.user_role = attendee.role.value
+    return read
+
+
+@router.get("/{session_id}/attendance", response_model=list[AttendanceRead])
+def list_attendance(
+    session_id: str,
+    db: Session = Depends(get_db),
+    _current_user: User = Depends(get_current_user),
+) -> list[AttendanceRead]:
+    entries = (
+        db.query(TumorBoardAttendance).filter(TumorBoardAttendance.session_id == session_id).all()
+    )
+    return [_attendance_to_read(e, db) for e in entries]
+
+
+@router.post(
+    "/{session_id}/attendance", response_model=AttendanceRead, status_code=status.HTTP_201_CREATED
+)
+def mark_attendance(
+    session_id: str,
+    payload: AttendanceCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(
+        require_role(RoleEnum.tumor_board_coordinator, RoleEnum.administrator)
+    ),
+) -> AttendanceRead:
+    session = db.get(TumorBoardSession, session_id)
+    if not session:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tumor board session not found.")
+    existing = (
+        db.query(TumorBoardAttendance)
+        .filter(
+            TumorBoardAttendance.session_id == session_id,
+            TumorBoardAttendance.user_id == payload.user_id,
+        )
+        .first()
+    )
+    if existing:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail="Attendance already recorded for this user."
+        )
+    entry = TumorBoardAttendance(session_id=session_id, recorded_by_id=current_user.id, **payload.model_dump())
+    db.add(entry)
+    db.commit()
+    db.refresh(entry)
+    write_audit_event(
+        db,
+        actor_id=current_user.id,
+        action="tumor_board.attendance_marked",
+        entity_type="tumor_board_attendance",
+        entity_id=entry.id,
+        metadata={"session_id": session_id, "user_id": payload.user_id},
+    )
+    return _attendance_to_read(entry, db)
+
+
+@router.delete("/{session_id}/attendance/{attendance_id}", status_code=status.HTTP_204_NO_CONTENT)
+def remove_attendance(
+    session_id: str,
+    attendance_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(
+        require_role(RoleEnum.tumor_board_coordinator, RoleEnum.administrator)
+    ),
+) -> None:
+    entry = db.get(TumorBoardAttendance, attendance_id)
+    if not entry or entry.session_id != session_id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Attendance record not found.")
+    write_audit_event(
+        db,
+        actor_id=current_user.id,
+        action="tumor_board.attendance_removed",
+        entity_type="tumor_board_attendance",
+        entity_id=entry.id,
+        metadata={"session_id": session_id, "user_id": entry.user_id},
+    )
+    db.delete(entry)
+    db.commit()
