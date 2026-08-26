@@ -1,9 +1,10 @@
 /**
- * DESIGN BOUNDARY: 3D/WebGL is an atmospheric accent only, scoped to this
- * hero and the dashboard's CareNetwork3D panel. It never encodes or carries
- * clinical data — no 3D tables, no 3D charts. If you're tempted to add 3D
- * anywhere else in this app, read the plan's "Design reconciliation" note
- * first.
+ * DESIGN BOUNDARY: 3D/WebGL is scoped to three deliberate spots — this hero,
+ * the dashboard's CareNetwork3D panel, and the patient profile's schematic
+ * AnatomyViewer3D. It never encodes or carries real clinical data — no 3D
+ * tables, no 3D charts, no real imaging. If you're tempted to add 3D
+ * anywhere else in this app, treat that as a deliberate decision, not a
+ * default.
  */
 import { Suspense, useMemo, useRef, useState } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'

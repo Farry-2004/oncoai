@@ -1,0 +1,25 @@
+.canvasBox {
+  height: 280px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: #0a262b;
+}
+.canvasBox canvas { display: block; }
+.fallback { width: 100%; height: 100%; background: #0a262b; }
+
+.activeLabel {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--navy-950);
+  background: #e8fffb;
+  padding: 3px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.caption {
+  margin-top: 10px;
+  font-size: 0.76rem;
+  color: var(--gray-500);
+  font-style: italic;
+}

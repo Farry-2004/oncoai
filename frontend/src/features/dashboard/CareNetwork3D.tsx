@@ -4,6 +4,7 @@
  * counts/values into this scene. If a stat needs to be shown, it belongs in
  * a flat StatCard, not here.
  */
+// See Hero3D.tsx for the full three-spot 3D design boundary.
 import { Suspense, useMemo, useRef } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Html, OrbitControls } from '@react-three/drei'
