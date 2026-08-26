@@ -1,8 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/lib/api'
 import type {
+  CaseFinding,
+  CaseFindingCreateInput,
   CasePriority,
   CaseStatus,
+  SessionMeetingLink,
   TumorBoardAttendance,
   TumorBoardSession,
   TumorBoardSessionDetail,
@@ -79,6 +82,44 @@ export function useRemoveAttendance(sessionId: string | undefined) {
       api.delete(`/tumor-boards/${sessionId}/attendance/${attendanceId}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tumor-board-attendance', sessionId] })
+    },
+  })
+}
+
+export function useCaseFindings(sessionId: string | undefined, caseId: string | undefined) {
+  return useQuery({
+    queryKey: ['case-findings', sessionId, caseId],
+    queryFn: () => api.get<CaseFinding[]>(`/tumor-boards/${sessionId}/cases/${caseId}/findings`),
+    enabled: !!sessionId && !!caseId,
+  })
+}
+
+export function useAddCaseFinding(sessionId: string | undefined, caseId: string | undefined) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (input: CaseFindingCreateInput) =>
+      api.post<CaseFinding>(`/tumor-boards/${sessionId}/cases/${caseId}/findings`, input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['case-findings', sessionId, caseId] })
+    },
+  })
+}
+
+export function useSessionMeetingLink(sessionId: string | undefined) {
+  return useQuery({
+    queryKey: ['session-meeting-link', sessionId],
+    queryFn: () => api.get<SessionMeetingLink | null>(`/tumor-boards/${sessionId}/meeting-link`),
+    enabled: !!sessionId,
+  })
+}
+
+export function useSetSessionMeetingLink(sessionId: string | undefined) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (meetingLink: string) =>
+      api.put<SessionMeetingLink>(`/tumor-boards/${sessionId}/meeting-link`, { meeting_link: meetingLink }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['session-meeting-link', sessionId] })
     },
   })
 }

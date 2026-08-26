@@ -1,5 +1,6 @@
 from app.models.ai_analysis import AIAnalysis, AnalysisTypeEnum
 from app.models.audit import AuditLog
+from app.models.case_finding import CaseFinding, FindingFormatEnum, FindingTypeEnum
 from app.models.family_conference import FamilyConference, FamilyConferenceOutcomeEnum
 from app.models.follow_up import FollowUp, FollowUpStatusEnum
 from app.models.patient import Patient, PatientStatusEnum, SexEnum
@@ -7,6 +8,7 @@ from app.models.patient_concern import ConcernCategoryEnum, ConcernLevelEnum, Pa
 from app.models.notification import Notification
 from app.models.patient_record import PatientRecord, RecordTypeEnum
 from app.models.report import Report, ReportStatusEnum, ReportTypeEnum
+from app.models.session_meeting_link import SessionMeetingLink
 from app.models.task import Task, TaskComment, TaskPriorityEnum, TaskStatusEnum
 from app.models.tumor_board import (
     CasePriorityEnum,
@@ -24,6 +26,9 @@ __all__ = [
     "AIAnalysis",
     "AnalysisTypeEnum",
     "AuditLog",
+    "CaseFinding",
+    "FindingFormatEnum",
+    "FindingTypeEnum",
     "FamilyConference",
     "FamilyConferenceOutcomeEnum",
     "FollowUp",
@@ -40,6 +45,7 @@ __all__ = [
     "Report",
     "ReportStatusEnum",
     "ReportTypeEnum",
+    "SessionMeetingLink",
     "Task",
     "TaskComment",
     "TaskPriorityEnum",

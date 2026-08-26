@@ -4,6 +4,8 @@ import {
   useAddCaseToQueue,
   useMarkAttendance,
   useRemoveAttendance,
+  useSessionMeetingLink,
+  useSetSessionMeetingLink,
   useTumorBoardAttendance,
   useTumorBoardSession,
   useTumorBoardSessions,
@@ -15,6 +17,7 @@ import { useAuth } from '@/context/AuthContext'
 import { DemoDataBanner } from '@/components/ui/DemoDataBanner'
 import { PriorityPill } from '@/components/ui/PriorityPill'
 import { NewTaskDrawer } from '@/features/tasks/NewTaskDrawer'
+import { CaseFindingsSection } from '@/features/tumor-board/CaseFindingsSection'
 import { DiscussionAndDecision } from '@/features/tumor-board/DiscussionAndDecision'
 import { GenerateReportDrawer } from '@/features/reports/GenerateReportDrawer'
 import type { CasePriority, CaseStatus, TumorBoardCase } from '@/types/api'
@@ -66,6 +69,11 @@ export function TumorBoardWorkspacePage() {
   const [attendeeId, setAttendeeId] = useState('')
   const attendeeOptions = (allUsers ?? []).filter((u) => !attendance?.some((a) => a.user_id === u.id))
 
+  const { data: meetingLink } = useSessionMeetingLink(activeSessionId)
+  const setMeetingLink = useSetSessionMeetingLink(activeSessionId)
+  const [editingLink, setEditingLink] = useState(false)
+  const [linkDraft, setLinkDraft] = useState('')
+
   const isLoading = sessionsLoading || sessionLoading
 
   return (
@@ -113,6 +121,64 @@ export function TumorBoardWorkspacePage() {
                 <span>
                   Coordinator: <strong>{session.coordinator_name ?? '—'}</strong>
                 </span>
+              </div>
+              <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                {editingLink ? (
+                  <>
+                    <input
+                      type="url"
+                      value={linkDraft}
+                      onChange={(e) => setLinkDraft(e.target.value)}
+                      placeholder="https://meet.example.com/..."
+                      style={{ minWidth: 260 }}
+                    />
+                    <button
+                      type="button"
+                      className="btn btn-dark btn-sm"
+                      disabled={!linkDraft || setMeetingLink.isPending}
+                      onClick={() => {
+                        setMeetingLink.mutate(linkDraft, { onSuccess: () => setEditingLink(false) })
+                      }}
+                    >
+                      {setMeetingLink.isPending ? 'Saving…' : 'Save'}
+                    </button>
+                    <button type="button" className="btn btn-ghost btn-sm" onClick={() => setEditingLink(false)}>
+                      Cancel
+                    </button>
+                  </>
+                ) : meetingLink ? (
+                  <>
+                    <a href={meetingLink.meeting_link} target="_blank" rel="noreferrer" className="btn btn-primary btn-sm">
+                      Dial in patient
+                    </a>
+                    {canManageAttendance && (
+                      <button
+                        type="button"
+                        className="btn btn-ghost btn-sm"
+                        onClick={() => {
+                          setLinkDraft(meetingLink.meeting_link)
+                          setEditingLink(true)
+                        }}
+                      >
+                        Edit link
+                      </button>
+                    )}
+                  </>
+                ) : (
+                  canManageAttendance && (
+                    <button
+                      type="button"
+                      className="btn btn-ghost btn-sm"
+                      style={{ border: '1px solid var(--border)' }}
+                      onClick={() => {
+                        setLinkDraft('')
+                        setEditingLink(true)
+                      }}
+                    >
+                      + Add meeting link for patient dial-in
+                    </button>
+                  )
+                )}
               </div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -192,6 +258,7 @@ export function TumorBoardWorkspacePage() {
                     </div>
                   )}
 
+                  {activeSessionId && <CaseFindingsSection sessionId={activeSessionId} caseId={c.id} />}
                   {activeSessionId && <DiscussionAndDecision sessionId={activeSessionId} caseId={c.id} />}
                 </div>
               )

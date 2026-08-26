@@ -4,11 +4,15 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.deps import get_current_user, get_db, require_role
+from app.models.case_finding import CaseFinding
 from app.models.patient import Patient
+from app.models.session_meeting_link import SessionMeetingLink
 from app.models.tumor_board import TumorBoardCase, TumorBoardSession
 from app.models.tumor_board_attendance import TumorBoardAttendance
 from app.models.user import RoleEnum, User
 from app.routers.patients import patient_to_read
+from app.schemas.case_finding import CaseFindingCreate, CaseFindingRead
+from app.schemas.session_meeting_link import SessionMeetingLinkRead, SessionMeetingLinkUpsert
 from app.schemas.tumor_board import (
     TumorBoardCaseCreate,
     TumorBoardCaseRead,
@@ -266,3 +270,113 @@ def remove_attendance(
     )
     db.delete(entry)
     db.commit()
+
+
+def _finding_to_read(entry: CaseFinding, db: Session) -> CaseFindingRead:
+    read = CaseFindingRead.model_validate(entry)
+    if entry.contributed_by_id:
+        contributor = db.get(User, entry.contributed_by_id)
+        if contributor:
+            read.contributed_by_name = contributor.full_name
+    return read
+
+
+@router.get("/{session_id}/cases/{case_id}/findings", response_model=list[CaseFindingRead])
+def list_case_findings(
+    session_id: str,
+    case_id: str,
+    db: Session = Depends(get_db),
+    _current_user: User = Depends(get_current_user),
+) -> list[CaseFindingRead]:
+    case = db.get(TumorBoardCase, case_id)
+    if not case or case.session_id != session_id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tumor board case not found.")
+    entries = (
+        db.query(CaseFinding)
+        .filter(CaseFinding.tumor_board_case_id == case_id)
+        .order_by(CaseFinding.created_at.desc())
+        .all()
+    )
+    return [_finding_to_read(e, db) for e in entries]
+
+
+@router.post(
+    "/{session_id}/cases/{case_id}/findings",
+    response_model=CaseFindingRead,
+    status_code=status.HTTP_201_CREATED,
+)
+def add_case_finding(
+    session_id: str,
+    case_id: str,
+    payload: CaseFindingCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> CaseFindingRead:
+    case = db.get(TumorBoardCase, case_id)
+    if not case or case.session_id != session_id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tumor board case not found.")
+    entry = CaseFinding(
+        tumor_board_case_id=case_id, contributed_by_id=current_user.id, **payload.model_dump()
+    )
+    db.add(entry)
+    db.commit()
+    db.refresh(entry)
+    write_audit_event(
+        db,
+        actor_id=current_user.id,
+        action="tumor_board.case_finding_added",
+        entity_type="case_finding",
+        entity_id=entry.id,
+        metadata={"session_id": session_id, "case_id": case_id, "is_remote_consult": entry.is_remote_consult},
+    )
+    return _finding_to_read(entry, db)
+
+
+def _meeting_link_to_read(entry: SessionMeetingLink, db: Session) -> SessionMeetingLinkRead:
+    read = SessionMeetingLinkRead.model_validate(entry)
+    if entry.updated_by_id:
+        editor = db.get(User, entry.updated_by_id)
+        if editor:
+            read.updated_by_name = editor.full_name
+    return read
+
+
+@router.get("/{session_id}/meeting-link", response_model=SessionMeetingLinkRead | None)
+def get_meeting_link(
+    session_id: str,
+    db: Session = Depends(get_db),
+    _current_user: User = Depends(get_current_user),
+) -> SessionMeetingLinkRead | None:
+    entry = db.query(SessionMeetingLink).filter(SessionMeetingLink.session_id == session_id).first()
+    return _meeting_link_to_read(entry, db) if entry else None
+
+
+@router.put("/{session_id}/meeting-link", response_model=SessionMeetingLinkRead)
+def set_meeting_link(
+    session_id: str,
+    payload: SessionMeetingLinkUpsert,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(
+        require_role(RoleEnum.tumor_board_coordinator, RoleEnum.administrator)
+    ),
+) -> SessionMeetingLinkRead:
+    session = db.get(TumorBoardSession, session_id)
+    if not session:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tumor board session not found.")
+    entry = db.query(SessionMeetingLink).filter(SessionMeetingLink.session_id == session_id).first()
+    if not entry:
+        entry = SessionMeetingLink(session_id=session_id)
+        db.add(entry)
+    entry.meeting_link = payload.meeting_link
+    entry.updated_by_id = current_user.id
+    db.commit()
+    db.refresh(entry)
+    write_audit_event(
+        db,
+        actor_id=current_user.id,
+        action="tumor_board.meeting_link_set",
+        entity_type="session_meeting_link",
+        entity_id=entry.id,
+        metadata={"session_id": session_id},
+    )
+    return _meeting_link_to_read(entry, db)

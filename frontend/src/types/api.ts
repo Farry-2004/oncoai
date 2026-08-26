@@ -254,6 +254,37 @@ export interface TumorBoardAttendance {
   created_at: string
 }
 
+export type FindingType = 'pathology' | 'imaging' | 'other'
+export type FindingFormat = 'written' | 'video_link'
+
+export interface CaseFinding {
+  id: string
+  tumor_board_case_id: string
+  finding_type: FindingType
+  format: FindingFormat
+  content: string
+  is_remote_consult: boolean
+  contributed_by_id?: string | null
+  contributed_by_name?: string | null
+  created_at: string
+}
+
+export interface CaseFindingCreateInput {
+  finding_type: FindingType
+  format: FindingFormat
+  content: string
+  is_remote_consult: boolean
+}
+
+export interface SessionMeetingLink {
+  id: string
+  session_id: string
+  meeting_link: string
+  updated_by_id?: string | null
+  updated_by_name?: string | null
+  updated_at: string
+}
+
 export interface FollowUpCreateInput {
   follow_up_date: string
   notes?: string
