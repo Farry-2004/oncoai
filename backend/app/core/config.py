@@ -16,5 +16,12 @@ class Settings(BaseSettings):
     openai_api_key: str | None = None
     openai_model: str = "gpt-4o-mini"
 
+    # Required for the SMS concern survey (Patient Profile > Concerns > Send survey).
+    # Without these set, the survey still runs but logs messages instead of sending
+    # real texts — see app/services/sms_service.py.
+    twilio_account_sid: str | None = None
+    twilio_auth_token: str | None = None
+    twilio_from_number: str | None = None
+
 
 settings = Settings()

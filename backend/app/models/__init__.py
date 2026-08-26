@@ -1,6 +1,7 @@
 from app.models.ai_analysis import AIAnalysis, AnalysisTypeEnum
 from app.models.audit import AuditLog
 from app.models.case_finding import CaseFinding, FindingFormatEnum, FindingTypeEnum
+from app.models.concern_survey import ConcernSurvey, SurveyStatusEnum
 from app.models.family_conference import FamilyConference, FamilyConferenceOutcomeEnum
 from app.models.follow_up import FollowUp, FollowUpStatusEnum
 from app.models.patient import Patient, PatientStatusEnum, SexEnum
@@ -29,6 +30,8 @@ __all__ = [
     "CaseFinding",
     "FindingFormatEnum",
     "FindingTypeEnum",
+    "ConcernSurvey",
+    "SurveyStatusEnum",
     "FamilyConference",
     "FamilyConferenceOutcomeEnum",
     "FollowUp",

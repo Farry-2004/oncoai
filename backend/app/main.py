@@ -20,6 +20,7 @@ from app.routers import (
     tumor_board_decisions,
     tumor_boards,
     users,
+    webhooks,
 )
 
 # Import models so they're registered on Base.metadata before create_all().
@@ -65,6 +66,7 @@ app.include_router(users.router)
 app.include_router(analytics.router)
 app.include_router(notifications.router)
 app.include_router(search.router)
+app.include_router(webhooks.router)
 
 
 @app.get("/")

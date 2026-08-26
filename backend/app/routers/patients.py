@@ -5,9 +5,11 @@ from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from app.core.deps import get_current_user, get_db, require_role
+from app.models.concern_survey import ConcernSurvey, SurveyStatusEnum
 from app.models.patient import Patient, PatientStatusEnum
 from app.models.patient_concern import PatientConcerns
 from app.models.user import RoleEnum, User
+from app.schemas.concern_survey import ConcernSurveyRead, SimulateReplyInput
 from app.schemas.patient import PatientCreate, PatientListResponse, PatientRead, PatientUpdate
 from app.schemas.patient_concern import PatientConcernsRead, PatientConcernsUpsert
 from app.schemas.tumor_board import TumorBoardCaseRead
@@ -15,7 +17,9 @@ from app.schemas.workup import WorkupItemCreate, WorkupItemRead, WorkupItemUpdat
 from app.models.tumor_board import TumorBoardCase
 from app.models.workup import WorkupItem, WorkupStatusEnum
 from app.services.audit_service import write_audit_event
+from app.services.concern_survey_service import advance_survey, start_survey
 from app.services.notification_service import create_notification
+from app.services.sms_service import is_sms_configured
 
 router = APIRouter(prefix="/patients", tags=["patients"])
 
@@ -246,6 +250,89 @@ def upsert_patient_concerns(
         metadata={"patient_id": patient_id, "concern_category": entry.concern_category.value},
     )
     return concerns_to_read(entry, db)
+
+
+def survey_to_read(survey: ConcernSurvey) -> ConcernSurveyRead:
+    read = ConcernSurveyRead.model_validate(survey)
+    read.sms_provider_configured = is_sms_configured()
+    return read
+
+
+@router.get("/{patient_id}/concerns/survey", response_model=ConcernSurveyRead | None)
+def get_latest_survey(
+    patient_id: str,
+    db: Session = Depends(get_db),
+    _current_user: User = Depends(get_current_user),
+) -> ConcernSurveyRead | None:
+    survey = (
+        db.query(ConcernSurvey)
+        .filter(ConcernSurvey.patient_id == patient_id)
+        .order_by(ConcernSurvey.started_at.desc())
+        .first()
+    )
+    return survey_to_read(survey) if survey else None
+
+
+@router.post(
+    "/{patient_id}/concerns/survey", response_model=ConcernSurveyRead, status_code=status.HTTP_201_CREATED
+)
+def start_patient_survey(
+    patient_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(
+        require_role(RoleEnum.tumor_board_coordinator, RoleEnum.administrator)
+    ),
+) -> ConcernSurveyRead:
+    patient = db.get(Patient, patient_id)
+    if not patient:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found.")
+    try:
+        survey = start_survey(db, patient, current_user.id)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+    write_audit_event(
+        db,
+        actor_id=current_user.id,
+        action="concern_survey.started",
+        entity_type="concern_survey",
+        entity_id=survey.id,
+        metadata={"patient_id": patient_id, "sms_provider_configured": is_sms_configured()},
+    )
+    return survey_to_read(survey)
+
+
+@router.post("/{patient_id}/concerns/survey/simulate-reply", response_model=ConcernSurveyRead)
+def simulate_survey_reply(
+    patient_id: str,
+    payload: SimulateReplyInput,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(
+        require_role(RoleEnum.tumor_board_coordinator, RoleEnum.administrator)
+    ),
+) -> ConcernSurveyRead:
+    survey = (
+        db.query(ConcernSurvey)
+        .filter(
+            ConcernSurvey.patient_id == patient_id,
+            ConcernSurvey.status == SurveyStatusEnum.in_progress,
+        )
+        .order_by(ConcernSurvey.started_at.desc())
+        .first()
+    )
+    if not survey:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="No in-progress survey for this patient."
+        )
+    survey = advance_survey(db, survey, payload.body)
+    write_audit_event(
+        db,
+        actor_id=current_user.id,
+        action="concern_survey.simulated_reply",
+        entity_type="concern_survey",
+        entity_id=survey.id,
+        metadata={"patient_id": patient_id, "reply": payload.body},
+    )
+    return survey_to_read(survey)
 
 
 @router.get("/{patient_id}/cases", response_model=list[TumorBoardCaseRead])
