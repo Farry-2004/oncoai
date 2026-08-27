@@ -15,3 +15,32 @@ class DashboardSummary(BaseModel):
     incomplete_workups: int
     recent_cases: list[TumorBoardCaseRead]
     recent_activity: list[AuditLogRead]
+
+
+class PreparationChecklist(BaseModel):
+    patient_history: bool
+    pathology: bool
+    imaging: bool
+    laboratory: bool
+    treatment_history: bool
+    workup_complete: bool
+
+
+class TBPreparationCase(BaseModel):
+    case_id: str
+    patient_id: str
+    patient_name: str
+    ready: bool
+    checklist: PreparationChecklist
+    missing: list[str]
+
+
+class TBPreparationSummary(BaseModel):
+    session_id: str | None = None
+    session_title: str | None = None
+    scheduled_at: datetime | None = None
+    chair_name: str | None = None
+    location: str | None = None
+    cases: list[TBPreparationCase]
+    ready_count: int
+    total_count: int

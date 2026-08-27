@@ -1,0 +1,55 @@
+.stack {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 360px;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  font-size: 0.88rem;
+  font-weight: 600;
+  background: var(--white);
+  border: 1px solid var(--border);
+  color: var(--ink-900);
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+.success .icon { background: var(--success-bg); color: var(--success-fg); }
+.info .icon { background: var(--cream-100); color: var(--teal-600); }
+.warning .icon { background: var(--warning-bg); color: var(--warning-fg); }
+.error .icon { background: var(--danger-bg); color: var(--danger-fg); }
+
+.close {
+  margin-left: auto;
+  background: none;
+  border: none;
+  font-size: 1rem;
+  line-height: 1;
+  color: var(--gray-500);
+  cursor: pointer;
+  padding: 0 2px;
+}
+
+@media (max-width: 640px) {
+  .stack { left: 12px; right: 12px; bottom: 12px; max-width: none; }
+}

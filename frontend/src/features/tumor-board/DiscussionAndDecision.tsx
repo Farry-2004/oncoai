@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useRecordDecision, useTumorBoardDecision } from '@/hooks/useTumorBoardDecision'
+import { useToast } from '@/context/ToastContext'
 import { ApiError } from '@/lib/api'
 import { LoadingRow } from '@/components/ui/Spinner'
 import { CHECKLIST_LABELS, EMPTY_CHECKLIST } from '@/types/api'
@@ -12,6 +13,7 @@ export function DiscussionAndDecision({ sessionId, caseId }: { sessionId: string
   const [expanded, setExpanded] = useState(false)
   const { data: decision, isLoading } = useTumorBoardDecision(sessionId, caseId)
   const recordDecision = useRecordDecision(sessionId, caseId)
+  const { showToast } = useToast()
 
   const [checklist, setChecklist] = useState<DiscussionChecklist>(EMPTY_CHECKLIST)
   const [decisionText, setDecisionText] = useState('')
@@ -38,8 +40,11 @@ export function DiscussionAndDecision({ sessionId, caseId }: { sessionId: string
         responsible_team: responsibleTeam,
         follow_up_date: followUpDate || undefined,
       })
+      showToast('Tumor board decision recorded', 'success')
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Unable to record decision.')
+      const message = err instanceof ApiError ? err.message : 'Unable to record decision.'
+      setError(message)
+      showToast(message, 'error')
     }
   }
 

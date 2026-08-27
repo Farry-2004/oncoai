@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useCreatePatient } from '@/hooks/usePatients'
+import { useToast } from '@/context/ToastContext'
 import { ApiError } from '@/lib/api'
 import type { PatientCreateInput, Sex } from '@/types/api'
 import styles from './NewPatientDrawer.module.css'
@@ -10,6 +11,7 @@ const CANCER_SITES = [
 
 export function NewPatientDrawer({ onClose }: { onClose: () => void }) {
   const createPatient = useCreatePatient()
+  const { showToast } = useToast()
   const [form, setForm] = useState<PatientCreateInput>({
     mrn: '',
     full_name: '',
@@ -31,9 +33,12 @@ export function NewPatientDrawer({ onClose }: { onClose: () => void }) {
     setError(null)
     try {
       await createPatient.mutateAsync(form)
+      showToast(`${form.full_name} registered successfully`, 'success')
       onClose()
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Unable to create patient.')
+      const message = err instanceof ApiError ? err.message : 'Unable to create patient.'
+      setError(message)
+      showToast(message, 'error')
     }
   }
 

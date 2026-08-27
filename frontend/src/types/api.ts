@@ -140,6 +140,35 @@ export interface DashboardSummary {
   recent_activity: AuditLogEntry[]
 }
 
+export interface PreparationChecklist {
+  patient_history: boolean
+  pathology: boolean
+  imaging: boolean
+  laboratory: boolean
+  treatment_history: boolean
+  workup_complete: boolean
+}
+
+export interface TBPreparationCase {
+  case_id: string
+  patient_id: string
+  patient_name: string
+  ready: boolean
+  checklist: PreparationChecklist
+  missing: string[]
+}
+
+export interface TBPreparationSummary {
+  session_id?: string | null
+  session_title?: string | null
+  scheduled_at?: string | null
+  chair_name?: string | null
+  location?: string | null
+  cases: TBPreparationCase[]
+  ready_count: number
+  total_count: number
+}
+
 export type WorkupItemType = 'imaging' | 'pathology' | 'labs' | 'genomics' | 'other'
 export type WorkupStatus = 'ordered' | 'in_progress' | 'completed' | 'cancelled'
 

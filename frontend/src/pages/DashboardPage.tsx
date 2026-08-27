@@ -6,6 +6,7 @@ import { PriorityPill } from '@/components/ui/PriorityPill'
 import { LoadingRow } from '@/components/ui/Spinner'
 import { TableRowsSkeleton } from '@/components/ui/Skeleton'
 import { CareNetwork3D } from '@/features/dashboard/CareNetwork3D'
+import { TBPreparationCard } from '@/features/dashboard/TBPreparationCard'
 
 function timeAgo(iso: string): string {
   const diffMs = Date.now() - new Date(iso).getTime()
@@ -110,6 +111,8 @@ export function DashboardPage() {
           </div>
         </div>
       </div>
+
+      <TBPreparationCard />
 
       <div className="dash-grid">
         <div className="panel">

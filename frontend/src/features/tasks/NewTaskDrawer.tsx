@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useCreateTask } from '@/hooks/useTasks'
 import { useUsers } from '@/hooks/useUsers'
+import { useToast } from '@/context/ToastContext'
 import type { TaskPriority } from '@/types/api'
 import styles from './NewTaskDrawer.module.css'
 
@@ -19,6 +20,7 @@ export function NewTaskDrawer({
 }) {
   const createTask = useCreateTask()
   const { data: users } = useUsers()
+  const { showToast } = useToast()
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [assignedTo, setAssignedTo] = useState('')
@@ -36,6 +38,7 @@ export function NewTaskDrawer({
       priority,
       due_date: dueDate || undefined,
     })
+    showToast('Task assigned', 'success')
     onClose()
   }
 

@@ -1,0 +1,52 @@
+.card {
+  margin-bottom: 24px;
+}
+
+.summaryRow {
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+  font-size: 0.92rem;
+}
+.summaryRow strong { font-size: 1.3rem; font-weight: 800; }
+.summaryMeta { color: var(--gray-500); font-size: 0.85rem; }
+
+.progressTrack {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--cream-100);
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+.progressFill {
+  height: 100%;
+  background: var(--teal-400);
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+.caseGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.caseTile {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  background: var(--white);
+}
+.caseTile.ready { border-color: #bfe6d9; background: var(--success-bg); }
+
+.caseName { font-weight: 700; font-size: 0.9rem; margin-bottom: 6px; }
+.checklistList { display: flex; flex-direction: column; gap: 3px; font-size: 0.78rem; }
+.checkYes { color: var(--success-fg); }
+.checkNo { color: var(--gray-500); }
+
+.actions { display: flex; gap: 10px; }
+
+.emptyState { color: var(--gray-500); font-size: 0.9rem; }
