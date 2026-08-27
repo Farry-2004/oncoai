@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useCreateWorkup, usePatientWorkups, useUpdateWorkup } from '@/hooks/usePatientProfile'
 import { TableRowsSkeleton } from '@/components/ui/Skeleton'
+import { WorkupProgress3D } from '@/features/visualization/WorkupProgress3D'
 import type { WorkupItemType, WorkupStatus } from '@/types/api'
 import styles from './InvestigationsTab.module.css'
 
@@ -27,6 +28,7 @@ export function InvestigationsTab({ patientId }: { patientId: string }) {
 
   return (
     <div>
+      <WorkupProgress3D items={workups ?? []} />
       {!isLoading && !!workups?.length && (
         <div className={styles.completion}>
           Workup completion: <strong>{completionPct}%</strong> ({completedCount}/{workups.length})

@@ -3,6 +3,7 @@ import { useCreatePatientRecord, usePatientRecords } from '@/hooks/usePatientPro
 import { useDeleteRecordImage, useRecordImages, useUploadRecordImage } from '@/hooks/useRecordImages'
 import { LoadingRow } from '@/components/ui/Spinner'
 import { AuthenticatedImage } from '@/components/ui/AuthenticatedImage'
+import { RecordTimeline3D } from '@/features/visualization/RecordTimeline3D'
 import { ApiError } from '@/lib/api'
 import recordStyles from './RecordListTab.module.css'
 import styles from './ImagingTab.module.css'
@@ -96,6 +97,9 @@ export function ImagingTab({ patientId }: { patientId: string }) {
 
   return (
     <div>
+      <RecordTimeline3D
+        entries={records?.map((r) => ({ id: r.id, date: r.recorded_at, label: r.title })) ?? []}
+      />
       <div className={recordStyles.list}>
         {isLoading && (
           <div className={recordStyles.empty}>

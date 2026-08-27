@@ -1,0 +1,19 @@
+.canvasBox {
+  height: 200px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: #0a262b;
+  margin-bottom: 16px;
+}
+.canvasBox canvas { display: block; }
+.fallback { width: 100%; height: 100%; background: #0a262b; }
+
+.label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--navy-950);
+  background: #e8fffb;
+  padding: 3px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useCreatePatientRecord, usePatientRecords } from '@/hooks/usePatientProfile'
 import { LoadingRow } from '@/components/ui/Spinner'
+import { RecordTimeline3D } from '@/features/visualization/RecordTimeline3D'
 import type { RecordType } from '@/types/api'
 import styles from './RecordListTab.module.css'
 
@@ -31,6 +32,9 @@ export function RecordListTab({
 
   return (
     <div>
+      <RecordTimeline3D
+        entries={records?.map((r) => ({ id: r.id, date: r.recorded_at, label: r.title })) ?? []}
+      />
       <div className={styles.list}>
         {isLoading && (
           <div className={styles.empty}>

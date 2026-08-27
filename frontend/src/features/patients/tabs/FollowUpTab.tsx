@@ -6,6 +6,7 @@ import {
   useFollowUps,
 } from '@/hooks/usePatientProfile'
 import { LoadingRow } from '@/components/ui/Spinner'
+import { RecordTimeline3D } from '@/features/visualization/RecordTimeline3D'
 import type { FamilyConferenceOutcome } from '@/types/api'
 import styles from './RecordListTab.module.css'
 
@@ -50,8 +51,22 @@ export function FollowUpTab({ patientId }: { patientId: string }) {
     setShowConferenceForm(false)
   }
 
+  const timelineEntries = [
+    ...(followUps?.map((f) => ({
+      id: f.id,
+      date: f.follow_up_date,
+      label: 'Follow-up',
+    })) ?? []),
+    ...(conferences?.map((c) => ({
+      id: c.id,
+      date: c.conducted_at,
+      label: 'Family Conference',
+    })) ?? []),
+  ]
+
   return (
     <div>
+      <RecordTimeline3D entries={timelineEntries} />
       <div className={styles.list}>
         {isLoading && (
           <div className={styles.empty}>

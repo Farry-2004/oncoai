@@ -1,6 +1,7 @@
 import { usePatientCases, usePatientWorkups, useFollowUps } from '@/hooks/usePatientProfile'
 import { StatusBadge } from '@/components/ui/StatusBadge'
 import { ConcernsCard } from '@/features/patients/ConcernsCard'
+import { PatientImagingGallery } from '@/features/patients/PatientImagingGallery'
 import { AnatomyViewer3D } from '@/features/anatomy/AnatomyViewer3D'
 import type { Patient } from '@/types/api'
 
@@ -50,6 +51,7 @@ export function OverviewTab({ patient }: { patient: Patient }) {
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
         <AnatomyViewer3D cancerSite={patient.cancer_site} />
+        <PatientImagingGallery patientId={patient.id} />
         <div className="panel">
           <div className="panel-head">
             <div className="title">Workup Completion</div>

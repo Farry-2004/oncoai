@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useAiAnalyses, useRunAiAnalysis } from '@/hooks/usePatientProfile'
 import { AiResultCard } from '@/components/ui/AiResultCard'
+import { RecordTimeline3D } from '@/features/visualization/RecordTimeline3D'
 import type { AnalysisType } from '@/types/api'
 import styles from './AiAnalysisTab.module.css'
 
@@ -37,6 +38,13 @@ export function AiAnalysisTab({ patientId }: { patientId: string }) {
 
   return (
     <div>
+      <RecordTimeline3D
+        entries={analyses?.map((a) => ({
+          id: a.id,
+          date: a.created_at,
+          label: LABELS[a.analysis_type] ?? a.analysis_type,
+        })) ?? []}
+      />
       <div className={styles.actions}>
         {ACTIONS.map((a) => (
           <button
