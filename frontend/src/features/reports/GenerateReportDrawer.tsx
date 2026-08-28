@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useGenerateReport } from '@/hooks/useReports'
 import { usePatients } from '@/hooks/usePatients'
 import { useTumorBoardSessions } from '@/hooks/useTumorBoard'
+import { Alert } from '@/components/ui/Alert'
 import { ApiError } from '@/lib/api'
 import { REPORT_TYPE_LABELS } from '@/types/api'
 import type { ReportType } from '@/types/api'
@@ -65,7 +66,7 @@ export function GenerateReportDrawer({
           </button>
         </div>
 
-        {error && <div className="form-error">{error}</div>}
+        {error && <Alert type="error">{error}</Alert>}
 
         {!fixedType && (
           <div className={styles.typeGrid}>

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
+import { Alert } from '@/components/ui/Alert'
 import { ApiError } from '@/lib/api'
 
 const QUICK_LOGINS = [
@@ -75,7 +76,7 @@ export function LoginPage() {
           <h2>Welcome back</h2>
           <p className="sub">Sign in to access the clinical dashboard</p>
 
-          {error && <div className="form-error">{error}</div>}
+          {error && <Alert type="error">{error}</Alert>}
 
           <form onSubmit={handleSubmit}>
             <div className="field">

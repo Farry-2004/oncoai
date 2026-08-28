@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useReports } from '@/hooks/useReports'
+import { Alert } from '@/components/ui/Alert'
 import { DemoDataBanner } from '@/components/ui/DemoDataBanner'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { TableRowsSkeleton } from '@/components/ui/Skeleton'
 import { GenerateReportDrawer } from '@/features/reports/GenerateReportDrawer'
 import { REPORT_TYPE_LABELS } from '@/types/api'
@@ -51,7 +53,7 @@ export function ReportsPage() {
         </select>
       </div>
 
-      {isError && <div className="form-error">Couldn't load reports. Is the API running?</div>}
+      {isError && <Alert type="error">Couldn't load reports. Is the API running?</Alert>}
 
       <div className="panel">
         <div className="table-scroll">
@@ -70,7 +72,17 @@ export function ReportsPage() {
               {isLoading && <TableRowsSkeleton columns={6} />}
               {!isLoading && !reports?.length && (
                 <tr>
-                  <td colSpan={6}>No reports yet. Generate one to get started.</td>
+                  <td colSpan={6}>
+                    <EmptyState
+                      title="No reports yet"
+                      description="Generate one to get started."
+                      actions={
+                        <button className="btn btn-dark btn-sm" type="button" onClick={() => setDrawerOpen(true)}>
+                          + Generate Report
+                        </button>
+                      }
+                    />
+                  </td>
                 </tr>
               )}
               {reports?.map((r) => (

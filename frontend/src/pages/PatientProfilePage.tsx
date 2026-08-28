@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { usePatient } from '@/hooks/usePatientProfile'
 import { DemoDataBanner } from '@/components/ui/DemoDataBanner'
+import { ErrorState } from '@/components/ui/ErrorState'
 import { StatusBadge } from '@/components/ui/StatusBadge'
 import { PriorityPill } from '@/components/ui/PriorityPill'
 import { NewTaskDrawer } from '@/features/tasks/NewTaskDrawer'
@@ -36,7 +37,7 @@ function calculateAge(dob: string): number {
 
 export function PatientProfilePage() {
   const { id } = useParams<{ id: string }>()
-  const { data: patient, isLoading, isError } = usePatient(id)
+  const { data: patient, isLoading, isError, refetch } = usePatient(id)
   const [activeTab, setActiveTab] = useState<Tab>('Overview')
   const [taskDrawerOpen, setTaskDrawerOpen] = useState(false)
   const [reportDrawerOpen, setReportDrawerOpen] = useState(false)
@@ -48,7 +49,7 @@ export function PatientProfilePage() {
         <Link to="/patients" className="back-link">
           ← Back to Patient Tracking
         </Link>
-        <div className="form-error">Couldn't load this patient.</div>
+        <ErrorState title="Couldn't load this patient" onRetry={() => refetch()} />
       </div>
     )
   }

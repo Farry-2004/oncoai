@@ -1,4 +1,5 @@
 import { useAnalytics } from '@/hooks/useAnalytics'
+import { Alert } from '@/components/ui/Alert'
 import { DemoDataBanner } from '@/components/ui/DemoDataBanner'
 import { LoadingRow } from '@/components/ui/Spinner'
 import { HorizontalBarChart } from '@/components/charts/HorizontalBarChart'
@@ -72,7 +73,7 @@ export function AnalyticsPage() {
 
       <DemoDataBanner />
 
-      {isError && <div className="form-error">Couldn't load analytics. Is the API running?</div>}
+      {isError && <Alert type="error">Couldn't load analytics. Is the API running?</Alert>}
 
       <div className={styles.statGrid}>
         <StatCard num={isLoading ? '–' : data?.patients_registered ?? 0} name="Patients Registered" />

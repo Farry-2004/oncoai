@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
 import { useDashboardSummary } from '@/hooks/useDashboardSummary'
+import { Alert } from '@/components/ui/Alert'
 import { DemoDataBanner } from '@/components/ui/DemoDataBanner'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { PriorityPill } from '@/components/ui/PriorityPill'
 import { LoadingRow } from '@/components/ui/Spinner'
 import { TableRowsSkeleton } from '@/components/ui/Skeleton'
@@ -51,7 +53,7 @@ export function DashboardPage() {
 
       <DemoDataBanner />
 
-      {isError && <div className="form-error">Couldn't load dashboard data. Is the API running?</div>}
+      {isError && <Alert type="error">Couldn't load dashboard data. Is the API running?</Alert>}
 
       <div className="stat-cards">
         <div className="stat-card">
@@ -146,7 +148,9 @@ export function DashboardPage() {
                 {isLoading && <TableRowsSkeleton columns={5} />}
                 {!isLoading && !data?.recent_cases.length && (
                   <tr>
-                    <td colSpan={5}>No cases yet.</td>
+                    <td colSpan={5}>
+                      <EmptyState title="No cases yet" description="Recent tumor board cases will appear here." />
+                    </td>
                   </tr>
                 )}
                 {data?.recent_cases.map((c) => (
@@ -199,7 +203,7 @@ export function DashboardPage() {
                 </div>
               </div>
             ))}
-            {!isLoading && !data?.recent_activity.length && <div className="activity-item">No recent activity.</div>}
+            {!isLoading && !data?.recent_activity.length && <EmptyState title="No recent activity" />}
           </div>
         </div>
       </div>

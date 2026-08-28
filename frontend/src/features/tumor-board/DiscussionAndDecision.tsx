@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useRecordDecision, useTumorBoardDecision } from '@/hooks/useTumorBoardDecision'
 import { useToast } from '@/context/ToastContext'
 import { ApiError } from '@/lib/api'
+import { Alert } from '@/components/ui/Alert'
 import { LoadingRow } from '@/components/ui/Spinner'
 import { CHECKLIST_LABELS, EMPTY_CHECKLIST } from '@/types/api'
 import type { DiscussionChecklist } from '@/types/api'
@@ -114,7 +115,7 @@ export function DiscussionAndDecision({ sessionId, caseId }: { sessionId: string
                 ))}
               </div>
 
-              {error && <div className="form-error">{error}</div>}
+              {error && <Alert type="error">{error}</Alert>}
 
               <form onSubmit={handleSubmit}>
                 <div className="field">

@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { useTasks } from '@/hooks/useTasks'
 import { useUsers } from '@/hooks/useUsers'
+import { Alert } from '@/components/ui/Alert'
 import { DemoDataBanner } from '@/components/ui/DemoDataBanner'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { TableRowsSkeleton } from '@/components/ui/Skeleton'
 import { NewTaskDrawer } from '@/features/tasks/NewTaskDrawer'
 import { TaskRow } from '@/features/tasks/TaskRow'
@@ -52,7 +54,7 @@ export function TasksPage() {
         </select>
       </div>
 
-      {isError && <div className="form-error">Couldn't load tasks. Is the API running?</div>}
+      {isError && <Alert type="error">Couldn't load tasks. Is the API running?</Alert>}
 
       <div className="panel">
         <div className="panel-head">
@@ -82,7 +84,9 @@ export function TasksPage() {
               {isLoading && <TableRowsSkeleton columns={5} />}
               {!isLoading && !tasks?.length && (
                 <tr>
-                  <td colSpan={5}>No tasks match these filters.</td>
+                  <td colSpan={5}>
+                    <EmptyState title="No tasks match these filters" description="Try adjusting your status or assignee filter." />
+                  </td>
                 </tr>
               )}
               {tasks?.map((t) => (

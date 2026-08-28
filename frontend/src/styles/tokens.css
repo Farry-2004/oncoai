@@ -29,4 +29,41 @@
   --radius-lg: 22px;
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-serif: 'Playfair Display', Georgia, serif;
+
+  /* Spacing scale (4px base) -- use instead of ad hoc px values in new work */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Focus ring, kept separate from --teal-400 so it can change without touching brand color */
+  --focus-ring: #2dd4bf;
+  --focus-ring-offset: 2px;
+
+  /* Surface/text roles -- indirection so dark mode (below) only has to remap these */
+  --surface-bg: var(--cream-50);
+  --surface-card: var(--white);
+  --surface-border: var(--border);
+  --text-primary: var(--ink-900);
+  --text-secondary: var(--ink-700);
+  --text-muted: var(--gray-500);
+}
+
+/* Dark mode scaffolding: no toggle wired up yet, but any component built against
+   the surface/text role variables above (rather than raw --white, --ink-900, etc.)
+   will pick this up automatically once a [data-theme="dark"] toggle is added. */
+:root[data-theme='dark'] {
+  --surface-bg: var(--navy-950);
+  --surface-card: var(--navy-900);
+  --surface-border: rgba(255, 255, 255, 0.12);
+  --text-primary: var(--white);
+  --text-secondary: rgba(255, 255, 255, 0.78);
+  --text-muted: rgba(255, 255, 255, 0.55);
+  --cream-100: rgba(255, 255, 255, 0.06);
 }

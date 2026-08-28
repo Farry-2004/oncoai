@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useCreatePatient } from '@/hooks/usePatients'
 import { useToast } from '@/context/ToastContext'
+import { Alert } from '@/components/ui/Alert'
 import { ApiError } from '@/lib/api'
 import type { PatientCreateInput, Sex } from '@/types/api'
 import styles from './NewPatientDrawer.module.css'
@@ -52,7 +53,7 @@ export function NewPatientDrawer({ onClose }: { onClose: () => void }) {
           </button>
         </div>
 
-        {error && <div className="form-error">{error}</div>}
+        {error && <Alert type="error">{error}</Alert>}
 
         <form onSubmit={handleSubmit}>
           <div className="field">

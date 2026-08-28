@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { usePatients } from '@/hooks/usePatients'
+import { Alert } from '@/components/ui/Alert'
 import { DemoDataBanner } from '@/components/ui/DemoDataBanner'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { StatusBadge } from '@/components/ui/StatusBadge'
 import { TableRowsSkeleton } from '@/components/ui/Skeleton'
 import { NewPatientDrawer } from '@/features/patients/NewPatientDrawer'
@@ -76,7 +78,7 @@ export function PatientTrackingPage() {
         </select>
       </div>
 
-      {isError && <div className="form-error">Couldn't load patients. Is the API running?</div>}
+      {isError && <Alert type="error">Couldn't load patients. Is the API running?</Alert>}
 
       <div className="panel">
         <div className="panel-head">
@@ -109,7 +111,9 @@ export function PatientTrackingPage() {
               {isLoading && <TableRowsSkeleton columns={8} />}
               {!isLoading && !data?.items.length && (
                 <tr>
-                  <td colSpan={8}>No patients match these filters.</td>
+                  <td colSpan={8}>
+                    <EmptyState title="No patients match these filters" description="Try adjusting your search or status filter." />
+                  </td>
                 </tr>
               )}
               {data?.items.map((p) => (

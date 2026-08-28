@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
+import { Alert } from '@/components/ui/Alert'
 import { ApiError } from '@/lib/api'
 import type { Role } from '@/types/api'
 
@@ -160,7 +161,7 @@ export function RegisterPage() {
 
           <div className="divider">your details</div>
 
-          {error && <div className="form-error">{error}</div>}
+          {error && <Alert type="error">{error}</Alert>}
 
           <form onSubmit={handleSubmit}>
             <div className="field">

@@ -1,14 +1,16 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useApproveReport, useReport, useUpdateReport } from '@/hooks/useReports'
+import { Alert } from '@/components/ui/Alert'
 import { DemoDataBanner } from '@/components/ui/DemoDataBanner'
+import { ErrorState } from '@/components/ui/ErrorState'
 import { ApiError } from '@/lib/api'
 import { REPORT_TYPE_LABELS } from '@/types/api'
 import styles from './ReportDetailPage.module.css'
 
 export function ReportDetailPage() {
   const { id } = useParams<{ id: string }>()
-  const { data: report, isLoading, isError } = useReport(id)
+  const { data: report, isLoading, isError, refetch } = useReport(id)
   const updateReport = useUpdateReport(id ?? '')
   const approveReport = useApproveReport(id ?? '')
 
@@ -31,7 +33,7 @@ export function ReportDetailPage() {
         <Link to="/reports" className="back-link">
           ← Back to Reports
         </Link>
-        <div className="form-error">Couldn't load this report.</div>
+        <ErrorState title="Couldn't load this report" onRetry={() => refetch()} />
       </div>
     )
   }
@@ -121,7 +123,11 @@ export function ReportDetailPage() {
         <DemoDataBanner />
       </div>
 
-      {error && <div className="form-error no-print">{error}</div>}
+      {error && (
+        <Alert type="error" className="no-print">
+          {error}
+        </Alert>
+      )}
 
       {editing ? (
         <textarea className={styles.reportTextarea} value={content} onChange={(e) => setContent(e.target.value)} />

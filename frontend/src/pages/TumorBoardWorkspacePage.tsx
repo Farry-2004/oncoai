@@ -14,7 +14,9 @@ import {
 import { usePatients } from '@/hooks/usePatients'
 import { useUsers } from '@/hooks/useUsers'
 import { useAuth } from '@/context/AuthContext'
+import { Alert } from '@/components/ui/Alert'
 import { DemoDataBanner } from '@/components/ui/DemoDataBanner'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { PriorityPill } from '@/components/ui/PriorityPill'
 import { LoadingRow } from '@/components/ui/Spinner'
 import { NewTaskDrawer } from '@/features/tasks/NewTaskDrawer'
@@ -108,7 +110,7 @@ export function TumorBoardWorkspacePage() {
           <LoadingRow label="Loading tumor board…" />
         </div>
       )}
-      {isError && <div className="form-error">Couldn't load this tumor board session.</div>}
+      {isError && <Alert type="error">Couldn't load this tumor board session.</Alert>}
 
       {session && (
         <>
@@ -200,7 +202,11 @@ export function TumorBoardWorkspacePage() {
           </div>
 
           <div className={styles.caseList}>
-            {session.cases.length === 0 && <div className="panel">No cases queued for this session yet.</div>}
+            {session.cases.length === 0 && (
+              <div className="panel">
+                <EmptyState title="No cases queued for this session yet" />
+              </div>
+            )}
             {session.cases.map((c) => {
               const nextStatus = NEXT_STATUS[c.status]
               return (

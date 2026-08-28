@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { useCreatePatientRecord, usePatientRecords } from '@/hooks/usePatientProfile'
 import { useDeleteRecordImage, useRecordImages, useUploadRecordImage } from '@/hooks/useRecordImages'
+import { Alert } from '@/components/ui/Alert'
 import { LoadingRow } from '@/components/ui/Spinner'
 import { AuthenticatedImage } from '@/components/ui/AuthenticatedImage'
 import { RecordTimeline3D } from '@/features/visualization/RecordTimeline3D'
@@ -69,7 +70,11 @@ function ImageGallery({ patientId, recordId }: { patientId: string; recordId: st
           />
         </label>
       </div>
-      {error && <div className="form-error" style={{ marginTop: 6 }}>{error}</div>}
+      {error && (
+        <div style={{ marginTop: 6 }}>
+          <Alert type="error">{error}</Alert>
+        </div>
+      )}
 
       {lightboxSrc && (
         <div className={styles.lightbox} onClick={() => setLightboxSrc(null)}>

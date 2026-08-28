@@ -13,6 +13,20 @@ ul { margin: 0; padding: 0; list-style: none; }
 h1, h2, h3, h4, p { margin: 0; }
 button { font-family: inherit; cursor: pointer; }
 #root { min-height: 100vh; }
+
+/* ---------- Focus states ---------- */
+/* :focus-visible so mouse clicks don't show a ring, only keyboard/AT navigation does */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+  border-radius: 4px;
+}
+:focus:not(:focus-visible) { outline: none; }
 .container {
   max-width: 1216px;
   margin: 0 auto;
@@ -894,6 +908,46 @@ thead th:first-child, tbody td:first-child { padding-right: 20px; }
   .role-grid { grid-template-columns: 1fr; }
   .footer-top { flex-direction: column; }
 }
+
+/* ---------- Empty / error states ---------- */
+.state-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-3);
+  padding: var(--space-10) var(--space-6);
+  color: var(--text-muted);
+}
+.state-block .state-icon {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--cream-100);
+  color: var(--text-muted);
+  margin-bottom: var(--space-1);
+}
+.state-block.state-error .state-icon { background: var(--danger-bg); color: var(--danger-fg); }
+.state-block .state-title { font-size: 1rem; font-weight: 700; color: var(--text-primary); }
+.state-block .state-desc { font-size: 0.88rem; max-width: 360px; line-height: 1.5; }
+.state-block .state-actions { display: flex; gap: 10px; margin-top: var(--space-2); flex-wrap: wrap; justify-content: center; }
+
+/* ---------- Alerts (inline banners, distinct from toasts which are transient) ---------- */
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.88rem;
+  line-height: 1.5;
+  border: 1px solid transparent;
+}
+.alert .alert-icon { flex-shrink: 0; width: 18px; height: 18px; margin-top: 1px; }
+.alert-info { background: #e5f0f7; color: #1c5c85; border-color: #c7dfef; }
+.alert-success { background: var(--success-bg); color: var(--success-fg); border-color: #bfe6d9; }
+.alert-warning { background: var(--warning-bg); color: var(--warning-fg); border-color: #f0dcab; }
+.alert-error { background: var(--danger-bg); color: var(--danger-fg); border-color: #f3c6c2; }
 
 /* ---------- Print (used by report Export/Print) ---------- */
 @media print {
