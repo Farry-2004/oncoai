@@ -13,7 +13,7 @@ export function LandingPage() {
         <Hero3D />
         <div className="container hero-inner">
           <span className="badge">
-            <span className="badge-icon">MNH</span> Muhimbili National Hospital · Dar es Salaam, Tanzania
+            <span className="badge-icon">SAI</span> Built on Saratani AI's mission · Tanzania
           </span>
           <h1>
             OncoAI Intelligent Oncology<span className="accent">East Africa</span>
@@ -25,9 +25,10 @@ export function LandingPage() {
               treatment decisions across Tanzania and East Africa.
             </p>
             <p>
-              Developed in partnership with Muhimbili National Hospital — Tanzania's premier
-              cancer center — our platform processes imaging, pathology, and genomics to
-              deliver predictive insights aligned with WHO and NCCN guidelines.
+              Built on Saratani AI's mission to make accurate, affordable cancer diagnostics
+              accessible to hospitals and clinics of every size, our platform processes
+              imaging, pathology, and genomics to deliver predictive insights aligned with
+              WHO and NCCN guidelines.
             </p>
           </div>
           <div className="hero-actions">
@@ -57,7 +58,7 @@ export function LandingPage() {
               <svg className="icon" viewBox="0 0 24 24" strokeWidth={2}>
                 <path d="M4 12h4l2 7 4-14 2 7h4" />
               </svg>
-              Deployed at Muhimbili National Hospital
+              Designed for African healthcare facilities of every size
             </span>
           </div>
         </div>
@@ -118,7 +119,7 @@ export function LandingPage() {
                 </div>
                 <div className="stat-item">
                   <div className="num">12,000+</div>
-                  <div className="label">Cases Analyzed at Muhimbili</div>
+                  <div className="label">Cases Analyzed Platform-Wide</div>
                 </div>
               </div>
             </div>
@@ -233,19 +234,19 @@ export function LandingPage() {
           <div className="why-grid">
             <div>
               <span className="eyebrow">WHY ONCOAI</span>
-              <h2 className="section-title">Built with Muhimbili, for East Africa</h2>
+              <h2 className="section-title">Grounded in Saratani AI's Mission, for East Africa</h2>
               <p>
-                OncoAI was developed in partnership with Muhimbili National Hospital —
-                Tanzania's largest and most advanced cancer center — to address the critical
-                need for evidence-based, transparent decision support in multidisciplinary
-                tumor board reviews across East Africa.
+                OncoAI is built around Saratani AI's mission — making accurate, affordable
+                cancer diagnostics accessible to hospitals and clinics of every size — to
+                address the critical need for evidence-based, transparent decision support in
+                multidisciplinary tumor board reviews across East Africa.
               </p>
               <p>
                 Our platform synthesizes patient history, imaging studies, pathology reports,
                 and molecular profiling to generate holistic clinical assessments. Every
                 prediction is accompanied by quantitative and interpretable explanations,
-                ensuring clinicians at Muhimbili and partner hospitals maintain full oversight
-                of AI-generated insights while benefiting from advanced pattern recognition
+                ensuring clinicians at every partner facility maintain full oversight of
+                AI-generated insights while benefiting from advanced pattern recognition
                 across multi-modal data.
               </p>
             </div>
@@ -277,7 +278,7 @@ export function LandingPage() {
             <div>
               <div className="quote-mark">&ldquo;</div>
               <blockquote>
-                Muhimbili AI has transformed how our tumor board reviews complex cases. The
+                OncoAI has transformed how our tumor board reviews complex cases. The
                 explainable predictions give our team confidence in treatment decisions, and
                 the multi-modal integration saves hours of prep time for our patients across
                 Tanzania.
@@ -286,7 +287,7 @@ export function LandingPage() {
                 <div>
                   <strong>Dr. Grace Kibiki</strong>
                   <br />
-                  <span className="stars">★ Muhimbili National Hospital, Dar es Salaam</span>
+                  <span className="stars">★ Head &amp; Neck Tumor Board Lead, Tanzania</span>
                 </div>
               </div>
             </div>
@@ -303,13 +304,13 @@ export function LandingPage() {
       <section className="section cta">
         <div className="container cta-inner">
           <span className="badge">
-            <span className="badge-icon">MNH</span> Muhimbili Mloganzila · Dar es Salaam
+            <span className="badge-icon">SAI</span> A Saratani AI initiative · Tanzania
           </span>
           <h2>Ready to Transform Oncology Care in Tanzania?</h2>
           <p className="lead">
-            Join Muhimbili National Hospital and partner institutions using OncoAI to enhance
-            clinical decision-making with transparent, evidence-based artificial intelligence
-            built for East Africa.
+            Join hospitals and clinics across Tanzania and East Africa using OncoAI to enhance
+            clinical decision-making with transparent, evidence-based artificial intelligence,
+            built on Saratani AI's mission to make cancer diagnostics accessible to all.
           </p>
           <Link to="/login" className="btn btn-primary">
             Request a Demo →
@@ -362,7 +363,7 @@ export function LandingPage() {
             </ul>
           </div>
           <div className="footer-bottom">
-            <span>© 2026 OncoAI. Built in partnership with Muhimbili National Hospital.</span>
+            <span>© 2026 OncoAI. An initiative aligned with Saratani AI's mission for accessible cancer care.</span>
             <span>Dar es Salaam, Tanzania</span>
           </div>
         </div>

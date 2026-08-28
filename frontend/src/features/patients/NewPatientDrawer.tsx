@@ -19,7 +19,7 @@ export function NewPatientDrawer({ onClose }: { onClose: () => void }) {
     sex: 'female' as Sex,
     cancer_site: CANCER_SITES[0],
     stage: '',
-    facility: 'Muhimbili National Hospital',
+    facility: '',
     priority: 'medium',
   })
   const [error, setError] = useState<string | null>(null)
@@ -132,10 +132,18 @@ export function NewPatientDrawer({ onClose }: { onClose: () => void }) {
           </div>
           <div className="field">
             <label htmlFor="np-facility">Facility</label>
-            <select id="np-facility" value={form.facility} onChange={(e) => update('facility', e.target.value)}>
-              <option value="Muhimbili National Hospital">Muhimbili National Hospital</option>
-              <option value="Ocean Road Cancer Institute">Ocean Road Cancer Institute</option>
-            </select>
+            <input
+              id="np-facility"
+              list="np-facility-options"
+              value={form.facility}
+              onChange={(e) => update('facility', e.target.value)}
+              placeholder="Hospital or clinic name"
+              required
+            />
+            <datalist id="np-facility-options">
+              <option value="Muhimbili National Hospital" />
+              <option value="Ocean Road Cancer Institute" />
+            </datalist>
           </div>
 
           <button type="submit" className="btn btn-dark btn-block" disabled={createPatient.isPending}>

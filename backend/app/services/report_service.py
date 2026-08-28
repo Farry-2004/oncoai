@@ -152,7 +152,7 @@ def generate_follow_up_summary(db: Session, patient: Patient) -> GeneratedReport
 def generate_medical_passport(db: Session, patient: Patient) -> GeneratedReport:
     lines = [
         f"DIGITAL MEDICAL PASSPORT — {patient.full_name}",
-        "This passport summarizes your care at Muhimbili National Hospital / Ocean Road Cancer Institute.",
+        f"This passport summarizes your care at {patient.facility}.",
         "",
     ]
     lines += _patient_header(patient)

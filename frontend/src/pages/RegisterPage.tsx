@@ -98,14 +98,14 @@ export function RegisterPage() {
           </div>
           <h1>OncoAI</h1>
           <p className="desc">
-            AI-powered clinical decision support for East African oncology teams. Deployed at
-            Muhimbili National Hospital for tumor board workflows, treatment recommendations,
-            and predictive analytics across Tanzania.
+            AI-powered clinical decision support for East African oncology teams. Built on
+            Saratani AI's mission for tumor board workflows, treatment recommendations, and
+            predictive analytics across Tanzania.
           </p>
           <div className="auth-stats">
             <div className="auth-stat-box">
               <div className="num">12,000+</div>
-              <div className="label">Cases at Muhimbili</div>
+              <div className="label">Cases Analyzed</div>
             </div>
             <div className="auth-stat-box">
               <div className="num">98.7%</div>
@@ -114,7 +114,6 @@ export function RegisterPage() {
           </div>
           <div className="auth-compliance">
             <span>✓ WHO Compliant</span>
-            <span>✓ MNH Certified</span>
             <span>✓ TMDA Approved</span>
           </div>
         </div>

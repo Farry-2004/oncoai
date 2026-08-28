@@ -38,7 +38,7 @@ export function DashboardPage() {
               {firstName}
             </span>
             <span className="live-badge">
-              <span className="live-dot"></span>Live · Muhimbili National Hospital
+              <span className="live-dot"></span>Live · Clinical Workspace
             </span>
           </p>
         </div>
