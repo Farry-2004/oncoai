@@ -3,6 +3,7 @@ import { useCreatePatientRecord, usePatientRecords } from '@/hooks/usePatientPro
 import { useDeleteRecordImage, useRecordImages, useUploadRecordImage } from '@/hooks/useRecordImages'
 import { Alert } from '@/components/ui/Alert'
 import { LoadingRow } from '@/components/ui/Spinner'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { AuthenticatedImage } from '@/components/ui/AuthenticatedImage'
 import { RecordTimeline3D } from '@/features/visualization/RecordTimeline3D'
 import { ApiError } from '@/lib/api'
@@ -111,9 +112,7 @@ export function ImagingTab({ patientId }: { patientId: string }) {
             <LoadingRow />
           </div>
         )}
-        {!isLoading && !records?.length && (
-          <div className={recordStyles.empty}>No entries recorded yet.</div>
-        )}
+        {!isLoading && !records?.length && <EmptyState title="No entries recorded yet" />}
         {records?.map((r) => (
           <div key={r.id} className={recordStyles.entry}>
             <div className={recordStyles.entryHead}>

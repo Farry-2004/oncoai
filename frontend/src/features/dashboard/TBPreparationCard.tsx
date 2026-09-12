@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useTBPreparation } from '@/hooks/useDashboardSummary'
 import { LoadingRow } from '@/components/ui/Spinner'
+import { EmptyState } from '@/components/ui/EmptyState'
 import type { PreparationChecklist } from '@/types/api'
 import styles from './TBPreparationCard.module.css'
 
@@ -38,9 +39,7 @@ export function TBPreparationCard() {
 
       {isLoading && <LoadingRow label="Checking case readiness…" />}
 
-      {!isLoading && !data?.session_id && (
-        <div className={styles.emptyState}>No upcoming tumor board session is scheduled yet.</div>
-      )}
+      {!isLoading && !data?.session_id && <EmptyState title="No upcoming tumor board session is scheduled yet" />}
 
       {!isLoading && data?.session_id && (
         <>

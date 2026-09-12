@@ -6,6 +6,7 @@ import {
   useFollowUps,
 } from '@/hooks/usePatientProfile'
 import { LoadingRow } from '@/components/ui/Spinner'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { RecordTimeline3D } from '@/features/visualization/RecordTimeline3D'
 import type { FamilyConferenceOutcome } from '@/types/api'
 import styles from './RecordListTab.module.css'
@@ -73,7 +74,7 @@ export function FollowUpTab({ patientId }: { patientId: string }) {
             <LoadingRow />
           </div>
         )}
-        {!isLoading && !followUps?.length && <div className={styles.empty}>No follow-ups scheduled yet.</div>}
+        {!isLoading && !followUps?.length && <EmptyState title="No follow-ups scheduled yet" />}
         {followUps?.map((f) => (
           <div key={f.id} className={styles.entry}>
             <div className={styles.entryHead}>
@@ -129,7 +130,7 @@ export function FollowUpTab({ patientId }: { patientId: string }) {
           </div>
         )}
         {!conferencesLoading && !conferences?.length && (
-          <div className={styles.empty}>No family conference calls logged yet.</div>
+          <EmptyState title="No family conference calls logged yet" />
         )}
         {conferences?.map((c) => (
           <div key={c.id} className={styles.entry}>

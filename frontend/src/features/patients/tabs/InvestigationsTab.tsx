@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useCreateWorkup, usePatientWorkups, useUpdateWorkup } from '@/hooks/usePatientProfile'
 import { TableRowsSkeleton } from '@/components/ui/Skeleton'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { WorkupProgress3D } from '@/features/visualization/WorkupProgress3D'
 import type { WorkupItemType, WorkupStatus } from '@/types/api'
 import styles from './InvestigationsTab.module.css'
@@ -50,7 +51,9 @@ export function InvestigationsTab({ patientId }: { patientId: string }) {
             {isLoading && <TableRowsSkeleton columns={4} />}
             {!isLoading && !workups?.length && (
               <tr>
-                <td colSpan={4}>No investigations recorded yet.</td>
+                <td colSpan={4}>
+                  <EmptyState title="No investigations recorded yet" />
+                </td>
               </tr>
             )}
             {workups?.map((w) => (

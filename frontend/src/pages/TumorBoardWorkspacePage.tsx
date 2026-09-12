@@ -325,7 +325,7 @@ export function TumorBoardWorkspacePage() {
               <div className="title">Attendance &amp; CME Credit</div>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: canManageAttendance ? 14 : 0 }}>
-              {!attendance?.length && <div style={{ fontSize: '0.85rem', color: 'var(--gray-500)' }}>No attendance recorded yet.</div>}
+              {!attendance?.length && <EmptyState title="No attendance recorded yet" />}
               {attendance?.map((a) => (
                 <div key={a.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.88rem' }}>
                   <span>

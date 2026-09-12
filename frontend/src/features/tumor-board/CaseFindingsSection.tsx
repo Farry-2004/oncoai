@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useAddCaseFinding, useCaseFindings } from '@/hooks/useTumorBoard'
 import { LoadingRow } from '@/components/ui/Spinner'
+import { EmptyState } from '@/components/ui/EmptyState'
 import type { FindingFormat, FindingType } from '@/types/api'
 import styles from './DiscussionAndDecision.module.css'
 
@@ -39,9 +40,7 @@ export function CaseFindingsSection({ sessionId, caseId }: { sessionId: string; 
         <div className={styles.panel}>
           {isLoading && <LoadingRow />}
           {!isLoading && !findings?.length && (
-            <div style={{ fontSize: '0.85rem', color: 'var(--gray-500)', marginBottom: 12 }}>
-              No pre-recorded findings or remote consults logged yet.
-            </div>
+            <EmptyState title="No pre-recorded findings or remote consults logged yet" />
           )}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 14 }}>
             {findings?.map((f) => (

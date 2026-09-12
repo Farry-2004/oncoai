@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useAiAnalyses, useRunAiAnalysis } from '@/hooks/usePatientProfile'
 import { AiResultCard } from '@/components/ui/AiResultCard'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { RecordTimeline3D } from '@/features/visualization/RecordTimeline3D'
 import type { AnalysisType } from '@/types/api'
 import styles from './AiAnalysisTab.module.css'
@@ -63,10 +64,10 @@ export function AiAnalysisTab({ patientId }: { patientId: string }) {
       <div className={styles.results}>
         {isLoading && <div>Loading past analyses…</div>}
         {!isLoading && !analyses?.length && (
-          <div style={{ color: 'var(--gray-500)', fontSize: '0.9rem' }}>
-            No AI analysis has been run for this patient yet. Choose an action above to generate one from
-            this patient's real records.
-          </div>
+          <EmptyState
+            title="No AI analysis has been run for this patient yet"
+            description="Choose an action above to generate one from this patient's real records."
+          />
         )}
         {analyses?.map((a) => (
           <AiResultCard

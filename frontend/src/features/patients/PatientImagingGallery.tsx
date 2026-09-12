@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { usePatientImagingPhotos } from '@/hooks/useRecordImages'
 import { AuthenticatedImage } from '@/components/ui/AuthenticatedImage'
 import { LoadingRow } from '@/components/ui/Spinner'
+import { EmptyState } from '@/components/ui/EmptyState'
 import styles from './PatientImagingGallery.module.css'
 
 export function PatientImagingGallery({ patientId }: { patientId: string }) {
@@ -16,9 +17,7 @@ export function PatientImagingGallery({ patientId }: { patientId: string }) {
 
       {isLoading && <LoadingRow />}
       {!isLoading && !photos?.length && (
-        <div style={{ fontSize: '0.85rem', color: 'var(--gray-500)' }}>
-          No imaging uploaded yet — add photos from the Imaging tab.
-        </div>
+        <EmptyState title="No imaging uploaded yet" description="Add photos from the Imaging tab." />
       )}
       {!!photos?.length && (
         <div className={styles.row}>

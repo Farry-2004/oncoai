@@ -48,5 +48,3 @@
 .checkNo { color: var(--gray-500); }
 
 .actions { display: flex; gap: 10px; }
-
-.emptyState { color: var(--gray-500); font-size: 0.9rem; }

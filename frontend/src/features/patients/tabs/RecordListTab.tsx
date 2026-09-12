@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useCreatePatientRecord, usePatientRecords } from '@/hooks/usePatientProfile'
 import { LoadingRow } from '@/components/ui/Spinner'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { RecordTimeline3D } from '@/features/visualization/RecordTimeline3D'
 import type { RecordType } from '@/types/api'
 import styles from './RecordListTab.module.css'
@@ -41,7 +42,7 @@ export function RecordListTab({
             <LoadingRow />
           </div>
         )}
-        {!isLoading && !records?.length && <div className={styles.empty}>No entries recorded yet.</div>}
+        {!isLoading && !records?.length && <EmptyState title="No entries recorded yet" />}
         {records?.map((r) => (
           <div key={r.id} className={styles.entry}>
             <div className={styles.entryHead}>
