@@ -72,7 +72,7 @@ export function NewPatientDrawer({ onClose }: { onClose: () => void }) {
                 id="np-mrn"
                 value={form.mrn}
                 onChange={(e) => update('mrn', e.target.value)}
-                placeholder="MNH-2026-00099"
+                placeholder="RCC-2026-00099"
                 required
               />
             </div>
@@ -142,7 +142,7 @@ export function NewPatientDrawer({ onClose }: { onClose: () => void }) {
               required
             />
             <datalist id="np-facility-options">
-              <option value="Muhimbili National Hospital" />
+              <option value="Regional Cancer Center" />
               <option value="Ocean Road Cancer Institute" />
             </datalist>
           </div>

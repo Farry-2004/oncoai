@@ -24,7 +24,7 @@ from app.models.user import RoleEnum, User
 from app.models.workup import WorkupItem, WorkupItemTypeEnum, WorkupStatusEnum
 
 DEMO_PASSWORD = "Demo1234!"
-FACILITY_MNH = "Muhimbili National Hospital"
+FACILITY_RCC = "Regional Cancer Center"
 FACILITY_ORCI = "Ocean Road Cancer Institute"
 
 DEMO_USERS = [
@@ -170,7 +170,7 @@ def seed() -> None:
                     used_names.add(name)
                     break
             patient = Patient(
-                mrn=f"MNH-2026-{i:05d}",
+                mrn=f"RCC-2026-{i:05d}",
                 full_name=name,
                 date_of_birth=_rand_date_of_birth(),
                 sex=random.choice([SexEnum.male, SexEnum.female]),
@@ -181,7 +181,7 @@ def seed() -> None:
                 status=random.choice(PATIENT_STATUSES),
                 priority=random.choice(PRIORITIES),
                 primary_physician_id=random.choice([oncologist.id, surgeon.id]),
-                facility=random.choice([FACILITY_MNH, FACILITY_ORCI]),
+                facility=random.choice([FACILITY_RCC, FACILITY_ORCI]),
                 is_demo=True,
             )
             db.add(patient)
@@ -222,11 +222,11 @@ def seed() -> None:
             session = TumorBoardSession(
                 title=title,
                 scheduled_at=scheduled_at,
-                location="MNH Conference Room B" if sess_status != SessionStatusEnum.scheduled else "Virtual — Zoom",
+                location="RCC Conference Room B" if sess_status != SessionStatusEnum.scheduled else "Virtual — Zoom",
                 status=sess_status,
                 chair_id=oncologist.id,
                 coordinator_id=coordinator.id,
-                facility=FACILITY_MNH,
+                facility=FACILITY_RCC,
                 is_demo=True,
             )
             db.add(session)

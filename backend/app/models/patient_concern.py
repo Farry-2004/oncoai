@@ -30,10 +30,10 @@ _LEVEL_SCORE = {
 class PatientConcerns(Base):
     """Socioeconomic barriers and treatment-concern survey for a patient.
 
-    One row per patient. Concept comes from the Muhimbili ORCI Tumor Board
-    prototyping workshop: coordinator-tracked socioeconomic factors, and a
-    travel/cost/risk/radiation concern survey used to sort patients into a
-    low/moderate/high concern category for the tumor board discussion.
+    Concept comes from a tumor board prototyping workshop: coordinator-tracked
+    socioeconomic factors, and a travel/cost/risk/radiation concern survey used
+    to sort patients into a low/moderate/high concern category for the tumor
+    board discussion.
     """
 
     __tablename__ = "patient_concerns"
