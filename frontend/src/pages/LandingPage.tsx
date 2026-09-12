@@ -291,11 +291,7 @@ export function LandingPage() {
                 </div>
               </div>
             </div>
-            <div className="testimonial-photo">
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0 2c-4.4 0-9 2.2-9 5v3h18v-3c0-2.8-4.6-5-9-5Z" />
-              </svg>
-            </div>
+            <div className="testimonial-photo" role="img" aria-label="Dr. Grace Kibiki, Head & Neck Tumor Board Lead" />
           </div>
         </div>
       </section>

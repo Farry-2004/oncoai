@@ -287,9 +287,12 @@ textarea:focus-visible,
 .stat-panel-visual {
   border-radius: var(--radius-md);
   height: 210px;
-  background:
+  background-image:
     radial-gradient(circle at 30% 30%, rgba(45,212,191,0.35), transparent 55%),
-    linear-gradient(135deg, #123b44, #0a2229);
+    linear-gradient(135deg, rgba(18,59,68,0.82), rgba(10,34,41,0.9)),
+    url('/images/readdy-tumor-board.webp');
+  background-size: cover, cover, cover;
+  background-position: center, center, center 30%;
   position: relative;
   overflow: hidden;
   margin-bottom: 18px;
@@ -443,9 +446,12 @@ textarea:focus-visible,
 .why-visual {
   border-radius: var(--radius-lg);
   height: 340px;
-  background:
+  background-image:
     radial-gradient(circle at 70% 20%, rgba(45,212,191,0.28), transparent 50%),
-    linear-gradient(150deg, #123b44, #071b1f);
+    linear-gradient(150deg, rgba(18,59,68,0.75), rgba(7,27,31,0.88)),
+    url('/images/readdy-why.webp');
+  background-size: cover, cover, cover;
+  background-position: center, center, center;
   position: relative;
   box-shadow: var(--shadow-lg);
   overflow: hidden;
@@ -487,18 +493,12 @@ textarea:focus-visible,
 .testimonial-photo {
   border-radius: var(--radius-lg);
   height: 340px;
-  background:
-    radial-gradient(circle at 50% 30%, #f0d8c4 0%, #d9b79b 55%, #a9764f 100%);
+  background-image: url('/images/readdy-testimonial.webp');
+  background-size: cover;
+  background-position: center top;
   box-shadow: var(--shadow-lg);
   position: relative;
   overflow: hidden;
-}
-.testimonial-photo svg {
-  position: absolute;
-  bottom: -10px; left: 50%;
-  transform: translateX(-50%);
-  width: 220px; height: 220px;
-  color: rgba(255,255,255,0.55);
 }
 
 /* ---------- CTA ---------- */
@@ -514,7 +514,11 @@ textarea:focus-visible,
   position: absolute; inset: 0;
   background-image:
     radial-gradient(circle at 20% 30%, rgba(45,212,191,0.18), transparent 40%),
-    radial-gradient(circle at 85% 70%, rgba(45,212,191,0.14), transparent 42%);
+    radial-gradient(circle at 85% 70%, rgba(45,212,191,0.14), transparent 42%),
+    linear-gradient(155deg, rgba(18,59,68,0.75) 0%, rgba(10,25,29,0.85) 55%, rgba(4,15,18,0.92) 100%),
+    url('/images/readdy-hero-clinician.webp');
+  background-size: auto, auto, cover, cover;
+  background-position: center, center, center, center 25%;
 }
 .cta-inner { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; }
 .cta .badge { background: rgba(255,255,255,0.08); }

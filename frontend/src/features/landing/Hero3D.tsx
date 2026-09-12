@@ -180,9 +180,8 @@ function Scene() {
       <Canvas
         dpr={[1, 2]}
         camera={{ fov: 45, position: [0, 0, 9] }}
-        gl={{ antialias: true, powerPreference: 'low-power' }}
+        gl={{ antialias: true, powerPreference: 'low-power', alpha: true }}
       >
-        <color attach="background" args={['#071b1f']} />
         <fog attach="fog" args={['#071b1f', 6, 13]} />
         <ambientLight intensity={0.6} />
         <pointLight position={[5, 5, 5]} intensity={40} color="#2dd4bf" />
